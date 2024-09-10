@@ -23,3 +23,17 @@ fruitsinBasket.style.color='green'
 //Another way
 const thanks=document.querySelector('#thanks')
 thanks.innerHTML='<p>Please Visit us Again</p>'
+
+// Make all the elements in the list have bold font and background of 3rd element yellow.
+//  Make all the "li" tags italic.
+const fruitList=document.querySelectorAll('.fruit')
+fruitList[2].style.backgroundColor='yellow'
+for(let i=0;i<fruitList.length;i++){
+    fruitList[i].style.fontWeight='bold'
+    fruitList[i].style.fontStyle='italic'
+}
+
+//Change the color of 5th "li" tag
+const lastItem=document.getElementsByTagName('li')
+lastItem[4].style.color='blue'
+lastItem[4].style.fontStyle='italic'
