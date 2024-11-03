@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body style="margin-top: 3;">
+    <h1 style="text-align: center;">Bus Booking</h1>
+    <div id="selectBus">
+    <label for="filter" style="text-align: center;">Filter</label>
+        <select name="filter" id="filter">
+            <option value="All">All</option>
+            <option value="BUS 1">BUS 1</option>
+            <option value="BUS 2">BUS 2</option>
+            <option value="BUS 3">BUS 3</option>
+        </select>
+    </div>
+    <form onsubmit="handleFormSubmit(event)">
+        <label for="name">Name</label>
+        <input type="text" name="name" id="name" /><br /><br / >
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" /><br /><br / >
+        <label for="phone">Phone</label>
+        <input type="tel" name="phone" id="phone" /><br /><br / >
+        <label for="carNum">Car Number</label>
+        <select name="carNum" id="carNum">
+            <option value="BUS 1">BUS 1</option>
+            <option value="BUS 2">BUS 2</option>
+            <option value="BUS 3">BUS 3</option>
+        </select><br /><br / >
+        <button type="submit">Book</button>
+      </form>
+    <div>
+        <ul id="bookings"></ul>
+    </div>
+    
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script src="index.js"></script>
+
+</html>
