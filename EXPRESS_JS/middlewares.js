@@ -1,22 +1,18 @@
+const adminRoutes=require('./Routes/admin.js')
+const shopRoutes=require('./Routes/shop.js')
 const express=require('express')
-const bodyParser=require('body-parser')
+const bodyParser=require('body-parser') //this is importing the router object
+const shopRouter = require('./Routes/shop.js')
 const app=express()
 
-
 app.use(bodyParser.urlencoded({extended:false})) //registers a middleware
-app.use('/add-product',(req,res,next)=>{
-    // console.log('In another middleware');
-    res.send('<form action="/product" method="POST"><input type="text" name="title"></input><input type="number" name="size"></input><button type="submit">Add Product</button></form>')
-})
+//outsourced routes
+app.use("/admin",adminRoutes);
+app.use(shopRouter)
+app.use((req,res,next)=>{
 
-app.post('/product',(req,res,next)=>{ //this middleware will execute not only for post but also for get request
-    console.log(req.body)//new field added by express.
-    res.redirect('/')
-})
-app.use('/',(req,res,next)=>{
-    // console.log('In another middleware');
-    res.send('<h1>Hello from express</h1>')
-    
-})
+res.status(404).send('<h1>Page not found</h1>')
+});
+
 
 app.listen(5000)
