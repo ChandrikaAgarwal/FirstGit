@@ -1,0 +1,66 @@
+html,body{
+    background-image: url('book_a_call.jpg');
+    background-size: cover ;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding:0%;
+    margin:0%;
+    font-family: sans-serif;
+}
+main{
+    padding: 1rem;
+}
+hr{
+    margin: 1rem auto;
+    width: 100%;
+    align-self: center;
+    margin-bottom: 2%;
+    border-width: 2px;
+}
+#book-a-call{
+ color:brown;
+ text-align: center;
+ margin-top: 1rem;
+ padding: 1%;
+ font-weight: bold;
+ font-size: large;
+}
+#text{
+    font-size:12px;
+    text-align: center;
+}
+.form-control{
+    display:block;
+    width: 350px;
+    height: 250px;
+    padding: 10px;
+    border: 2px solid brown;
+    border-radius: 5px;
+    margin: 5rem auto;
+    background-color: aliceblue;
+    opacity: 0.9;
+}
+
+.form-control label,
+.form-control input{
+    margin-bottom: 3%;
+    width:98%;
+    height:1.5rem;
+}
+.form-control input{
+    border: 1px solid black;
+    font:inherit;
+    border-radius: 2px;
+
+}
+
+button{
+    width: 100%;
+    background-color: brown;
+    color:white;
+    padding:2%;
+    border: none;
+    border-radius: 3px;
+    margin: 1px 1px;
+}
