@@ -1,13 +1,11 @@
 const Product = require('../models/product');
-
+const Cart=require('../models/cart')
 exports.getAddProduct = (req, res, next) => {
-  res.render('admin/add-product', {
+  res.render('admin/edit-product', {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
-    formsCSS: true,
-    productCSS: true,
-    activeAddProduct: true
-  });
+    editing: false
+      });
 };
 
 exports.postAddProduct = (req, res, next) => {
@@ -15,11 +13,58 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(title, imageUrl, description, price);
+  const product = new Product(null,title, imageUrl, description, price);
   product.save();
   res.redirect('/');
 };
 
+exports.getEditProduct = (req, res, next) => {
+  const editMode=req.query.edit
+  if(!editMode){
+   return res.redirect('/')
+  }
+  prodId=req.params.productId
+  Product.findById(prodId,product=>{
+    if(!product){
+      return res.redirect('/')
+    }
+    res.render('admin/edit-product', {
+      pageTitle: 'Edit Product',
+      path: '/admin/edit-product',
+      editing: editMode,
+      product:product
+        });
+  })
+  
+};
+exports.getDeleteProduct=(req,res,next)=>{
+  prodId=req.params.productId
+  console.log("ProductId!: ",prodId);
+  Product.findById(prodId,product=>{
+   if(!product){
+    res.redirect('/')
+   }else{
+    console.log("product: ",product);
+    
+    Product.deleteproductbyId(prodId)
+    res.redirect('/admin/products')
+    Cart.deleteProduct(prodId)
+   }
+  })
+
+}
+exports.postEditProduct=(req,res,next)=>{
+const prodId=req.body.productId //in the view in edit-product.ejs we have used productId as the name of hidden input
+const updatedTitle=req.body.title;
+const updatedPrice=req.body.price;
+const updatedimageUrl=req.body.imageUrl;
+const updatedDescription=req.body.description;
+const updatedProduct= new Product(prodId,updatedTitle,updatedimageUrl,updatedDescription,updatedPrice);
+console.log(prodId);
+
+updatedProduct.save()
+}
+ 
 exports.getProducts = (req, res, next) => {
   Product.fetchAll(products => {
     res.render('admin/products', {

@@ -15,7 +15,7 @@ module.exports=class Cart{
         if(!err){
            cart=JSON.parse(fileContent) 
         }
-        //analyze the cart => find exixting cart
+        //analyze the cart => find existing cart
         const existingProdIndex=cart.products.findIndex(prod=>prod.id===id)
         const existingProd=cart.products[existingProdIndex]
         let updatedProd;
@@ -39,6 +39,25 @@ module.exports=class Cart{
     })
     
    }
+ 
+   static deleteProduct(id,productPrice){
+    fs.readFile(p,(err,fileContent)=>{
+      if(err){
+         return
+      }
+        const updatedCart={...JSON.parse(fileContent)}
+        const product=updatedCart.products.find(p=>p.id===id)
+        const productQty=product.qty
+        updatedCart.products=updatedCart.products.filter(prod=>prod.id!==id)
+   
+        updatedCart.totalPrice= updatedCart.totalPrice-(productPrice*productQty)
+         fs.writeFile(p, JSON.stringify(updatedCart,null,2),err=>{
+        console.log("Error writing to cart.js: ",err);
+        return
+      })
+      
+   })
 
+   }
 
 }

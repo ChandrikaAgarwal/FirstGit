@@ -50,8 +50,6 @@ const prod_Id=req.body.ProductId //productId is the name we are using in the pro
 Product.findById(prod_Id,(product)=>{
 console.log(prod_Id);
 console.log(product);
-
-
 Cart.addProduct(prod_Id,product.price);
 })
 res.redirect('/cart') //this will go to the get cart
