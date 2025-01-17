@@ -1,11 +1,7 @@
-//to connect to sql and also gives us back a connection object so that we can run queries.
+const {Sequelize}=require('sequelize')
 
-const mysql=require('mysql2');
-const pool=mysql.createPool({
-    host: 'localhost',
-    user:'root',
-    database: 'node-complete',
-    password: 'Ia24yon#'
-})
+const sequelize=new Sequelize('book_Appointment','root','Ia24yon#',{
+    dialect:'mysql',host:'localhost'
+});
 
-module.exports=pool.promise();
+module.exports=sequelize;
