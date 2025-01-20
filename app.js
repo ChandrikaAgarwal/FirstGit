@@ -9,7 +9,8 @@ const Product=require('./models/product') //we have to relate both the models wh
 const User=require('./models/user')
 const Cart=require('./models/cart')
 const CartItem=require('./models/cart-item')
-
+const Order=require('./models/order')
+const OrderItem=require('./models/order-items')
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -33,13 +34,17 @@ app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
 app.use(errorController.get404);
+User.hasMany(Product, { constraints: true, onDelete: 'CASCADE' });
 Product.belongsTo(User,{constraints:true, onDelete:'CASCADE'}) //this is for user who created /owns the product and not the purchase
 //CASCADE means that if the user is deleted the product related to the user is also deleted.
-User.hasMany(Product);
 User.hasOne(Cart);
 Cart.belongsTo(User); //this is optional 
 Cart.belongsToMany(Product,{through:CartItem}); //many to many relation
 Product.belongsToMany(Cart,{through:CartItem}); //many to many relation
+Order.belongsTo(User);
+User.hasMany(Order); //one to many relation; one user many orders
+Order.belongsToMany(Product, {through:OrderItem});
+
 
 //now sync will not only create models but also relations in our database as we define them here
 sequelize
@@ -58,7 +63,7 @@ sequelize
 })
 .then(user=>{
     // console.log(user);
-    return user.createCart();
+    return user.createCart(); //creating cart for the current user and we dont pass any thing because cart in the beginning will not hold any special data
     // app.listen(3000 )
 })
 .then(cart=>{
