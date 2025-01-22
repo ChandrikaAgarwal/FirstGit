@@ -14,7 +14,7 @@ form.addEventListener('submit', async (e)=>{
         category:e.target.category.value
     }
 
-    await axios.post(`${api_url}/expenses`,expenseDetail)
+    await axios.post(`${api_url}/api/expenses`,expenseDetail)
     .then((response)=>{
         console.log("Expense Detail: ",response);
         displayExpenses(response.data.expensedetail, response.data.expensedetail.id)
@@ -32,7 +32,7 @@ form.reset()
 }
 
 window.addEventListener('DOMContentLoaded', ()=>{
-    axios.get(`${api_url}/expenses`)
+    axios.get(`${api_url}/api/expenses`)
     .then((response)=>{
         console.log("Getting Expenses ",response.data);
         for(let i=0;i<response.data.expenses.length;i++){
@@ -51,7 +51,7 @@ expense_list.addEventListener('click', (e)=>{
             const id=delItem.dataset.id
             axios
             .delete(
-                `${api_url}/expenses/${id}`
+                `${api_url}/api/expenses/${id}`
             )
             .then((res)=>{
                 expense_list.removeChild(delItem)
@@ -66,12 +66,12 @@ expense_list.addEventListener('click', async (e)=>{
     if(e.target.classList.contains('edit')){
         const editItem=e.target.parentElement;
         const id=editItem.dataset.id
-        await axios.get(`${api_url}/expenses/${id}`)
+        await axios.get(`${api_url}/api/expenses/${id}`)
         .then((res)=>{
             console.log("To edit expense: ", res.data.expense);
             expense_list.removeChild(editItem)
             let editExpense=populateFields(res.data.expense)
-            const response=axios.put(`${api_url}/expenses/${id}`,editExpense)
+            const response=axios.put(`${api_url}/api/expenses/${id}`,editExpense)
             console.log("Response: ",response);
             
         })
