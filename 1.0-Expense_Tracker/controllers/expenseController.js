@@ -1,16 +1,57 @@
 const Expense=require('../models/expense')
+const User=require('../models/user')
+const {jwtAuthMiddleware,generateToken}=require('../jwtmiddleware')
+
+exports.postAddUser= async (req,res,next)=>{
+    try{
+        const email=req.body.email
+        const password=req.body.password
+        const user=await User.findOne({where:{email:email}})
+        if (!user){
+            const newUser= await User.create({
+                email:email,
+                password:password
+        })  
+        const token=generateToken({id:newUser.id, email:newUser.email})
+        console.log("New User Created: ",newUser,"Token :",token);
+        
+        return res.status(200).json({message:"New user created ", userdetail:newUser})
+        }
+        
+        if(user.password!==password){
+            console.log("passowrd mismatch ", email);
+            return res.status(500).json({message:"Password mismatch"})
+            
+        }
+        const token=generateToken({id:user.id, email:user.email})
+        console.log("Existing User:",user,"Token: ",token);
+        return res.status(200).json({message:"New user created ", userdetail:user})
+        // console.log("New user: ",newUser);
+        
+}catch(err){
+    console.log(err);
+    
+        res.status(500).json({error:"Failed to create a new user",details:err})
+
+}
+}
 exports.postAddExpense=async (req,res,next)=>{
     try{
        const amount=req.body.amount
        const description=req.body.description
        const category=req.body.category
-       const newExpense=await Expense.create({
+       const user=await User.findByPk(req.user.id)
+       if(!user){
+        return res.status(404).json({message:"User not found"})
+       }
+       const newExpense=await user.createExpense({
         amount:amount,
         description:description,
         category:category
        })
 
        console.log("New Expense ",newExpense);
+    //    res.redirect('http://localhost:5000')
        res.status(200).json({message:"New expense created ", expensedetail:newExpense})
        
     }catch(err){
