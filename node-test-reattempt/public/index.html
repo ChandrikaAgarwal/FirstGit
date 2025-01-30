@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <form id="companyReview">
+            <label for="name">Company Name:</label>
+                <input type="text" name="name" id="name"> </br> </br>
+            
+            <label for="pros"> Pros </label> </br>
+                <textarea name="pros" id="pros" rows="6" cols="50"> </textarea> </br> </br>
+ 
+            <label for="cons"> Cons </label> </br>
+            <textarea name="cons" id="cons" rows="6" cols="50"> </textarea> </br> </br>
+            <label for="rating">Rating:</label>
+            <input type="number" name="rating" id="rating" min="1" max="5">
+            <button type="submit">Submit</button> <br /> <br />
+
+        </form>
+        <input type="text" name="search" id="search" placeholder="Search a company">
+        <button id="search-btn">Search</button>
+
+        <h3>Company Reviews</h3>
+    </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script src="script.js"></script>
+</html>
