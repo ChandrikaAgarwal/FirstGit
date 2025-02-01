@@ -5,6 +5,7 @@ const container=document.querySelector('.container')
 const expense_list=document.createElement('ul')
 expense_list.className="allExpenses"
 const usersDiv=document.getElementById('users')
+var userId;
 
 if(loginForm){
     const usersul=document.createElement('ul')
@@ -19,7 +20,7 @@ if(loginForm){
         console.log("userdetail ",userDetail);
         try{
             const res=await axios.post(`${api_url}`,userDetail)
-             console.log("User Detail: ",res);
+            console.log("User Detail: ",res.data);
             //  alert(res.data.message)
             localStorage.setItem('token', res.data.token);
              window.location.href="/expenses"
@@ -50,7 +51,9 @@ if(form){
             category:e.target.category.value
         }
         const token = localStorage.getItem('token')
-        await axios.post(`${api_url}/api/expenses`,expenseDetail,{
+        
+       
+        await axios.post(`${api_url}/api/expenses/`,expenseDetail,{
             headers:{
                 Authorization:`Bearer ${token}`
             }
@@ -123,11 +126,15 @@ if(form){
                     Authorization:`Bearer ${token}`
                 }
             })
-            .then((res)=>{
+            .then(async (res)=>{
                 console.log("To edit expense: ", res.data.expense);
                 expense_list.removeChild(editItem)
                 let editExpense=populateFields(res.data.expense)
-                const response=axios.put(`${api_url}/api/expenses/${id}`,editExpense)
+                const response=await axios.put(`${api_url}/api/expenses/${id}`,editExpense,{
+                    headers:{
+                        Authorization:`Bearer ${token}`
+                    }
+                    })
                 console.log("Response: ",response);
                 
             })

@@ -5,7 +5,7 @@ const {jwtAuthMiddleware,generateToken}=require('../jwtmiddleware')
 exports.postAddUser= async (req,res,next)=>{
     try{
         const email=req.body.email
-        const password=req.body.password
+        const password=req.body.password 
         const user=await User.findOne({where:{email:email}})
         if (!user){
             const newUser= await User.create({
@@ -15,17 +15,17 @@ exports.postAddUser= async (req,res,next)=>{
         const token=generateToken({id:newUser.id, email:newUser.email})
         console.log("New User Created: ",newUser,"Token :",token);
         
-        return res.status(200).json({message:"New user created ", userdetail:newUser})
+        return res.status(200).json({message:"New user created ", userdetail:newUser,token:token})
         }
         
         if(user.password!==password){
             console.log("passowrd mismatch ", email);
-            return res.status(500).json({message:"Password mismatch"})
+            return res.status(401).json({message:"Password mismatch"})
             
         }
         const token=generateToken({id:user.id, email:user.email})
         console.log("Existing User:",user,"Token: ",token);
-        return res.status(200).json({message:"New user created ", userdetail:user})
+        return res.status(200).json({message: "Login successful",existinguser:user, token})
         // console.log("New user: ",newUser);
         
 }catch(err){
@@ -36,6 +36,9 @@ exports.postAddUser= async (req,res,next)=>{
 }
 }
 exports.postAddExpense=async (req,res,next)=>{
+    // const {userId}= req.params
+    // console.log("Backend:",userId);
+    
     try{
        const amount=req.body.amount
        const description=req.body.description
@@ -62,7 +65,7 @@ exports.postAddExpense=async (req,res,next)=>{
 exports.getExpenses= async (req,res,next)=>{
     try{
         console.log("Response ",res);
-        const expenses=await Expense.findAll()
+        const expenses=await Expense.findAll({where:{userId:req.user.id}})
         res.status(200).json({expenses})
         
     }catch(err){
@@ -99,20 +102,26 @@ exports.updateExpense=async (req,res,next)=>{
         const {amount,description,category}=req.body
         const expense=await Expense.findByPk(id)
         .then(expense=>{
+            console.log(expense); 
             return expense.destroy()
         }) 
-        .then(result=>{
-            console.log("Expense to be edited removed from db");
-            
-        })
-        .catch(err=>console.log(err))
         if (!expense) {
             return res.status(404).json({ error: 'Expense not found' });
         }
+        
+        // .then(result=>{
+        //     console.log("Expense to be edited removed from db");
+            
+        // })
+        // .catch(err=>console.log(err))
+        
          // Update fields
-         expense.amount = amount || expense.amount;
-         expense.description = description || expense.description;
-         expense.category = category || expense.category;
+         expense.amount;
+         expense.description;
+         expense.category;
+        //  expense.amount = amount ||
+        //  expense.description = description || 
+        //  expense.category = category || 
          await expense.save()
          res.status(200).json({message:'Updated expense',editexpense:expense})
     }catch(err){

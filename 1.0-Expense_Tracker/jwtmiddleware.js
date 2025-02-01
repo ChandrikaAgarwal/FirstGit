@@ -1,8 +1,9 @@
 const jwt=require('jsonwebtoken')
 
 const jwtAuthMiddleware=(req,res,next)=>{
-    const token=req.headers.authorization.split(' ')[1]
-    // const token = authHeader.split(' ')[1]; // Extract token from "Bearer <token>"
+    // const token=req.headers.authorization.split(' ')[1]
+    const authHeader=req.headers.authorization;
+    const token = authHeader.split(' ')[1]; // Extract token from "Bearer <token>"
     console.log("Received Token: ", token); // Debugging step
     if(!token) return res.status(401).json({error:'Unauthorized'})
     
