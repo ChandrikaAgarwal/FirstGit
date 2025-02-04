@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
     <title>Document</title>
 </head>
 <body>
@@ -11,13 +12,24 @@
             <label for="name">Company Name:</label>
                 <input type="text" name="name" id="name"> </br> </br>
             
-            <label for="pros"> Pros </label> </br>
+            <label for="pros"> Pros: </label> </br>
                 <textarea name="pros" id="pros" rows="6" cols="50"> </textarea> </br> </br>
  
-            <label for="cons"> Cons </label> </br>
+            <label for="cons"> Cons: </label> </br>
             <textarea name="cons" id="cons" rows="6" cols="50"> </textarea> </br> </br>
             <label for="rating">Rating:</label>
-            <input type="number" name="rating" id="rating" min="1" max="5">
+            <div class="star-rating">
+                <input type="radio" name="rating" id="star5" value="5">
+                <label for="star5">&#9733;</label>
+                <input type="radio" name="rating" id="star4" value="4">
+                <label for="star4">&#9733;</label>
+                <input type="radio" name="rating" id="star3" value="3">
+                <label for="star3">&#9733;</label>
+                <input type="radio" name="rating" id="star2" value="2">
+                <label for="star2">&#9733;</label>
+                <input type="radio" name="rating" id="star1" value="1">
+                <label for="star1">&#9733;</label>
+            </div>
             <button type="submit">Submit</button> <br /> <br />
 
         </form>

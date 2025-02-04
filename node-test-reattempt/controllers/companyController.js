@@ -30,19 +30,22 @@ exports.getCompanyReview=async(req,res,next)=>{
     }
 
     try{
-        const companies=await Company.findAll({where:{name},
+        const companyDetail=await Company.findAll({ where:{name},
         attributes:[
             'name',
-            [Sequelize.fn('AVG',Sequelize.col('rating')),'averageRating']
+            [Sequelize.fn('AVG',Sequelize.col('rating')),'averageRating'],
+            [Sequelize.literal('(SELECT pros FROM companies WHERE name = company.name ORDER BY createdAt DESC LIMIT 1)'), 'pros'],
+            [Sequelize.literal('(SELECT cons FROM companies WHERE name = company.name ORDER BY createdAt DESC LIMIT 1)'), 'cons']
         ],
+        group:['name']
     })
     
-        if (companies.length>0){
-            console.log("Companiess!!!",companies);
+        if (companyDetail.length>0){
+            console.log("companyDetails!!!",companyDetail);
             res.status(200).json({
                 message: "Company found",
-                companies: companies,
-                averageRating: companies[0].dataValues.averageRating 
+                companyDetail: companyDetail,
+                averageRating: companyDetail[0].dataValues.averageRating 
         });
         
         }else{
