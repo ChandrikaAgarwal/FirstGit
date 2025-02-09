@@ -31,13 +31,8 @@ if(loginForm){
             }else{
                 alert("An error occured, please try again!!")
             }
-        }
-        
-        
-    
-    })
-
-    
+        }       
+     })   
 }
 
 if(form){
