@@ -1,10 +1,15 @@
 const form=document.getElementById('expense-form')
 const loginForm=document.getElementById('login-form')
+const togBtn=document.getElementById("toggle")
+const cat=document.getElementById("category")
+const catlabel=document.getElementById("catlabel")
 const api_url='http://localhost:5000'
+const containerfluid=document.querySelector('.container-fluid')
 const container=document.querySelector('.container')
 const expense_list=document.createElement('ul')
 expense_list.className="allExpenses"
 const usersDiv=document.getElementById('users')
+const row=document.querySelector('.incomedisplay')
 var userId;
 
 if(loginForm){
@@ -22,6 +27,7 @@ if(loginForm){
             const res=await axios.post(`${api_url}`,userDetail)
             console.log("User Detail: ",res.data);
             //  alert(res.data.message)
+
             localStorage.setItem('token', res.data.token);
              window.location.href="/expenses"
         }catch(err){
@@ -36,31 +42,126 @@ if(loginForm){
 }
 
 if(form){
-    container.appendChild(expense_list)
-    form.addEventListener('submit', async (e)=>{
-        e.preventDefault()
-    
-        const expenseDetail={
-            amount:e.target.amount.value,
-            description:e.target.description.value,
-            category:e.target.category.value
-        }
-        const token = localStorage.getItem('token')
+
+    togBtn.addEventListener("click",(e)=>{
+       if(togBtn.textContent==="EXPENSE"){
+        togBtn.textContent="INCOME";
+        cat.style.display="none"
+        // catlabel.style.display="none"
         
-       
-        await axios.post(`${api_url}/api/expenses/`,expenseDetail,{
-            headers:{
-                Authorization:`Bearer ${token}`
+       }else{
+        togBtn.textContent="EXPENSE"
+        cat.style.display="flex"
+        // catlabel.style.display="flex"
+       }
+    })
+    container.appendChild(expense_list)
+    const savingsDiv=document.createElement('div')
+    savingsDiv.className='row savingsdisplay'
+    savingsDiv.innerHTML=`<div class="col"><h4>Savings</h4></div> <div class="col savingsAmount"></div>`
+    container.insertBefore(savingsDiv,row)
+
+    const incomeDiv=document.createElement('div')
+    incomeDiv.className='col incomecol'
+    row.appendChild(incomeDiv)
+    console.log(container);
+    form.addEventListener("submit", async (e)=>{
+        e.preventDefault()
+        const token = localStorage.getItem('token')  
+    if(togBtn.textContent==="EXPENSE"){
+        console.log("i am in expense mode");
+        const Detail={
+            amount:parseFloat(e.target.amount.value),
+            description:e.target.description.value,
+            category:e.target.category.value,
+        }
+            await axios.post(`${api_url}/api/expenses/`,Detail,{
+                headers:{
+                    Authorization:`Bearer ${token}`
+                }
+            })
+            .then((response)=>{
+                console.log("Expense Detail: ",response);
+                displayExpenses(response.data.expensedetail, response.data.expensedetail.id,response.data.expensedetail.savings)
+                displaySavings(response.data.expensedetail.currentsaving)
+                
+                
+            }).catch(err=>console.log(err))
+        }else{
+            console.log("i am in income mode");
+            const incomeDetail={
+            amount:parseFloat(e.target.amount.value),
+            description:e.target.description.value,
             }
-        })
-        .then((response)=>{
-            console.log("Expense Detail: ",response);
-            displayExpenses(response.data.expensedetail, response.data.expensedetail.id)
-            
+            console.log("Income: ",incomeDetail); 
+            await axios.post(`${api_url}/api/income/`,incomeDetail,{
+                headers:{
+                    Authorization:`Bearer ${token}`
+                }
+        }).then((response)=>{
+                console.log("Income Details ",response.data);
+                console.log("User id::",response.data.incomedetail.userId);
+                userId=response.data.incomedetail.userId
+                localStorage.setItem(userId, response.data.incomedetail.amount)
+                displayIncome(response.data.incomedetail.amount)
+                displaySavings(response.data.incomedetail.totalsaving)
         }).catch(err=>console.log(err))
+        form.reset()
+    }     
+        
+    })   
+
+    function displayIncome(income){
+        console.log(income);
+        const incomecol=document.querySelector('.incomecol')
+        incomecol.innerHTML=`<h4>${income}</h4>`      
+        container.insertBefore(row, expense_list)
+    }
+
+    window.addEventListener("DOMContentLoaded",async ()=>{
+        try{       
+            const token=localStorage.getItem('token')
+            const incomeResponse= await axios.get(`${api_url}/api/income`,{
+                 headers:{
+                 Authorization:`Bearer ${token}`
+                 }
+             })
+             if(incomeResponse.data.income){
+     
+             console.log("Getting Data on refresh!!",incomeResponse.data);
+             
+             const storedincome=localStorage.getItem(incomeResponse.data.income.userId)
+             displayIncome(storedincome)
+             console.log("On refresh: ",incomeResponse.data.income.totalsaving);
+             displaySavings(incomeResponse.data.income.totalsaving) //to display the savings first
+             }
+             
+    const expenseResponse=await axios.get(`${api_url}/api/expenses`,{
+        headers:{
+            Authorization:`Bearer ${token}`
+        }
     })
     
+        console.log("Getting Expenses ",expenseResponse.data);
+        for(let i=0;i<expenseResponse.data.expenses.length;i++){
+            console.log();
+            
+            displayExpenses(expenseResponse.data.expenses[i], expenseResponse.data.expenses[i].id)
+
+            displaySavings(incomeResponse.data.income.totalsaving)
+            
+        }
+        
+       }catch(err){
+        console.log("Error fetching data on refresh:", err);
+       } 
+})
+    function displaySavings(savingsdone){
+        const savingcol=document.querySelector('.savingsAmount')
+        savingcol.innerHTML=`<h4>${savingsdone}</h4>`
+    }
     function displayExpenses(expenseDetail,id){
+    
     const newExpense=document.createElement('li')
     const details=[`${expenseDetail.amount}-${expenseDetail.description}-${expenseDetail.category}`]
     newExpense.innerHTML=details+'<button class="delete">Delete</button> <button class="edit">Edit</button>'
@@ -69,25 +170,7 @@ if(form){
         
     form.reset()
     }
-    
-    window.addEventListener('DOMContentLoaded', ()=>{
-        const token = localStorage.getItem('token');
-        axios.get(`${api_url}/api/expenses`,{
-            headers:{
-                Authorization:`Bearer ${token}`
-            }
-        })
-        .then((response)=>{
-            console.log("Getting Expenses ",response.data);
-            for(let i=0;i<response.data.expenses.length;i++){
-                console.log();
-                
-                displayExpenses(response.data.expenses[i], response.data.expenses[i].id)
-            }
-            
-        }).catch(err=>console.log(err))
-    })
-    
+        
     const delBtn=document.querySelector('.delete')
     expense_list.addEventListener('click', (e)=>{
         const token = localStorage.getItem('token');
@@ -102,8 +185,24 @@ if(form){
                         }
                     })
                 
-                .then((res)=>{
+                .then(async (res)=>{
+                    console.log(res);
                     expense_list.removeChild(delItem)
+                    const incomeResponse= await axios.get(`${api_url}/api/income`,{
+                        headers:{
+                        Authorization:`Bearer ${token}`
+                        }
+                    })
+                    if(incomeResponse.data.income){
+            
+                    console.log("Getting Data on refresh!!",incomeResponse.data);
+                    
+                    const storedincome=localStorage.getItem(incomeResponse.data.income.userId)
+                    displayIncome(storedincome)
+                    console.log("On refresh: ",incomeResponse.data.income.totalsaving);
+                    displaySavings(incomeResponse.data.income.totalsaving) //to display the savings first
+                    }
+                    
                 })
                 .catch(err=>console.log(err))
        
@@ -131,6 +230,21 @@ if(form){
                     }
                     })
                 console.log("Response: ",response);
+                const incomeResponse= await axios.get(`${api_url}/api/income`,{
+                    headers:{
+                    Authorization:`Bearer ${token}`
+                    }
+                })
+                if(incomeResponse.data.income){
+        
+                console.log("Getting Data on refresh!!",incomeResponse.data);
+                
+                const storedincome=localStorage.getItem(incomeResponse.data.income.userId)
+                displayIncome(storedincome)
+                console.log("On refresh: ",incomeResponse.data.income.totalsaving);
+                displaySavings(incomeResponse.data.income.totalsaving) //to display the savings first
+                }
+                
                 
             })
             .catch(err=>console.log(err))
