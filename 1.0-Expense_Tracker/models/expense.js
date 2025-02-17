@@ -23,7 +23,8 @@ const Expense=sequelize.define('expense', {
     currentsaving:{
         type:Sequelize.INTEGER,
         allowNull:false
-    }
-});
+    },
+
+},{ timestamps: true });
 
 module.exports=Expense;

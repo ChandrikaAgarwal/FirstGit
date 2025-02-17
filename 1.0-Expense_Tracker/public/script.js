@@ -4,12 +4,14 @@ const togBtn=document.getElementById("toggle")
 const cat=document.getElementById("category")
 const catlabel=document.getElementById("catlabel")
 const api_url='http://localhost:5000'
-const containerfluid=document.querySelector('.container-fluid')
-const container=document.querySelector('.container')
+const containerfluid=document.querySelector('.expense-Div')
+const container=document.querySelector('.savingsandIncome')
 const expense_list=document.createElement('ul')
 expense_list.className="allExpenses"
 const usersDiv=document.getElementById('users')
 const row=document.querySelector('.incomedisplay')
+
+
 var userId;
 
 if(loginForm){
@@ -42,6 +44,84 @@ if(loginForm){
 }
 
 if(form){
+    let prevdate=0;
+    const token = localStorage.getItem('token')  
+        const showformbtn = document.querySelector('#show-form'); 
+        console.log("Show form btn!!",showformbtn);
+        
+        if (!showformbtn) {
+            console.error("Button not found!");
+            
+        }
+    let icon = showformbtn.getElementsByTagName('i')[0]; 
+    showformbtn.addEventListener('click', ()=>{
+        if(showformbtn.classList.contains('collapsed')){
+            
+        icon.classList.replace('fa-minus', 'fa-plus'); // Change back to plus
+        }else{
+            icon.classList.replace('fa-plus', 'fa-minus'); // Change to minus
+        }
+    })
+    
+    const dateDisplay=document.getElementById('dateDisplay')
+    const prevBtn=document.getElementById('prevbtn')
+    const nextBtn=document.getElementById('nextbtn')
+    
+    let today=new Date()
+    let currentYear=today.getFullYear();
+    
+    let currentMonth=today.getMonth();
+    
+    let currentDay=today.getDate();
+       
+    let daysinMonth=new Date(currentYear,currentMonth+1,0).getDate()
+
+    function formatDate(year,month,day){
+        let date=new Date(year,month,day);     
+        prevdate= `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        console.log("prevDate: ",prevdate);
+        let options={weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+        // let options={year: 'numeric', month: 'numeric', day: 'numeric'};
+        return date.toLocaleDateString('en-US', options);
+       }
+
+    function updateDateDisplay(){
+        console.log("current day on display ",currentDay); //15
+        dateDisplay.textContent=formatDate(currentYear, currentMonth, currentDay)
+        console.log("datedisplay::",dateDisplay);
+        
+    }
+    
+    nextBtn.addEventListener("click", ()=>{
+        
+        
+        if(currentDay<daysinMonth){
+            currentDay++;
+        }
+        updateDateDisplay();
+        // console.log("next date: ",prevdate);
+        filterExpenses(prevdate)
+        
+    })
+
+    prevBtn.addEventListener("click", async ()=>{
+        console.log("current day: ",currentDay);  //16
+        if(currentDay>1){
+            currentDay--;
+            console.log("currentday on prev: ",currentDay); //15
+            
+        }
+        updateDateDisplay();
+        
+        
+        
+        filterExpenses(prevdate)
+        
+    })
+
+    //initial display
+    updateDateDisplay()
+
 
     togBtn.addEventListener("click",(e)=>{
        if(togBtn.textContent==="EXPENSE"){
@@ -67,13 +147,14 @@ if(form){
     console.log(container);
     form.addEventListener("submit", async (e)=>{
         e.preventDefault()
-        const token = localStorage.getItem('token')  
+        
     if(togBtn.textContent==="EXPENSE"){
         console.log("i am in expense mode");
         const Detail={
             amount:parseFloat(e.target.amount.value),
             description:e.target.description.value,
             category:e.target.category.value,
+            createdAt:prevdate
         }
             await axios.post(`${api_url}/api/expenses/`,Detail,{
                 headers:{
@@ -82,7 +163,7 @@ if(form){
             })
             .then((response)=>{
                 console.log("Expense Detail: ",response);
-                displayExpenses(response.data.expensedetail, response.data.expensedetail.id,response.data.expensedetail.savings)
+                displayExpenses(response.data.expensedetail, response.data.expensedetail.id)
                 displaySavings(response.data.expensedetail.currentsaving)
                 
                 
@@ -136,21 +217,22 @@ if(form){
              displaySavings(incomeResponse.data.income.totalsaving) //to display the savings first
              }
              
-    const expenseResponse=await axios.get(`${api_url}/api/expenses`,{
-        headers:{
-            Authorization:`Bearer ${token}`
-        }
-    })
+    // const expenseResponse=await axios.get(`${api_url}/api/expenses/`,{
+    //     headers:{
+    //         Authorization:`Bearer ${token}`
+    //     }
+    // })
     
-        console.log("Getting Expenses ",expenseResponse.data);
-        for(let i=0;i<expenseResponse.data.expenses.length;i++){
-            console.log();
+    //     console.log("Getting Expenses ",expenseResponse.data);
+    //     for(let i=0;i<expenseResponse.data.expenses.length;i++){
+    //         console.log();
             
-            displayExpenses(expenseResponse.data.expenses[i], expenseResponse.data.expenses[i].id)
+            filterExpenses(prevdate)
+            
 
             displaySavings(incomeResponse.data.income.totalsaving)
             
-        }
+        // }
         
        }catch(err){
         console.log("Error fetching data on refresh:", err);
@@ -160,15 +242,47 @@ if(form){
         const savingcol=document.querySelector('.savingsAmount')
         savingcol.innerHTML=`<h4>${savingsdone}</h4>`
     }
-    function displayExpenses(expenseDetail,id){
-    
-    const newExpense=document.createElement('li')
-    const details=[`${expenseDetail.amount}-${expenseDetail.description}-${expenseDetail.category}`]
-    newExpense.innerHTML=details+'<button class="delete">Delete</button> <button class="edit">Edit</button>'
-    newExpense.dataset.id=id
-    expense_list.appendChild(newExpense)
+
+   async function filterExpenses(date){
+    const response=await axios.get(`${api_url}/api/expenses/`,{
+        headers:{
+            Authorization:`Bearer ${token}`
+        }
+    })
+    allexpenses=response.data.expenses || [];  
+    if(allexpenses){
+        console.log("All expenses",response.data.expenses);
+
+    }else{
+        console.log("no expenses found");
         
-    form.reset()
+    }
+        let filteredExpenses=await allexpenses.filter(expense=>{
+            let expenseDate=expense.createdAt.split("T")[0]
+            console.log("Checking expense date ",expenseDate);
+                  
+            return expenseDate===date;
+        })
+        console.log("filtered Expenses:: ",filteredExpenses);
+
+        expense_list.innerHTML=""
+        if(filteredExpenses.length>0){
+            filteredExpenses.forEach(expense=> displayExpenses(expense, expense.id))
+        }else{
+            console.log("No expenses found for the date");
+        }
+    }
+
+    function displayExpenses(expenseDetail,id){
+        const newExpense=document.createElement('li')
+        console.log("expenseDetail ".expenseDetail);
+        const details=[`${expenseDetail.amount}-${expenseDetail.description}-${expenseDetail.category}`]
+        newExpense.innerHTML=details+'<button class="delete">Delete</button> <button class="edit">Edit</button>'
+        newExpense.dataset.id=id
+        expense_list.appendChild(newExpense)
+            
+        form.reset()
+    
     }
         
     const delBtn=document.querySelector('.delete')

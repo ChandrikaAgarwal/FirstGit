@@ -2,7 +2,7 @@ const Expense=require('../models/expense')
 const User=require('../models/user')
 const Income=require('../models/income')
 const {jwtAuthMiddleware,generateToken}=require('../jwtmiddleware')
-
+const { Op } = require("sequelize");
 async function finduserIncome(userId){
     const lastIncome=await Income.findOne({where:{userId},
         order: [['createdAt', 'DESC']],
@@ -50,6 +50,7 @@ exports.postAddUser= async (req,res,next)=>{
 exports.postAddExpense=async (req,res,next)=>{
   
     try{
+    
        let savings=[]
        let latestsaving=0
        const preExpenses=await Expense.findAll({
@@ -70,6 +71,7 @@ exports.postAddExpense=async (req,res,next)=>{
        const amount=req.body.amount
        const description=req.body.description
        const category=req.body.category
+       const createdAt=req.body.createdAt || new Date();
        latestsaving=latestsaving-amount
        const user=await User.findByPk(req.user.id)
        if(!user){
@@ -79,7 +81,8 @@ exports.postAddExpense=async (req,res,next)=>{
         amount:amount,
         description:description,
         category:category,
-        currentsaving:latestsaving
+        currentsaving:latestsaving,
+        createdAt:createdAt
        })
 
        console.log("New Expense ",newExpense);
@@ -102,8 +105,18 @@ exports.postAddExpense=async (req,res,next)=>{
 
 exports.getExpenses= async (req,res,next)=>{
     try{
+        // const {date}=req.query
+        const userid=req.user.id
         console.log("Response ",res);
-        const expenses=await Expense.findAll({where:{userId:req.user.id}})
+        // if (!date) {
+        //     return res.status(400).json({ error: "Date is required" });
+        // }
+        const expenses=await Expense.findAll(
+            {where:{
+                userId:userid,
+                // [Op.between]: [`${date} 00:00:00`, `${date} 23:59:59`]  //data for whole day
+            }
+        })
         res.status(200).json({expenses})
         
     }catch(err){
@@ -144,12 +157,12 @@ exports.getExpenseById=async (req,res,next)=>{
 exports.updateExpense=async (req,res,next)=>{
     try{
         const {id}=req.params
-        let diff=0,oldAmount=0
+        let oldAmount=0
         const {amount,description,category}=req.body
         const preExpenses=await Expense.findAll({
             where:{userId:req.user.id},
             order:[['createdAt','DESC']],
-            limit:1 //0-latest entry, 1-second latest
+            limit:1 
             })
         console.log("PreExpenses:: ",preExpenses);
         

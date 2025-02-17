@@ -10,12 +10,52 @@
 
 </head>
 <body>
-    <div class="container-fluid fixed-bottom pb-3">
-        <form action="/expenses" method="GET" id="expense-form">
+    <nav class="navbar navbar-expand-sm bg-body-tertiary " data-bs-theme="dark">
+          
+            <a class="navbar-brand" href="http://localhost:5000/expenses">
+                <img src="expense tracker logo-resized.png" alt=""> <sup class="daytodayexpenses"> Day to Day Expenses</sup>
+            </a>
+            
+            <ul class="nav nav-underline ">
+                <li class="nav-item daily "><a class="flex-sm-fill text-sm-center nav-link active " href="#">Daily</a></li>
+                <li class="nav-item monthly"><a class="flex-sm-fill text-sm-center nav-link" href="#">Monthly</a></li>
+                <li class="nav-item yearly"><a class="flex-sm-fill text-sm-center nav-link " href="#">Yearly</a></li>
+            </ul>
+        </nav>
+        <div class="container slider">
+            <div id="myslideshow" class="carousel slide" data-bs-ride="false" >
+                <div class="carousel-inner">
+                    <div class="carousel-item active" id="dateDisplay">
+                       
+                    </div>
+
+                    <!-- <div class="carousel-item">
+                        <p class="d-block w-50">second slide</p>
+                    </div>
+
+                    <div class="carousel-item">
+                        <p class="d-block w-50">third slide</p>
+                    </div> -->
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#myslideshow" data-bs-slide="prev" id="prevbtn">
+                    <span class="carousel-control-prev-icon p-3 rounded-circle" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                
+                <button class="carousel-control-next" type="button" data-bs-target="#myslideshow" data-bs-slide="next" id="nextbtn">
+                    <span class="carousel-control-next-icon p-3 rounded-circle" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+    </div>
+    <div class="expense-Div container-fluid fixed-bottom pb-3 ">
+        <button type="button" data-bs-toggle="collapse" data-bs-target="#expense-form" aria-expanded="false" id="show-form" class="rounded-pill"><i class="fa-solid fa-plus"></i></button>
+        <form action="/expenses" method="GET" id="expense-form" class="collapse collapse-horizontal">
             <hr class="p-2"/>
             <button id="toggle" type="button">EXPENSE</button>
-            <sup>Click to change</sup> <br /> <br />          
-            <div class="dropdown">
+            <sup>Click to change</sup> <br /> <br />  
+            <div class="detailDiv grid gap-3">       
+            <div class="g-col-0 dropdown">
             <button id="categoryDropdown" type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown"><i class="fa-solid fa-icons"></i></button>
             <div class="dropdown-menu">
             <select class="form-select" name="category" id="category">
@@ -26,14 +66,24 @@
                 <option value="Entertainment">Entertainment</option>
             </select>
         </div>
-        </div>
-        <input type="number" name="amount" id="amount" placeholder="Amount">
-          <input type="text" name="description" id="description" placeholder="Enter Text"> <br />
-            <button type="submit" id="add"><i class="fa-solid fa-list-check"></i></button>
-            
-        </form>
     </div>
-    <div class="container">
+       <div class="g-col-1">
+        <input type="number" name="amount"  id="amount" placeholder="Amount"> <br />
+        <!-- class="ms-0" -->
+    </div>
+</div>
+  <div class=" descaddbtn grid gap-3">
+  <div class="g-col-5">
+  <input type="text" name="description" class="mt-1 " id="description" placeholder="Enter Text"> <br />
+</div>
+<div class="g-col-0 offset-md-10">
+  <button type="submit" id="add" class="rounded-5 p-3"><i class="fa-solid fa-check"></i></button>
+</div>
+</div>    
+</form>
+</div>
+
+    <div class="container savingsandIncome">
         <div class="row incomedisplay">
             <div class="col ">
                 <h4>Total Income</h4>
@@ -42,9 +92,9 @@
     </div>
 
     </div>
-   
 </body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-<script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+
 </html>

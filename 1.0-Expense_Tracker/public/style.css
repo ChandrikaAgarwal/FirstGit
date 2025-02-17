@@ -12,7 +12,11 @@
 }
 
 input{
-    border:2px solid #74b174dc;
+    border:none;
+    border-bottom:2px solid #74b174dc;
+    outline:none;
+    width: 200px;
+    padding: 5px;
 }
 
 #amount{
@@ -21,4 +25,137 @@ input{
 
 .col{
     display: block;
+}
+
+
+.detailDiv{
+    display: flex;
+}
+
+.descaddbtn{
+    display: flex;
+}
+
+#show-form{
+   padding: 10px;
+   background-color:#74b174dc; 
+   border-radius:10px ;
+}
+
+.navbar{
+    height:130px;
+}
+
+.daytodayexpenses{
+    font-size: medium;
+    font-weight: bold;
+    font-family: 'Times New Roman', Times, serif;
+    font-style: italic;
+    outline: none;
+}
+
+a:hover{
+    cursor: default;
+}
+
+.nav-underline{
+    position: absolute;
+    bottom: 1%;
+    left:41%;
+    display: flex;
+    gap: 45px;
+    /* justify-content: space-evenly;
+    width: 40%;  */
+}
+ .daily {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 20px;
+}
+
+.monthly{
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 20px;
+}
+
+.yearly{
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 20px;
+} 
+p{
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    margin-right: 2%;
+    position: relative;
+    left:20%;
+}
+.slider{
+    width: 50%;
+    background-color: #74b174dc;
+    height: 50px;
+    margin-top: 1%;
+    border-radius: 10px;
+}
+
+/* #dateList {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    transition: transform 0.3s ease-in-out;
+} */
+
+/* #dateList li {
+    min-width: 50px;
+    padding: 10px;
+    text-align: center;
+    background: #f0f0f0;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+} */
+
+button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+/* .carousel-item {
+    display: none;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px; 
+    /* Adjust as needed */
+/* } */
+
+/* .carousel-item.active{
+    display: flex;
+} */
+/* .slide-text {
+    font-size: 24px;
+    font-weight: bold;
+} */
+
+.carousel-control-prev,
+.carousel-control-next {
+    top: 70%; /* Vertical center */
+    transform: translateY(-50%); /* Center adjustment */
+    width: auto; /* Adjust width */
+}
+
+.carousel-control-prev, .carousel-control-next {
+    justify-content: center;
+    color:black;
+}
+
+#dateDisplay{
+    color:white;
+    text-align: center;
+    font-weight: bold;
+    font-family: cursive;
+    margin-top: 1.5%;
 }
