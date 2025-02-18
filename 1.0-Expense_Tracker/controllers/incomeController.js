@@ -1,17 +1,28 @@
 const Income=require('../models/income')
 const User=require('../models/user')
 const Expense=require('../models/expense')
+const { Sequelize } = require('sequelize')
 let savings=0
 exports.postAddIncome=async (req,res,next)=>{
     try{
+        const {date}=req.query
         const prevExp=await Expense.findAll({
-            where:{userId:req.user.id},
+            where:
+            {
+                userId: req.user.id,
+                createdAt:Sequelize.literal(`DATE(createdAt)='${date}'`)
+            },
             order:[['createdAt','DESC']],
             limit:1
 })
         const preIncome=await Income.findAll({
-            where:{userId:req.user.id},
-            order:[['createdAt','DESC']],
+            where:
+            {
+                userId: req.user.id,
+                createdAt: Sequelize.literal(`DATE(createdAt)='${date}'`)
+                    
+                 },
+            order:[['id','DESC']],
             limit:1
         })
         let amount=req.body.amount
@@ -21,20 +32,23 @@ exports.postAddIncome=async (req,res,next)=>{
         if(!user){
             return res.status(404).json({message:"User not found"})
            }
-           if(prevExp.length===0){
-            savings=amount
-           }else if(preIncome[0]){
-            console.log(prevExp[0].savings);
-            amount=preIncome[0].totalsaving+req.body.amount
+            if (preIncome.length>0) {
+            console.log("Previous Income!!!",preIncome[0]);
+            
+            // console.log(prevExp[0].currentsaving);
+            amount=preIncome[0].amount+req.body.amount
             console.log("amount",amount);
             savings=preIncome[0].totalsaving+req.body.amount
             console.log("Savings after new income: ",savings);
-            
-        }
+            } else {
+                savings = amount
+            }
+        
         const newIncome=await user.createIncome({
             amount,
             description,
-            totalsaving:savings
+            totalsaving:savings,
+            createdAt:date
         })  
         
 
@@ -46,11 +60,18 @@ exports.postAddIncome=async (req,res,next)=>{
 }
 
 exports.getIncome= async (req,res,next)=>{
-    try{
-        const income=await Income.findOne({where:{userId:req.user.id},
-        order:[['createdAt','DESC']],
+    try {
+        const { carouseldate }=req.query
+        const income = await Income.findOne({
+            where: {
+                userId: req.user.id,
+                createdAt:Sequelize.literal(`DATE(createdAt)='${carouseldate}'`)
+            },
+        order:[['id','DESC']], //largest id will come first
         limit:1
-})
+        })
+        console.log("Getting Income:::",income);
+        
         console.log("savings testing ",savings);
         
         res.status(200).json({income,savings:savings})

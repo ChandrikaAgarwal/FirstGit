@@ -22,13 +22,13 @@ app.get('/expenses', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'expense.html'));
 });
 
-// app.use((req,res,next)=>{
-//     User.findOne({where:{email}})
-//     .then(user=>{
-//         req.user=user;
-//         next();
-//     })
-// })
+app.get('/monthly', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'monthly.html'));
+});
+
+app.get('/yearly', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'yearly.html'));
+});
 app.use(userRoute)
 app.use('/api/expenses',expenseRoute)
 app.use('/api/income',incomeRoute)

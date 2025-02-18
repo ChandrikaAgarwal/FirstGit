@@ -111,10 +111,8 @@ if(form){
             console.log("currentday on prev: ",currentDay); //15
             
         }
-        updateDateDisplay();
-        
-        
-        
+        updateDateDisplay();    
+
         filterExpenses(prevdate)
         
     })
@@ -140,10 +138,11 @@ if(form){
     savingsDiv.className='row savingsdisplay'
     savingsDiv.innerHTML=`<div class="col"><h4>Savings</h4></div> <div class="col savingsAmount"></div>`
     container.insertBefore(savingsDiv,row)
-
+    const savingcol=document.querySelector('.savingsAmount')
     const incomeDiv=document.createElement('div')
     incomeDiv.className='col incomecol'
     row.appendChild(incomeDiv)
+    const incomecol = document.querySelector('.incomecol')
     console.log(container);
     form.addEventListener("submit", async (e)=>{
         e.preventDefault()
@@ -154,9 +153,9 @@ if(form){
             amount:parseFloat(e.target.amount.value),
             description:e.target.description.value,
             category:e.target.category.value,
-            createdAt:prevdate
+            // createdAt:prevdate- to send the date of creation of expense witht he request body
         }
-            await axios.post(`${api_url}/api/expenses/`,Detail,{
+            await axios.post(`${api_url}/api/expenses/?date=${prevdate}`,Detail,{ //sending date of creation as a query parameter
                 headers:{
                     Authorization:`Bearer ${token}`
                 }
@@ -164,7 +163,7 @@ if(form){
             .then((response)=>{
                 console.log("Expense Detail: ",response);
                 displayExpenses(response.data.expensedetail, response.data.expensedetail.id)
-                displaySavings(response.data.expensedetail.currentsaving)
+                displaySavings(prevdate,response.data.expensedetail.currentsaving)
                 
                 
             }).catch(err=>console.log(err))
@@ -175,7 +174,7 @@ if(form){
             description:e.target.description.value,
             }
             console.log("Income: ",incomeDetail); 
-            await axios.post(`${api_url}/api/income/`,incomeDetail,{
+            await axios.post(`${api_url}/api/income/?date=${prevdate}`,incomeDetail,{
                 headers:{
                     Authorization:`Bearer ${token}`
                 }
@@ -184,38 +183,26 @@ if(form){
                 console.log("User id::",response.data.incomedetail.userId);
                 userId=response.data.incomedetail.userId
                 localStorage.setItem(userId, response.data.incomedetail.amount)
-                displayIncome(response.data.incomedetail.amount)
-                displaySavings(response.data.incomedetail.totalsaving)
+                displayIncome(prevdate,response.data.incomedetail.amount)
+                displaySavings(prevdate,response.data.incomedetail.totalsaving)
         }).catch(err=>console.log(err))
         form.reset()
     }     
         
     })   
 
-    function displayIncome(income){
-        console.log(income);
-        const incomecol=document.querySelector('.incomecol')
-        incomecol.innerHTML=`<h4>${income}</h4>`      
+    function displayIncome(createdAt, income) {
+        incomecol.innerHTML = "";
+        if (createdAt === prevdate) {
+            incomecol.innerHTML=`<h4>${income}</h4>`      
+        }
+        // console.log(income);
+        // const incomecol=document.querySelector('.incomecol')
         container.insertBefore(row, expense_list)
     }
 
     window.addEventListener("DOMContentLoaded",async ()=>{
-        try{       
-            const token=localStorage.getItem('token')
-            const incomeResponse= await axios.get(`${api_url}/api/income`,{
-                 headers:{
-                 Authorization:`Bearer ${token}`
-                 }
-             })
-             if(incomeResponse.data.income){
-     
-             console.log("Getting Data on refresh!!",incomeResponse.data);
-             
-             const storedincome=localStorage.getItem(incomeResponse.data.income.userId)
-             displayIncome(storedincome)
-             console.log("On refresh: ",incomeResponse.data.income.totalsaving);
-             displaySavings(incomeResponse.data.income.totalsaving) //to display the savings first
-             }
+            
              
     // const expenseResponse=await axios.get(`${api_url}/api/expenses/`,{
     //     headers:{
@@ -230,44 +217,71 @@ if(form){
             filterExpenses(prevdate)
             
 
-            displaySavings(incomeResponse.data.income.totalsaving)
             
-        // }
-        
-       }catch(err){
-        console.log("Error fetching data on refresh:", err);
-       } 
+             
 })
-    function displaySavings(savingsdone){
-        const savingcol=document.querySelector('.savingsAmount')
-        savingcol.innerHTML=`<h4>${savingsdone}</h4>`
+    function displaySavings(createdAt, savingsdone) {
+        savingcol.innerHTML = ""
+        console.log("savingsdone::",savingsdone);
+        console.log("Savings createdAt: ",prevdate);
+        
+        if (createdAt === prevdate) {
+            savingcol.innerHTML = `<h4>${savingsdone}</h4>`
+        }
+        // const savingcol=document.querySelector('.savingsAmount')
+        
+    }
+
+    async function filter(targetArr, carouseldate) {
+        let filteredArray = await targetArr.filter(item => {
+            let dateCreatedAt = item.createdAt.split("T")[0]
+            console.log("Checking expense date ", dateCreatedAt);
+            return dateCreatedAt === carouseldate;
+        })
+        return filteredArray
     }
 
    async function filterExpenses(date){
+            let incomecreatedAt=0
+            const incomeResponse= await axios.get(`${api_url}/api/income/?carouseldate=${date}`,{
+                 headers:{
+                 Authorization:`Bearer ${token}`
+                 }
+            })
+       console.log("incomeResponse on Specific date of carousel: ",incomeResponse.data);
+       
+    //    let incomeResponseArr = incomeResponse.data.income
+    //    console.log("Income response: ", incomeResponseArr);
+    //    let filteredIncome=await filter(incomeResponseArr,date)
+            
+       if (incomeResponse.data.income) {
+           incomecreatedAt = incomeResponse.data.income.createdAt.split('T')[0]
+           //  savingcol.innerHTML = ""
+           console.log("Getting Data on refresh!!", incomeResponse.data.income);
+                 
+           const storedincome = localStorage.getItem(incomeResponse.data.income.userId)
+           displayIncome(incomecreatedAt, incomeResponse.data.income.amount)
+           console.log("On refresh: ", incomeResponse.data.income.totalsaving);
+           displaySavings(incomecreatedAt, incomeResponse.data.income.totalsaving) //to display the savings first
+       } else {
+           incomecol.innerHTML = "";
+           savingcol.innerHTML = ""
+        }
+
+       
     const response=await axios.get(`${api_url}/api/expenses/`,{
         headers:{
             Authorization:`Bearer ${token}`
         }
     })
-    allexpenses=response.data.expenses || [];  
-    if(allexpenses){
-        console.log("All expenses",response.data.expenses);
-
-    }else{
-        console.log("no expenses found");
-        
-    }
-        let filteredExpenses=await allexpenses.filter(expense=>{
-            let expenseDate=expense.createdAt.split("T")[0]
-            console.log("Checking expense date ",expenseDate);
-                  
-            return expenseDate===date;
-        })
+    let allexpenses=response.data.expenses || [];  
+        let filteredExpenses=await filter(allexpenses, date)
         console.log("filtered Expenses:: ",filteredExpenses);
 
         expense_list.innerHTML=""
         if(filteredExpenses.length>0){
             filteredExpenses.forEach(expense=> displayExpenses(expense, expense.id))
+            displaySavings(incomecreatedAt,incomeResponse.data.income.totalsaving)
         }else{
             console.log("No expenses found for the date");
         }
@@ -275,7 +289,6 @@ if(form){
 
     function displayExpenses(expenseDetail,id){
         const newExpense=document.createElement('li')
-        console.log("expenseDetail ".expenseDetail);
         const details=[`${expenseDetail.amount}-${expenseDetail.description}-${expenseDetail.category}`]
         newExpense.innerHTML=details+'<button class="delete">Delete</button> <button class="edit">Edit</button>'
         newExpense.dataset.id=id
@@ -293,7 +306,10 @@ if(form){
                 const id=delItem.dataset.id
                 axios
                 .delete(
-                    `${api_url}/api/expenses/${id}`,{
+                    `${api_url}/api/expenses/${id}`, {
+                        params:{
+                        prevdate     
+                        },
                         headers:{
                             Authorization:`Bearer ${token}`
                         }
@@ -302,7 +318,7 @@ if(form){
                 .then(async (res)=>{
                     console.log(res);
                     expense_list.removeChild(delItem)
-                    const incomeResponse= await axios.get(`${api_url}/api/income`,{
+                    const incomeResponse = await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`,{
                         headers:{
                         Authorization:`Bearer ${token}`
                         }
@@ -312,9 +328,9 @@ if(form){
                     console.log("Getting Data on refresh!!",incomeResponse.data);
                     
                     const storedincome=localStorage.getItem(incomeResponse.data.income.userId)
-                    displayIncome(storedincome)
+                    displayIncome(prevdate,incomeResponse.data.income.amount)
                     console.log("On refresh: ",incomeResponse.data.income.totalsaving);
-                    displaySavings(incomeResponse.data.income.totalsaving) //to display the savings first
+                    displaySavings(prevdate,incomeResponse.data.income.totalsaving) //to display the savings first
                     }
                     
                 })
@@ -329,7 +345,10 @@ if(form){
         if(e.target.classList.contains('edit')){
             const editItem=e.target.parentElement;
             const id=editItem.dataset.id
-            await axios.get(`${api_url}/api/expenses/${id}`,{
+            await axios.get(`${api_url}/api/expenses/${id}`, {
+                params: {
+                    prevdate
+                },
                 headers:{
                     Authorization:`Bearer ${token}`
                 }
@@ -338,13 +357,16 @@ if(form){
                 console.log("To edit expense: ", res.data.expense);
                 expense_list.removeChild(editItem)
                 let editExpense=populateFields(res.data.expense)
-                const response=await axios.put(`${api_url}/api/expenses/${id}`,editExpense,{
+                const response = await axios.put(`${api_url}/api/expenses/${id}`, editExpense, {
+                    params: {
+                        prevdate
+                    },
                     headers:{
                         Authorization:`Bearer ${token}`
                     }
                     })
                 console.log("Response: ",response);
-                const incomeResponse= await axios.get(`${api_url}/api/income`,{
+                const incomeResponse = await axios.get(`${api_url}/api/income/?carouseldate=${prevdate}`,{
                     headers:{
                     Authorization:`Bearer ${token}`
                     }
@@ -354,9 +376,9 @@ if(form){
                 console.log("Getting Data on refresh!!",incomeResponse.data);
                 
                 const storedincome=localStorage.getItem(incomeResponse.data.income.userId)
-                displayIncome(storedincome)
+                displayIncome(prevdate,storedincome)
                 console.log("On refresh: ",incomeResponse.data.income.totalsaving);
-                displaySavings(incomeResponse.data.income.totalsaving) //to display the savings first
+                displaySavings(prevdate,incomeResponse.data.income.totalsaving) //to display the savings first
                 }
                 
                 

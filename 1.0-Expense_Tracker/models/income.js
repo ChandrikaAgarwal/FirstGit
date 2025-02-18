@@ -9,16 +9,16 @@ id:{
 },
 amount:{
     type:Sequelize.INTEGER,
-    allowNull:false
+    allowNull:true
 },
 description:{
     type:Sequelize.STRING,
-    allowNull:false
+    allowNull:true
 },
 totalsaving:{
     type:Sequelize.INTEGER,
-    allowNull:false
+    allowNull:true
 }
-})
+},{timestamps:true}) // automatically adds `createdAt` and `updatedAt
 
 module.exports=Income;

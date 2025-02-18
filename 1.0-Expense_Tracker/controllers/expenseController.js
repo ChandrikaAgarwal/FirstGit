@@ -1,11 +1,17 @@
 const Expense=require('../models/expense')
 const User=require('../models/user')
 const Income=require('../models/income')
-const {jwtAuthMiddleware,generateToken}=require('../jwtmiddleware')
-const { Op } = require("sequelize");
-async function finduserIncome(userId){
-    const lastIncome=await Income.findOne({where:{userId},
-        order: [['createdAt', 'DESC']],
+const { jwtAuthMiddleware, generateToken } = require('../jwtmiddleware');
+const { Sequelize } = require('sequelize');
+
+async function finduserIncome(incomedate,userId){
+    const lastIncome = await Income.findOne({
+        where:
+        {
+            userId,
+            createdAt:Sequelize.literal(`DATE(createdAt)='${incomedate}'`)  
+             },
+        order: [['id', 'DESC']],
         limit: 1
     });
 return lastIncome
@@ -16,6 +22,7 @@ exports.postAddUser= async (req,res,next)=>{
     console.log("request body!! ",req.body );
     
     try{
+        
         const email=req.body.email
         const password=req.body.password 
         const user=await User.findOne({where:{email:email}})
@@ -50,19 +57,24 @@ exports.postAddUser= async (req,res,next)=>{
 exports.postAddExpense=async (req,res,next)=>{
   
     try{
-    
+        const { date } = req.query
+        
        let savings=[]
        let latestsaving=0
        const preExpenses=await Expense.findAll({
-        where:{userId:req.user.id},
+           where:
+           {
+               userId: req.user.id,
+               createdAt:Sequelize.literal(`DATE(createdAt)='${date}'`)
+           },
         order:[['createdAt','DESC']],
         limit:1
         })
-       const userIncome=await finduserIncome(req.user.id)
+        const userIncome = await finduserIncome(date,req.user.id)
        console.log(userIncome);
        
        if(preExpenses.length===0){
-        savings.push(userIncome.amount)
+        savings.push(userIncome.amount)  //userIncome
         latestsaving=savings.at(-1)
     }else{
         savings.push(preExpenses[0].currentsaving)
@@ -71,7 +83,7 @@ exports.postAddExpense=async (req,res,next)=>{
        const amount=req.body.amount
        const description=req.body.description
        const category=req.body.category
-       const createdAt=req.body.createdAt || new Date();
+    //    const createdAt=req.body.createdAt || new Date();
        latestsaving=latestsaving-amount
        const user=await User.findByPk(req.user.id)
        if(!user){
@@ -82,7 +94,8 @@ exports.postAddExpense=async (req,res,next)=>{
         description:description,
         category:category,
         currentsaving:latestsaving,
-        createdAt:createdAt
+        // createdAt:createdAt
+        createdAt:date //overriding default value of createdAt
        })
 
        console.log("New Expense ",newExpense);
@@ -126,8 +139,9 @@ exports.getExpenses= async (req,res,next)=>{
 
 exports.deleteExpense=async(req,res,next)=>{
     try{
-        const {id}=req.params
-        const userIncome=await finduserIncome(req.user.id)
+        const { id } = req.params
+        const {prevdate}=req.query
+        const userIncome=await finduserIncome(prevdate,req.user.id)
         const expensetodel=await Expense.findByPk(id)
         console.log("Expense to be deleted: ",expensetodel);
         
@@ -156,24 +170,29 @@ exports.getExpenseById=async (req,res,next)=>{
 
 exports.updateExpense=async (req,res,next)=>{
     try{
-        const {id}=req.params
+        const { id } = req.params
+        const {prevdate}=req.query
         let oldAmount=0
         const {amount,description,category}=req.body
         const preExpenses=await Expense.findAll({
-            where:{userId:req.user.id},
+            where:
+            {
+                userId: req.user.id,
+                createdAt: Sequelize.literal(`DATE(createdAt)='${prevdate}'`)
+            },
             order:[['createdAt','DESC']],
             limit:1 
             })
         console.log("PreExpenses:: ",preExpenses);
         
-        const userIncome=await finduserIncome(req.user.id)
+        const userIncome=await finduserIncome(prevdate,req.user.id)
 
         const expense=await Expense.findByPk(id)
         
             console.log(expense); 
             oldAmount=expense.amount
             console.log("Old Amount",oldAmount);
-            userIncome.totalsaving=preExpenses[0].currentsaving+oldAmount
+            userIncome.totalsaving=userIncome.totalsaving+oldAmount
             await userIncome.save()
             if (!expense) {
                 return res.status(404).json({ error: 'Expense not found' });

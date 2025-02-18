@@ -159,3 +159,11 @@ button {
     font-family: cursive;
     margin-top: 1.5%;
 }
+
+#monthDisplay{
+    margin-top: 4.5%;
+}
+
+#yearDisplay{
+    margin-top: 4.5%;
+}
