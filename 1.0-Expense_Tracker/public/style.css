@@ -1,52 +1,52 @@
-#toggle{
+#toggle {
     background-color: #74b174dc;
     padding: 8px;
     border-radius: 10px;
 }
 
-#add{
+#add {
     margin-top: 2%;
     background-color: #74b174dc;
-    padding:8px;
+    padding: 8px;
     border-radius: 10px;
 }
 
-input{
-    border:none;
-    border-bottom:2px solid #74b174dc;
-    outline:none;
+input {
+    border: none;
+    border-bottom: 2px solid #74b174dc;
+    outline: none;
     width: 200px;
     padding: 5px;
 }
 
-#amount{
+#amount {
     margin-right: 2%;
 }
 
-.col{
+.col {
     display: block;
 }
 
 
-.detailDiv{
+.detailDiv {
     display: flex;
 }
 
-.descaddbtn{
+.descaddbtn {
     display: flex;
 }
 
-#show-form{
-   padding: 10px;
-   background-color:#74b174dc; 
-   border-radius:10px ;
+#show-form {
+    padding: 10px;
+    background-color: #74b174dc;
+    border-radius: 10px;
 }
 
-.navbar{
-    height:130px;
+.navbar {
+    height: 130px;
 }
 
-.daytodayexpenses{
+.daytodayexpenses {
     font-size: medium;
     font-weight: bold;
     font-family: 'Times New Roman', Times, serif;
@@ -54,42 +54,45 @@ input{
     outline: none;
 }
 
-a:hover{
+a:hover {
     cursor: default;
 }
 
-.nav-underline{
+.nav-underline {
     position: absolute;
     bottom: 1%;
-    left:41%;
+    left: 41%;
     display: flex;
     gap: 45px;
     /* justify-content: space-evenly;
     width: 40%;  */
 }
- .daily {
+
+.daily {
     font-family: 'Times New Roman', Times, serif;
     font-size: 20px;
 }
 
-.monthly{
+.monthly {
     font-family: 'Times New Roman', Times, serif;
     font-size: 20px;
 }
 
-.yearly{
+.yearly {
     font-family: 'Times New Roman', Times, serif;
     font-size: 20px;
-} 
-p{
+}
+
+p {
     text-align: center;
     display: flex;
     justify-content: center;
     margin-right: 2%;
     position: relative;
-    left:20%;
+    left: 20%;
 }
-.slider{
+
+.slider {
     width: 50%;
     background-color: #74b174dc;
     height: 50px;
@@ -122,6 +125,7 @@ button {
     padding: 5px 10px;
     cursor: pointer;
 }
+
 /* .carousel-item {
     display: none;
     text-align: center;
@@ -142,28 +146,32 @@ button {
 
 .carousel-control-prev,
 .carousel-control-next {
-    top: 70%; /* Vertical center */
-    transform: translateY(-50%); /* Center adjustment */
-    width: auto; /* Adjust width */
+    top: 70%;
+    /* Vertical center */
+    transform: translateY(-50%);
+    /* Center adjustment */
+    width: auto;
+    /* Adjust width */
 }
 
-.carousel-control-prev, .carousel-control-next {
+.carousel-control-prev,
+.carousel-control-next {
     justify-content: center;
-    color:black;
+    color: black;
 }
 
-#dateDisplay{
-    color:white;
+#dateDisplay {
+    color: white;
     text-align: center;
     font-weight: bold;
     font-family: cursive;
     margin-top: 1.5%;
 }
 
-#monthDisplay{
+#monthDisplay {
     margin-top: 4.5%;
 }
 
-#yearDisplay{
+#yearDisplay {
     margin-top: 4.5%;
 }
