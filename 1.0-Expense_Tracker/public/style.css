@@ -126,23 +126,48 @@ button {
     cursor: pointer;
 }
 
-/* .carousel-item {
-    display: none;
-    text-align: center;
+.incomecol {
     display: flex;
-    justify-content: center;
+    gap: 10px;
+    /* Add spacing between elements */
     align-items: center;
-    height: 200px; 
-    /* Adjust as needed */
-/* } */
+}
 
-/* .carousel-item.active{
+.editIncome i,
+.deleteIncome i {
+    color: rgb(216, 211, 211)
+}
+
+.editIncome:hover i,
+.deleteIncome:hover i {
+    color: rgb(24, 49, 83)
+        /* Change color on hover */
+}
+
+.editIncome,
+.deleteIncome {
+    background: none;
+    margin-left: 2%;
+}
+
+.allExpenses li {
     display: flex;
-} */
-/* .slide-text {
-    font-size: 24px;
-    font-weight: bold;
-} */
+    gap: 10px;
+    align-items: center;
+}
+
+.deleteExpense,
+.editExpense {
+    background: none;
+    color: rgb(216, 211, 211);
+    align-items: center;
+}
+
+.editExpense:hover i,
+.deleteExpense:hover i {
+    color: rgb(24, 49, 83)
+        /* Change color on hover */
+}
 
 .carousel-control-prev,
 .carousel-control-next {

@@ -1,5 +1,8 @@
 const form = document.getElementById('expense-form')
 const loginForm = document.getElementById('login-form')
+const signupForm = document.getElementById('signup-form')
+const loginBtn = document.getElementById('loginBtn')
+const signupBtn = document.getElementById('signUpBtn')
 const togBtn = document.getElementById("toggle")
 const cat = document.getElementById("category")
 const catlabel = document.getElementById("catlabel")
@@ -10,14 +13,44 @@ const expense_list = document.createElement('ul')
 expense_list.className = "allExpenses"
 const usersDiv = document.getElementById('users')
 const row = document.querySelector('.incomedisplay')
-
+let listOfExpenses;
 
 var userId;
-
-if (loginForm) {
+if (signupForm) {
     const usersul = document.createElement('ul')
     usersul.className = "user_list"
     usersDiv.appendChild(usersul)
+    signupForm.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const newuserDetail = {
+            name: e.target.name.value,
+            email: e.target.email.value,
+            password: e.target.password.value
+        }
+        console.log("newuserdetail ", newuserDetail);
+        try {
+            const res = await axios.post(`${api_url}`, newuserDetail)
+            console.log("New User Detail: ", res.data);
+            localStorage.setItem('token', res.data.token);
+            alert("Signup successful! Please log in.");
+            window.location.href = "/users"
+        } catch (err) {
+            console.error("Error: ", err.response)
+            if (err.response && err.response.data.message) {
+                alert(err.response.data.message)
+                if (err.response.data.message === "User already exists.Please log in.") {
+                    window.location.href = "/users"
+                }
+            } else {
+                alert("An error occured, please try again!!")
+            }
+        }
+    });
+    loginBtn.addEventListener('click', () => {
+        window.location.href = "/users"
+    });
+}
+if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault()
         const userDetail = {
@@ -26,9 +59,9 @@ if (loginForm) {
         }
         console.log("userdetail ", userDetail);
         try {
-            const res = await axios.post(`${api_url}`, userDetail)
-            console.log("User Detail: ", res.data);
-            //  alert(res.data.message)
+            const res = await axios.post(`${api_url}/users`, userDetail)
+            console.log("Login Successful User Detail: ", res.data);
+            alert(res.data.message)
 
             localStorage.setItem('token', res.data.token);
             window.location.href = "/expenses"
@@ -36,11 +69,15 @@ if (loginForm) {
             console.error("Error: ", err.response)
             if (err.response && err.response.data.message) {
                 alert(err.response.data.message)
+                window.location.href = "http://localhost:5000";
             } else {
                 alert("An error occured, please try again!!")
             }
         }
     })
+    signupBtn.addEventListener('click', () => {
+        window.location.href = "http://localhost:5000";
+    });
 }
 
 if (form) {
@@ -199,7 +236,7 @@ if (form) {
                 console.log("User id::", response.data.incomedetail.userId);
                 userId = response.data.incomedetail.userId
                 localStorage.setItem(userId, response.data.incomedetail.amount)
-                displayIncome(prevdate, response.data.incomedetail.amount)
+                displayIncome(prevdate, response.data.incomedetail.amount, response.data.incomedetail.id)
                 displaySavings(prevdate, response.data.incomedetail.totalsaving)
             }).catch(err => console.log(err))
             form.reset()
@@ -207,48 +244,32 @@ if (form) {
 
     })
 
-    function displayIncome(createdAt, income) {
+    function displayIncome(createdAt, income, incomeid) {
         incomecol.innerHTML = "";
+        const incomeLi = document.createElement('li')
         if (createdAt === prevdate) {
-            incomecol.innerHTML = `<h4>${income}</h4>`
+            incomeLi.innerHTML = `${income} <button class="editIncome"><i class="fa-solid fa-pen"></i></button><button class="deleteIncome"><i class="fa-solid fa-trash"></i></button>`
         }
-        // console.log(income);
-        // const incomecol=document.querySelector('.incomecol')
+        incomeLi.className = "incomedisplayed"
+        incomeLi.dataset.id = incomeid
+        incomecol.appendChild(incomeLi)
+        console.log("income col innerhtml: ", incomecol.innerHTML);
+
         container.insertBefore(row, expense_list)
     }
 
     window.addEventListener("DOMContentLoaded", async () => {
 
-
-        // const expenseResponse=await axios.get(`${api_url}/api/expenses/`,{
-        //     headers:{
-        //         Authorization:`Bearer ${token}`
-        //     }
-        // })
-
-        //     console.log("Getting Expenses ",expenseResponse.data);
-        //     for(let i=0;i<expenseResponse.data.expenses.length;i++){
-        //         console.log();
-
         filterExpenses(prevdate)
-
-
-
 
     })
     function displaySavings(createdAt, savingsdone) {
-        // savingcol.innerHTML = ""
-        // const previoussaving = savingsdone
-        // console.log("previous savings: ", previoussaving, typeof previoussaving);
-
         console.log("savingsdone::", savingsdone);
         console.log("Savings createdAt: ", prevdate);
 
         if (createdAt === prevdate) {
             savingcol.innerHTML = `<h4>${savingsdone}</h4>`
         }
-        // const savingcol=document.querySelector('.savingsAmount')
-
     }
 
     async function filter(targetArr, carouseldate) {
@@ -269,27 +290,21 @@ if (form) {
         })
         console.log("incomeResponse on Specific date of carousel: ", incomeResponse.data);
 
-        //    let incomeResponseArr = incomeResponse.data.income
-        //    console.log("Income response: ", incomeResponseArr);
-        //    let filteredIncome=await filter(incomeResponseArr,date)
-
         if (incomeResponse.data.income) {
             incomecreatedAt = incomeResponse.data.income.createdAt.split('T')[0]
-            //  savingcol.innerHTML = ""
             console.log("Getting Data on refresh!!", incomeResponse.data.savings);
 
 
-            displayIncome(incomecreatedAt, incomeResponse.data.income.amount)
+            displayIncome(incomecreatedAt, incomeResponse.data.income.amount, incomeResponse.data.income.id)
             console.log("On refresh: ", incomeResponse.data.income.totalsaving);
             //    displaySavings(incomecreatedAt, incomeResponse.data.income.totalsaving) //to display the savings first
-            displaySavings(incomecreatedAt, incomeResponse.data.income.totalsaving)
+            // displaySavings(incomecreatedAt, incomeResponse.data.income.savings)
+            displaySavings(incomecreatedAt, incomeResponse.data.totalsaving)
         } else {
             incomecol.innerHTML = "";
-            //    savingcol.innerHTML = ""
-            //    let currentdaysaving=parseInt(savingcol.textContent)
-            //    displaySavings(date, currentdaysaving)
         }
-
+        listOfExpenses = document.querySelector('.allExpenses')
+        console.log("List of expenses: ", listOfExpenses);
 
         const response = await axios.get(`${api_url}/api/expenses/?carouseldate=${date}`, {
             headers: {
@@ -303,71 +318,103 @@ if (form) {
         expense_list.innerHTML = ""
         if (filteredExpenses.length > 0) {
             filteredExpenses.forEach(expense => displayExpenses(expense, expense.id))
+            // if (incomeResponse.data.income) {
+            //     // displaySavings(incomecreatedAt, incomeResponse.data.income.savings)
+            //     displaySavings(incomecreatedAt, incomeResponse.data.savings)
+            // } else {
+            console.log("Expense on no income:: ", filteredExpenses.at(-1).currentsaving)
+            displaySavings(date, filteredExpenses.at(-1).currentsaving) //bcz savings are being updated
+            // }
+        } else {
             if (incomeResponse.data.income) {
                 displaySavings(incomecreatedAt, incomeResponse.data.income.totalsaving)
             } else {
-                console.log("Expense on no income:: ", filteredExpenses.at(-1).currentsaving)
-                displaySavings(date, filteredExpenses.at(-1).currentsaving)
+                displaySavings(date, incomeResponse.data.savings) //for forwarding saving when no income and expense
+                console.log("No expenses found for the date");
             }
-        } else {
-            displaySavings(date, incomeResponse.data.savings)
-            console.log("No expenses found for the date");
         }
     }
 
     function displayExpenses(expenseDetail, id) {
         const newExpense = document.createElement('li')
         const details = [`${expenseDetail.amount}-${expenseDetail.description}-${expenseDetail.category}`]
-        newExpense.innerHTML = details + '<button class="delete">Delete</button> <button class="edit">Edit</button>'
+        newExpense.innerHTML = details + '<button class="editExpense"><i class="fa-solid fa-pen"></i></button> <button class="deleteExpense"><i class="fa-solid fa-trash"></i></button> '
         newExpense.dataset.id = id
+        newExpense.className = "expenseDisplayed"
         expense_list.appendChild(newExpense)
 
         form.reset()
 
     }
 
-    const delBtn = document.querySelector('.delete')
-    expense_list.addEventListener('click', (e) => {
-        const token = localStorage.getItem('token');
-        if (e.target.classList.contains('delete')) {
-            const delItem = e.target.parentElement;
-            const id = delItem.dataset.id
-            axios
-                .delete(
-                    `${api_url}/api/expenses/${id}`, {
-                    params: {
-                        prevdate
-                    },
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                })
+    const delBtn = document.querySelector('.deleteExpense')
 
-                .then(async (res) => {
-                    console.log(res);
-                    expense_list.removeChild(delItem)
-                    const incomeResponse = await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
+
+
+    expense_list.addEventListener('click', async (e) => {
+        try {
+            console.log(e.target);
+            const delBtn = e.target.closest('.deleteExpense');
+            if (delBtn) {
+                console.log("Expense Delete button clicked: ");
+                const delItem = delBtn.parentElement;
+                const id = delItem.dataset.id
+                console.log("Delete btn clicked to delete an expense :", delItem, "of id: ", id);
+
+                const deleteExp = await axios
+                    .delete(
+                        `${api_url}/api/expenses/${id}`, {
+                        params: {
+                            prevdate
+                        },
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
                     })
-                    if (incomeResponse.data.income) {
+                console.log("response on deleteing:: ", deleteExp);
 
-                        console.log("Getting Data on refresh!!", incomeResponse.data);
 
-                        const storedincome = localStorage.getItem(incomeResponse.data.income.userId)
-                        displayIncome(prevdate, incomeResponse.data.income.amount)
-                        console.log("On refresh: ", incomeResponse.data.income.totalsaving);
-                        displaySavings(prevdate, incomeResponse.data.income.totalsaving) //to display the savings first
+
+                expense_list.removeChild(delItem)
+                await axios.get(`${api_url}/api/expenses?carouseldate=${prevdate}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }).then(async (res) => {
+                    console.log("Response after expense deletion: ", res.data.expenses);
+                    if (res.data.expenses.length > 0) {
+                        displaySavings(prevdate, res.data.expenses.at(-1).currentsaving)
+                    } else {
+                        const incomeRes = await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
+                            headers: {
+                                Authorization: `Bearer ${token}`
+                            }
+                        })
+                        console.log("Income response:: ", incomeRes);
+
+                        displaySavings(prevdate, incomeRes.data.savings)
+
                     }
 
-                })
-                .catch(err => console.log(err))
+                }).catch(err => console.log("Error updating after ddeletion of expense: ", err))
 
+                // if (incomeResponse.data.income) {
+
+                //     console.log("Getting Data on refresh!!", incomeResponse.data);
+
+                //     displayIncome(prevdate, incomeResponse.data.income.amount, incomeResponse.data.income.id)
+                //     console.log("On refresh: ", incomeResponse.data.income.totalsaving);
+                //     displaySavings(prevdate, incomeResponse.data.income.totalsaving) //to display the savings first
+                // }
+
+            }
+
+        } catch (err) {
+            console.log("the error is:: ", err);
         }
     });
 
-    const editBtn = document.querySelector('.edit')
+    const editBtn = document.querySelector('.editExpense')
     expense_list.addEventListener('click', async (e) => {
         const token = localStorage.getItem('token');
         if (e.target.classList.contains('edit')) {
@@ -403,8 +450,8 @@ if (form) {
 
                         console.log("Getting Data on refresh!!", incomeResponse.data);
 
-                        const storedincome = localStorage.getItem(incomeResponse.data.income.userId)
-                        displayIncome(prevdate, storedincome)
+                        // const storedincome=localStorage.getItem(incomeResponse.data.income.userId)
+                        displayIncome(prevdate, incomeResponse.data.income.amount, incomeResponse.data.income.id)
                         console.log("On refresh: ", incomeResponse.data.income.totalsaving);
                         displaySavings(prevdate, incomeResponse.data.income.totalsaving) //to display the savings first
                     }
@@ -421,5 +468,48 @@ if (form) {
         let category = document.getElementById('category').value = response.category;
         return editExpense = { amount, description, category }
     }
+
+    const incomeDel = document.querySelector(".deleteIncome")
+
+
+    document.addEventListener('click', async (e) => {
+        if (e.target.closest('.deleteIncome')) {
+            console.log("Income Delete button: ", incomeDel);
+            const deleteItem = e.target.closest(".incomedisplayed")
+            const id = deleteItem.dataset.id
+            console.log("Delete Button Clicked for item : ", deleteItem, "of id ", id);
+            axios.delete(
+                `${api_url}/api/income/${id}`, {
+                params: {
+                    prevdate
+                },
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+                .then(async (response) => {
+                    console.log("Response on delete: ", response);
+                    incomecol.removeChild(deleteItem)
+                    incomecol.innerHTML = ""
+                    await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    })
+                        .then(response => {
+                            console.log("Response on getting the savings after delete: ", response);
+                            if (response.data.income) {
+
+                                displayIncome(prevdate, response.data.income.amount, response.data.income.id)
+                            }
+                            displaySavings(prevdate, response.data.savings)
+
+
+                        }).catch(err => console.log("Error in getting after deletion: ", err))
+
+                }).catch(err => console.log("Error deleting income ", err))
+        }
+    })
 }
+
 

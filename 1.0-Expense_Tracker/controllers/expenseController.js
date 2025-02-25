@@ -19,18 +19,20 @@ async function finduserIncome(incomedate, userId) {
     });
 }
 
-
 exports.postAddUser = async (req, res, next) => {
 
     console.log("request body!! ", req.body);
 
     try {
-
+        const name = req.body.name
         const email = req.body.email
         const password = req.body.password
         const user = await User.findOne({ where: { email: email } })
-        if (!user) {
+        if (user) {
+            return res.status(400).json({ message: "User already exists. Please log in." });
+        } else {
             const newUser = await User.create({
+                name: name,
                 email: email,
                 password: password
             })
@@ -39,7 +41,22 @@ exports.postAddUser = async (req, res, next) => {
 
             return res.status(200).json({ message: "New user created ", userdetail: newUser, token: token })
         }
+    } catch (err) {
+        console.log("Error in postAddUser:", err);
 
+        res.status(500).json({ error: "Failed to create a new user", details: err })
+
+    }
+}
+
+exports.getUser = async (req, res, next) => {
+    try {
+        const email = req.body.email
+        const password = req.body.password
+        const user = await User.findOne({ where: { email: email } })
+        if (!user) {
+            return res.status(400).json({ message: "Not a user. Kindly signup" });
+        }
         if (user.password !== password) {
             console.log("passowrd mismatch ", email);
             return res.status(401).json({ message: "Password mismatch" })
@@ -51,10 +68,8 @@ exports.postAddUser = async (req, res, next) => {
         // console.log("New user: ",newUser);
 
     } catch (err) {
-        console.log(err);
-
-        res.status(500).json({ error: "Failed to create a new user", details: err })
-
+        console.log("Error in getUser:", err);
+        res.status(500).json({ error: "Failed to fetch user", details: err });
     }
 }
 exports.postAddExpense = async (req, res, next) => {
@@ -138,11 +153,10 @@ exports.postAddExpense = async (req, res, next) => {
             await incomeonThatDate.save();
         }
 
-        // if (expenses) {
-        //     await updateFutureExpenses(req.user.id, date, );
-        // } else {
-        await updateFutureExpenses(req.user.id, date, latestsaving);
-        // }
+
+        // await updateFutureExpenses(req.user.id, date,latestsaving);
+        await updateFutureExpenses(req.user.id, date, req.body.amount);
+
         console.log("Updated Saving after Expense: ", latestsaving);
 
         console.log("incomes table updated");
@@ -160,20 +174,41 @@ exports.postAddExpense = async (req, res, next) => {
 };
 
 async function updateFutureExpenses(userId, updatedDate, newSaving) {
-    let futureExpenses = await Expense.findAll({
-        where: {
-            userId: userId,
-            createdAt: { [Op.gt]: updatedDate }  // Get expenses after the updated date
-        },
-        order: [['createdAt', 'ASC'], ['id', 'ASC']]
-    });
-    console.log("new saving:: ", newSaving);
+    try {
+        let futureExpenses = await Expense.findAll({
+            where: {
+                userId: userId,
+                createdAt: { [Op.gt]: updatedDate }  // Get expenses after the updated date
+            },
+            order: [['createdAt', 'ASC'], ['id', 'ASC']]
+        });
 
-    for (let expense of futureExpenses) {
-        newSaving -= expense.amount; // Deduct each future expense
-        expense.currentsaving = newSaving;
-        await expense.save(); // Save updated expense
+        let futureIncomes = await Income.findAll({
+            where: {
+                userId: userId,
+                createdAt: { [Op.gt]: updatedDate }
+            },
+            order: [['createdAt', 'ASC'], ['id', 'ASC']]
+        })
+        console.log("new saving:: ", newSaving);
+
+        for (let expense of futureExpenses) {
+            // Deduct each future expense
+            expense.currentsaving -= newSaving;
+            await expense.save(); // Save updated expense
+
+        }
+
+        for (let income of futureIncomes) {
+            income.totalsaving -= newSaving
+            await income.save()
+        }
+
+    } catch (err) {
+        console.log("Error in updating future incomes and expenses:: ", err);
+
     }
+
 }
 // exports.getExpenses = async (req, res, next) => {
 //     try {
@@ -227,7 +262,7 @@ exports.getExpenses = async (req, res, next) => {
             if (userIncome) {
                 expenses.at(-1).currentsaving += userIncome.amount
             }
-            expenses.at(-1).save()
+            await expenses.at(-1).save()
         }
         res.status(200).json({ expenses })
 
@@ -241,19 +276,114 @@ exports.deleteExpense = async (req, res, next) => {
     try {
         const { id } = req.params
         const { prevdate } = req.query
-        const userIncome = await finduserIncome(prevdate, req.user.id)
-        const expensetodel = await Expense.findByPk(id)
+        let userIncome;
+        const expensetodel = await Expense.findOne({ where: { id, userId: req.user.id } })
         console.log("Expense to be deleted: ", expensetodel);
 
-        userIncome.totalsaving += expensetodel.amount
-        delamount = expensetodel.amount
-        await userIncome.save()
+        let incomeonThatDate = await Income.findOne({
+            where:
+            {
+                userId: req.user.id,
+                createdAt: prevdate
+            },
+            order: [['id', 'DESC']],
+            limit: 1
+        });
+
+        let expensesbeforeDel = await Expense.findAll({
+            where: {
+                userId: req.user.id,
+                createdAt: prevdate
+            },
+            order: [['id', 'ASC']],
+        })
+        console.log("Expenses before Delete:: ", expensesbeforeDel);
+
+        let delamount = expensetodel.amount
+        let delcurrSave = expensetodel.currentsaving
+        console.log("Del amount:: ", delamount);
         await expensetodel.destroy()
-        res.status(200).json({ message: 'Congratulations you cut on expenses!' })
+
+        let remainingExpenses = await Expense.findAll({
+            where: {
+                userId: req.user.id,
+                createdAt: prevdate
+            },
+            order: [['id', 'ASC']],
+        })
+        console.log("Expenses after Delete:: ", remainingExpenses);
+        let lastExpcurrSaving;
+        console.log("delete id:: ", id);
+
+        console.log("last expense Before delete:: ", expensesbeforeDel.at(-1));
+        if (id !== expensesbeforeDel.at(-1).id) {
+            let lastExpense = remainingExpenses.at(-1)
+            console.log("last expense remaining:: ", lastExpense);
+            console.log("last expense remaining id:: ", remainingExpenses.at(-1).id);
+            lastExpcurrSaving = lastExpense.currentsaving + delamount
+            lastExpense.currentsaving = lastExpcurrSaving;
+            console.log("last expense current saving:: ", lastExpcurrSaving);
+            await lastExpense.save()
+            // for (let expense of remainingExpenses) {
+            //     expense.currentsaving = lastExpcurrSaving
+            //     expense.save()
+            // }
+        }
+        if (incomeonThatDate) {
+            incomeonThatDate.totalsaving += delamount
+            await incomeonThatDate.save()
+            let lastExponIncDate = remainingExpenses.at(-1)
+            lastExponIncDate.currentsaving = incomeonThatDate.totalsaving
+            lastExponIncDate.save()
+        }
+        updateAfterDelete(req.user.id, prevdate, delamount)
     } catch (err) {
+        console.log("delete error!!! ", err);
+
         res.status(500).json({ error: 'Failed to delete expense', details: err })
     }
 };
+
+async function updateAfterDelete(userId, updatedDate, addedAmount) {
+    try {
+
+        let futureExpenses = await Expense.findAll({
+            where: {
+                userId: userId,
+                createdAt: { [Op.gt]: updatedDate }  // Get expenses after the updated date
+            },
+            order: [['createdAt', 'ASC'], ['id', 'ASC']]
+        });
+
+        let futureIncomes = await Income.findAll({
+            where: {
+                userId: userId,
+                createdAt: { [Op.gt]: updatedDate }
+            },
+            order: [['createdAt', 'ASC'], ['id', 'ASC']]
+        })
+
+
+        console.log("new saving:: ", addedAmount);
+        for (let expense of futureExpenses) {
+            // date = expense.createdAt
+            expense.currentsaving += addedAmount
+            await expense.save(); // Save updated expense
+        }
+        console.log("New Saving from update function in income::: ", addedAmount);
+
+        for (let income of futureIncomes) {
+            income.totalsaving += addedAmount
+            await income.save()
+        }
+
+        console.log("Future expenses updated successfully");
+    } catch (err) {
+        console.log("update error!! ", err);
+
+        console.log("Error in updating future incomes:: ", err);
+    }
+}
 
 exports.getExpenseById = async (req, res, next) => {
     try {
