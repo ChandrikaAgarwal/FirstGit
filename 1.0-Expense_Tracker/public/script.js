@@ -359,9 +359,14 @@ if (form) {
                 console.log("Expense Delete button clicked: ");
                 const delItem = delBtn.parentElement;
                 const id = delItem.dataset.id
+
+                console.log("delItem: ", delItem);
+                console.log("delItem.dataset: ", delItem.dataset);
+                console.log("delItem.dataset.id: ", delItem.dataset.id);
+
                 console.log("Delete btn clicked to delete an expense :", delItem, "of id: ", id);
 
-                const deleteExp = await axios
+                const deleteResponse = await axios
                     .delete(
                         `${api_url}/api/expenses/${id}`, {
                         params: {
@@ -371,45 +376,54 @@ if (form) {
                             Authorization: `Bearer ${token}`
                         }
                     })
-                console.log("response on deleteing:: ", deleteExp);
+                // listOfExpenses.removeChild(delItem)
+                delItem.remove()
+                // const expensedisplayed = document.querySelector(`[data-id='${id}']`)
+                // console.log("expense to delete ",expensedisplayed);
+                // expensedisplayed.innerHTML=""
+                console.log("Delete API Response: ", deleteResponse.data);
+            }
 
-
-
-                expense_list.removeChild(delItem)
-                await axios.get(`${api_url}/api/expenses?carouseldate=${prevdate}`, {
+            const res = await axios.get(`${api_url}/api/expenses?carouseldate=${prevdate}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            console.log("Response after expense deletion: ", res.data.expenses);
+            if (res.data.expenses.length > 0) {
+                displaySavings(prevdate, res.data.expenses.at(-1).currentsaving)
+            } else {
+                const incomeRes = await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
-                }).then(async (res) => {
-                    console.log("Response after expense deletion: ", res.data.expenses);
-                    if (res.data.expenses.length > 0) {
-                        displaySavings(prevdate, res.data.expenses.at(-1).currentsaving)
-                    } else {
-                        const incomeRes = await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
-                            headers: {
-                                Authorization: `Bearer ${token}`
-                            }
-                        })
-                        console.log("Income response:: ", incomeRes);
+                })
+                console.log("Income response:: ", incomeRes);
+                if (incomeRes.data.income) {
+                    displaySavings(prevdate, incomeRes.data.income.totalsaving)
+                } else {
 
-                        displaySavings(prevdate, incomeRes.data.savings)
-
-                    }
-
-                }).catch(err => console.log("Error updating after ddeletion of expense: ", err))
-
-                // if (incomeResponse.data.income) {
-
-                //     console.log("Getting Data on refresh!!", incomeResponse.data);
-
-                //     displayIncome(prevdate, incomeResponse.data.income.amount, incomeResponse.data.income.id)
-                //     console.log("On refresh: ", incomeResponse.data.income.totalsaving);
-                //     displaySavings(prevdate, incomeResponse.data.income.totalsaving) //to display the savings first
-                // }
+                    displaySavings(prevdate, incomeRes.data.savings)
+                }
 
             }
 
+
+
+            // if (incomeResponse.data.income) {
+
+            //     console.log("Getting Data on refresh!!", incomeResponse.data);
+
+            //     displayIncome(prevdate, incomeResponse.data.income.amount, incomeResponse.data.income.id)
+            //     console.log("On refresh: ", incomeResponse.data.income.totalsaving);
+            //     displaySavings(prevdate, incomeResponse.data.income.totalsaving) //to display the savings first
+            // }
+
+
+
         } catch (err) {
+            console.log("The error is:: ", err.response ? err.response.data : err.message);
+
             console.log("the error is:: ", err);
         }
     });

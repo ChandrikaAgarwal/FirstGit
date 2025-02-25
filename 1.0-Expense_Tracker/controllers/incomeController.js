@@ -56,29 +56,36 @@ exports.postAddIncome = async (req, res, next) => {
 
         const lastIncome = await finduserIncome(date, req.user.id)
         console.log("lastExpense ", lastExpense);
-        const expenseonDate = await Expense.findOne({
+        // const expenseonDate = await Expense.findOne({
+        //     where: {
+        //         userId: req.user.id,
+        //         createdAt: date
+        //     },
+        //     order: [['id', 'DESC']],
+        //     limit: 1
+        // }) 
+        let allexpensesOnDate = await Expense.findAll({
             where: {
                 userId: req.user.id,
                 createdAt: date
             },
-            order: [['id', 'DESC']],
-            limit: 1
+            order: [['id', 'ASC']],
         })
-
         if (existingIncome) {
             amount = req.body.amount; // Add to existing income
             latestSaving = existingIncome.totalsaving + req.body.amount;
 
-            if (expenseonDate) {
-                expenseonDate.currentsaving += req.body.amount
-                latestSaving = expenseonDate.currentsaving
-                await expenseonDate.save()
+            if (allexpensesOnDate) {  //update the cs of all expenses on that date if present
+                for (let expense of allexpensesOnDate) {
+                    expense.currentsaving += req.body.amount
+                    expense.save();
+                }
             }
-        } else if (expenseonDate) {
-            expenseonDate.currentsaving += req.body.amount
-            latestSaving = expenseonDate.currentsaving
-            await expenseonDate.save()
-
+        } else if (allexpensesOnDate) {  //update the cs of all expenses on that date if present
+            for (let expense of allexpensesOnDate) {
+                expense.currentsaving += req.body.amount
+                expense.save();
+            }
         } else if (lastExpense) {
             latestSaving = lastExpense.currentsaving + req.body.amount;
 
@@ -88,6 +95,8 @@ exports.postAddIncome = async (req, res, next) => {
         } else {
             latestSaving = req.body.amount;
         }
+
+
 
         const newIncome = await user.createIncome({
             amount,

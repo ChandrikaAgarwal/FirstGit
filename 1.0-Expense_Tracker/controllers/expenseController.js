@@ -280,6 +280,8 @@ exports.deleteExpense = async (req, res, next) => {
         const expensetodel = await Expense.findOne({ where: { id, userId: req.user.id } })
         console.log("Expense to be deleted: ", expensetodel);
 
+        console.log("type of id:: ", typeof (id));
+
         let incomeonThatDate = await Income.findOne({
             where:
             {
@@ -297,7 +299,6 @@ exports.deleteExpense = async (req, res, next) => {
             },
             order: [['id', 'ASC']],
         })
-        console.log("Expenses before Delete:: ", expensesbeforeDel);
 
         let delamount = expensetodel.amount
         let delcurrSave = expensetodel.currentsaving
@@ -311,31 +312,23 @@ exports.deleteExpense = async (req, res, next) => {
             },
             order: [['id', 'ASC']],
         })
-        console.log("Expenses after Delete:: ", remainingExpenses);
         let lastExpcurrSaving;
         console.log("delete id:: ", id);
 
-        console.log("last expense Before delete:: ", expensesbeforeDel.at(-1));
-        if (id !== expensesbeforeDel.at(-1).id) {
+
+        if (parseInt(id) !== expensesbeforeDel.at(-1).dataValues.id) {
             let lastExpense = remainingExpenses.at(-1)
-            console.log("last expense remaining:: ", lastExpense);
-            console.log("last expense remaining id:: ", remainingExpenses.at(-1).id);
             lastExpcurrSaving = lastExpense.currentsaving + delamount
             lastExpense.currentsaving = lastExpcurrSaving;
-            console.log("last expense current saving:: ", lastExpcurrSaving);
             await lastExpense.save()
-            // for (let expense of remainingExpenses) {
-            //     expense.currentsaving = lastExpcurrSaving
-            //     expense.save()
-            // }
+
         }
         if (incomeonThatDate) {
             incomeonThatDate.totalsaving += delamount
             await incomeonThatDate.save()
-            let lastExponIncDate = remainingExpenses.at(-1)
-            lastExponIncDate.currentsaving = incomeonThatDate.totalsaving
-            lastExponIncDate.save()
         }
+
+        res.status(200).json({ message: "Deleted successfully!", expensetodelete: expensetodel });
         updateAfterDelete(req.user.id, prevdate, delamount)
     } catch (err) {
         console.log("delete error!!! ", err);
