@@ -148,6 +148,16 @@ button {
 .deleteIncome {
     background: none;
     margin-left: 2%;
+    font-size: 15px;
+}
+
+.incomecol li {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    font-weight: 600;
 }
 
 .allExpenses li {

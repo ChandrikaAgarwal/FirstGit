@@ -30,7 +30,7 @@ exports.postAddIncome = async (req, res, next) => {
         const { date } = req.query
         let amount = req.body.amount
         let description = req.body.description;
-        let latestSaving = 0;
+        let latestSaving =0;
 
         const existingIncome = await Income.findOne({
             where:
@@ -75,17 +75,18 @@ exports.postAddIncome = async (req, res, next) => {
             amount = req.body.amount; // Add to existing income
             latestSaving = existingIncome.totalsaving + req.body.amount;
 
-            if (allexpensesOnDate) {  //update the cs of all expenses on that date if present
+            if (allexpensesOnDate.length > 0) {  //update the cs of all expenses on that date if present
                 for (let expense of allexpensesOnDate) {
                     expense.currentsaving += req.body.amount
                     expense.save();
                 }
             }
-        } else if (allexpensesOnDate) {  //update the cs of all expenses on that date if present
+        } else if (allexpensesOnDate.length>0) {  //update the cs of all expenses on that date if present
             for (let expense of allexpensesOnDate) {
                 expense.currentsaving += req.body.amount
                 expense.save();
             }
+            latestSaving
         } else if (lastExpense) {
             latestSaving = lastExpense.currentsaving + req.body.amount;
 
@@ -96,6 +97,8 @@ exports.postAddIncome = async (req, res, next) => {
             latestSaving = req.body.amount;
         }
 
+        console.log("latestSaving:: ",latestSaving);
+        
 
 
         const newIncome = await user.createIncome({
