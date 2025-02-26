@@ -1,7 +1,6 @@
 const Expense = require('../models/expense')
 const User = require('../models/user')
 const Income = require('../models/income')
-const { jwtAuthMiddleware, generateToken } = require('../jwtmiddleware');
 const { Sequelize, Op } = require('sequelize');
 
 async function finduserIncome(incomedate, userId) {
@@ -18,7 +17,6 @@ async function finduserIncome(incomedate, userId) {
 
     });
 }
-
 
 exports.postAddExpense = async (req, res, next) => {
     console.log("expense controller activated!!");
@@ -158,29 +156,6 @@ async function updateFutureExpenses(userId, updatedDate, newSaving) {
     }
 
 }
-// exports.getExpenses = async (req, res, next) => {
-//     try {
-//         const { carouseldate } = req.query
-//         const userid = req.user.id
-//         console.log("Response ", res);
-//         // if (!date) {
-//         //     return res.status(400).json({ error: "Date is required" });
-//         // }
-//         const expenses = await Expense.findAll(
-//             {
-//                 where: {
-//                     userId: userid,
-//                     createdAt: carouseldate
-//                 }
-//             })
-//        
-
-//         res.status(200).json({ expenses })
-
-//     } catch (err) {
-//         res.status(500).json({ message: "Error fetching expenses ", details: err })
-//     }
-// };
 
 exports.getExpenses = async (req, res, next) => {
     try {
@@ -256,7 +231,8 @@ exports.deleteExpense = async (req, res, next) => {
         let remainingExpenses = await Expense.findAll({
             where: {
                 userId: req.user.id,
-                createdAt: prevdate
+                createdAt: prevdate,
+                id: { [Op.gt]: id }
             },
             order: [['id', 'ASC']],
         })
@@ -265,10 +241,11 @@ exports.deleteExpense = async (req, res, next) => {
 
 
         if (parseInt(id) !== expensesbeforeDel.at(-1).dataValues.id) {
-            let lastExpense = remainingExpenses.at(-1)
-            lastExpcurrSaving = lastExpense.currentsaving + delamount
-            lastExpense.currentsaving = lastExpcurrSaving;
-            await lastExpense.save()
+            for (let expense of remainingExpenses) {
+                expense.currentsaving += delamount
+                expense.save()
+            }
+
 
         }
         if (incomeonThatDate) {
@@ -377,18 +354,6 @@ exports.updateExpense = async (req, res, next) => {
         await expense.save()
 
         res.status(200).json({ message: 'Updated expense', editexpense: expense })
-
-
-        // .then(result=>{
-        //     console.log("Expense to be edited removed from db");
-
-        // })
-        // .catch(err=>console.log(err))
-
-        // Update fields
-
-
-
 
     } catch (err) {
         res.status(500).json({ error: 'Failed to edit expense', details: err.message });

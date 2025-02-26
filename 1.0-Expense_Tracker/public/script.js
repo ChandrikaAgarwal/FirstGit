@@ -27,6 +27,7 @@ if (signupForm) {
             email: e.target.email.value,
             password: e.target.password.value
         }
+
         console.log("newuserdetail ", newuserDetail);
         try {
             const res = await axios.post(`${api_url}`, newuserDetail)
@@ -121,7 +122,6 @@ if (form) {
         prevdate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         console.log("prevDate: ", prevdate);
         let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        // let options={year: 'numeric', month: 'numeric', day: 'numeric'};
         return date.toLocaleDateString('en-US', options);
     }
 
@@ -245,16 +245,19 @@ if (form) {
         }
 
     })
+    const incomeul = document.createElement('ul')
+    incomeul.className = "incomeul"
+    incomecol.appendChild(incomeul)
 
     function displayIncome(createdAt, income, incomeid) {
-        incomecol.innerHTML = "";
         const incomeLi = document.createElement('li')
+        // incomecol.innerHTML = "";
         if (createdAt === prevdate) {
             incomeLi.innerHTML = `${income} <button class="editIncome"><i class="fa-solid fa-pen"></i></button><button class="deleteIncome"><i class="fa-solid fa-trash"></i></button>`
         }
         incomeLi.className = "incomedisplayed"
         incomeLi.dataset.id = incomeid
-        incomecol.appendChild(incomeLi)
+        incomeul.appendChild(incomeLi)
         console.log("income col innerhtml: ", incomecol.innerHTML);
 
         container.insertBefore(row, expense_list)
@@ -292,18 +295,22 @@ if (form) {
         })
         console.log("incomeResponse on Specific date of carousel: ", incomeResponse.data);
 
-        if (incomeResponse.data.income) {
+        if (incomeResponse.data.income && incomeResponse.data.allincomesonDate.length > 0) {
             incomecreatedAt = incomeResponse.data.income.createdAt.split('T')[0]
             console.log("Getting Data on refresh!!", incomeResponse.data.savings);
+            let arrofincomes = incomeResponse.data.allincomesonDate
+            for (let income of arrofincomes) {
+                let incomeDate = income.createdAt.split('T')[0]
+                displayIncome(incomeDate, income.amount, income.id)
 
+            }
+            // displayIncome(incomecreatedAt, incomeResponse.data.income.amount, incomeResponse.data.income.id)
 
-            displayIncome(incomecreatedAt, incomeResponse.data.income.amount, incomeResponse.data.income.id)
             console.log("On refresh: ", incomeResponse.data.income.totalsaving);
-            //    displaySavings(incomecreatedAt, incomeResponse.data.income.totalsaving) //to display the savings first
-            // displaySavings(incomecreatedAt, incomeResponse.data.income.savings)
-            displaySavings(incomecreatedAt, incomeResponse.data.totalsaving)
-        } else {
-            incomecol.innerHTML = "";
+            displaySavings(incomecreatedAt, incomeResponse.data.income.totalsaving)//for ke bahar
+        }
+        else {
+            incomeul.innerHTML = "";
         }
         listOfExpenses = document.querySelector('.allExpenses')
         console.log("List of expenses: ", listOfExpenses);
@@ -350,8 +357,6 @@ if (form) {
     }
 
     const delBtn = document.querySelector('.deleteExpense')
-
-
 
     expense_list.addEventListener('click', async (e) => {
         try {
@@ -410,19 +415,6 @@ if (form) {
 
             }
 
-
-
-            // if (incomeResponse.data.income) {
-
-            //     console.log("Getting Data on refresh!!", incomeResponse.data);
-
-            //     displayIncome(prevdate, incomeResponse.data.income.amount, incomeResponse.data.income.id)
-            //     console.log("On refresh: ", incomeResponse.data.income.totalsaving);
-            //     displaySavings(prevdate, incomeResponse.data.income.totalsaving) //to display the savings first
-            // }
-
-
-
         } catch (err) {
             console.log("The error is:: ", err.response ? err.response.data : err.message);
 
@@ -479,10 +471,18 @@ if (form) {
     });
 
     function populateFields(response) {
-        let amount = document.getElementById('amount').value = response.amount;
-        let description = document.getElementById('description').value = response.description;
-        let category = document.getElementById('category').value = response.category;
-        return editExpense = { amount, description, category }
+        if (response.category) {
+            let amount = document.getElementById('amount').value = response.amount;
+            let description = document.getElementById('description').value = response.description;
+            let category = document.getElementById('category').value = response.category;
+            return modifyExpense = { amount, description, category }
+        } else {
+            let amount = document.getElementById('amount').value = response.data.editincome.amount;
+            let description = document.getElementById('description').value = response.data.editincome.description;
+            return modifyIncome = {
+                amount, description
+            }
+        }
     }
 
     const incomeDel = document.querySelector(".deleteIncome")
@@ -505,8 +505,7 @@ if (form) {
             })
                 .then(async (response) => {
                     console.log("Response on delete: ", response);
-                    incomecol.removeChild(deleteItem)
-                    incomecol.innerHTML = ""
+                    incomeul.removeChild(deleteItem)
                     await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -514,18 +513,60 @@ if (form) {
                     })
                         .then(response => {
                             console.log("Response on getting the savings after delete: ", response);
-                            if (response.data.income) {
-
-                                displayIncome(prevdate, response.data.income.amount, response.data.income.id)
-                            }
                             displaySavings(prevdate, response.data.savings)
-
 
                         }).catch(err => console.log("Error in getting after deletion: ", err))
 
                 }).catch(err => console.log("Error deleting income ", err))
         }
     })
+
+    function openForm() {
+        if (!form.classList.contains("show")) {
+            showformbtn.click();
+        }
+        if (togBtn.textContent === "EXPENSE") {
+            togBtn.click();
+        }
+    }
+    let editIncome = document.querySelector('.editIncome')
+
+    document.addEventListener('click', async (e) => {
+        try {
+            if (e.target.closest('.editIncome')) {
+                console.log("Income edit button: ", editIncome);
+                const editItem = e.target.closest(".incomedisplayed")
+                const id = editItem.dataset.id
+                console.log("edit Button Clicked for item : ", editItem, "of id ", id);
+                openForm();
+                const getIncomeRes = await axios.get(
+                    `${api_url}/api/income/${id}`, {
+                    params: {
+                        prevdate
+                    },
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                console.log("edit income response: ", getIncomeRes);
+
+                let fetchedIncome = populateFields(getIncomeRes)
+
+                const editedIncome = await axios.put(`${api_url}/api/income/${id}`, fetchedIncome, {
+                    params: {
+                        prevdate
+                    },
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                console.log("Income after edit response: ", editedIncome);
+
+
+            }
+        } catch (err) {
+            console.log("error in editing income: ", err);
+
+        }
+    })
 }
-
-

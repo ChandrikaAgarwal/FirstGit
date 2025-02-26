@@ -30,7 +30,7 @@ exports.postAddIncome = async (req, res, next) => {
         const { date } = req.query
         let amount = req.body.amount
         let description = req.body.description;
-        let latestSaving =0;
+        let latestSaving = 0;
 
         const existingIncome = await Income.findOne({
             where:
@@ -81,7 +81,7 @@ exports.postAddIncome = async (req, res, next) => {
                     expense.save();
                 }
             }
-        } else if (allexpensesOnDate.length>0) {  //update the cs of all expenses on that date if present
+        } else if (allexpensesOnDate.length > 0) {  //update the cs of all expenses on that date if present
             for (let expense of allexpensesOnDate) {
                 expense.currentsaving += req.body.amount
                 expense.save();
@@ -97,8 +97,8 @@ exports.postAddIncome = async (req, res, next) => {
             latestSaving = req.body.amount;
         }
 
-        console.log("latestSaving:: ",latestSaving);
-        
+        console.log("latestSaving:: ", latestSaving);
+
 
 
         const newIncome = await user.createIncome({
@@ -178,6 +178,15 @@ exports.getIncome = async (req, res, next) => {
             },
             order: [['id', 'ASC']]
         })
+
+        const allincomesonDate = await Income.findAll({
+            where: {
+                userId: req.user.id,
+                createdAt: carouseldate
+            },
+            order: [['id', 'ASC']]
+        })
+
         expenseOnLatest = await Expense.findOne({
             where: {
                 userId: req.user.id,
@@ -221,7 +230,8 @@ exports.getIncome = async (req, res, next) => {
 
         console.log("savings testing ", savings);
 
-        res.status(200).json({ income, savings })
+        // res.status(200).json({income, savings })
+        res.status(200).json({ allincomesonDate, income, savings })
 
     } catch (err) {
         console.log("Income EERR!!! ", err);
@@ -230,7 +240,18 @@ exports.getIncome = async (req, res, next) => {
 
     }
 }
+exports.getIncomebyId = async (req, res, next) => {
+    try {
+        const { id } = req.params
+        const { prevdate } = req.query
+        const editIncomeonDate = await Income.findByPk(id)
+        res.status(200).json({ message: "Getting income to be edited", editincome: editIncomeonDate })
+    } catch (err) {
+        console.log("get Income by id EERR!!! ", err);
 
+        res.status(500).json({ error: "Failed to get income", details: err })
+    }
+}
 exports.deleteIncome = async (req, res, next) => {
     try {
         const { id } = req.params
@@ -246,6 +267,14 @@ exports.deleteIncome = async (req, res, next) => {
         })
         console.log("Income to delete:: ", incometoDel);
         const delAmount = incometoDel.amount
+
+        let incomesbeforeDel = await Income.findAll({
+            where: {
+                userId: req.user.id,
+                createdAt: prevdate
+            },
+            order: [['id', 'ASC']],
+        })
         const expensesOnDate = await Expense.findAll({
             where: {
                 userId: req.user.id,
@@ -264,17 +293,21 @@ exports.deleteIncome = async (req, res, next) => {
             }
             await incometoDel.destroy()
         }
-        const incomeonDate = await Income.findOne({
+
+        const remainingincomes = await Income.findAll({
             where: {
                 userId: req.user.id,
-                createdAt: prevdate
+                createdAt: prevdate,
+                id: { [Op.gt]: id }
             },
-            order: [['id', "DESC"]],
-            limit: 1
+            order: [['id', "ASC"]],
+            // limit: 1
         })
-        if (incomeonDate) {
-            incomeonDate.totalsaving = finalsaving
-            incomeonDate.save()
+        if (parseInt(id) !== incomesbeforeDel.at(-1).id) {
+            for (let income of remainingincomes) {
+                income.totalsaving -= delAmount
+                await income.save()
+            }
         }
         await updateAfterDelete(req.user.id, prevdate, delAmount)
         res.status(200).json({ message: "Income deleted successfully" })
@@ -285,6 +318,13 @@ exports.deleteIncome = async (req, res, next) => {
     }
 }
 
+exports.editIncome = async (req, res, next) => {
+    try {
+
+    } catch (err) {
+
+    }
+}
 async function updateAfterDelete(userId, updatedDate, amount) {
     try {
         let futureExpenses = await Expense.findAll({
