@@ -33,6 +33,7 @@ if (signupForm) {
             console.log("New User Detail: ", res.data);
             localStorage.setItem('token', res.data.token);
             alert("Signup successful! Please log in.");
+            signupForm.reset()
             window.location.href = "/users"
         } catch (err) {
             console.error("Error: ", err.response)
@@ -61,6 +62,7 @@ if (loginForm) {
         try {
             const res = await axios.post(`${api_url}/users`, userDetail)
             console.log("Login Successful User Detail: ", res.data);
+            loginForm.reset()
             alert(res.data.message)
 
             localStorage.setItem('token', res.data.token);

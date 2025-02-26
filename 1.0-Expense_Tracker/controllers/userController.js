@@ -1,6 +1,8 @@
 const User = require('../models/user')
 const { jwtAuthMiddleware, generateToken } = require('../jwtmiddleware');
 const { Sequelize, Op } = require('sequelize');
+const bcrypt = require('bcryptjs')
+
 
 exports.postAddUser = async (req, res, next) => {
 
@@ -13,17 +15,20 @@ exports.postAddUser = async (req, res, next) => {
         const user = await User.findOne({ where: { email: email } })
         if (user) {
             return res.status(400).json({ message: "User already exists. Please log in." });
-        } else {
-            const newUser = await User.create({
-                name: name,
-                email: email,
-                password: password
-            })
-            const token = generateToken({ id: newUser.id, email: newUser.email })
-            console.log("New User Created: ", newUser, "Token :", token);
-
-            return res.status(200).json({ message: "New user created ", userdetail: newUser, token: token })
         }
+
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds)
+        const newUser = await User.create({
+            name: name,
+            email: email,
+            password: hashedPassword
+        })
+        const token = generateToken({ id: newUser.id, email: newUser.email })
+        console.log("New User Created: ", newUser, "Token :", token);
+
+        return res.status(200).json({ message: "New user created ", userdetail: newUser, token: token })
+
     } catch (err) {
         console.log("Error in postAddUser:", err);
 
@@ -40,9 +45,11 @@ exports.getUser = async (req, res, next) => {
         if (!user) {
             return res.status(400).json({ message: "Not a user. Kindly signup" });
         }
-        if (user.password !== password) {
+
+        const isMatch = await bcrypt.compare(password, user.password)
+        if (!isMatch) {
             console.log("passowrd mismatch ", email);
-            return res.status(401).json({ message: "Password mismatch" })
+            return res.status(401).json({ message: "Password is incorrect" })
 
         }
         const token = generateToken({ id: user.id, email: user.email })
