@@ -13,7 +13,11 @@ const expense_list = document.createElement('ul')
 expense_list.className = "allExpenses"
 const usersDiv = document.getElementById('users')
 const row = document.querySelector('.incomedisplay')
+const addBtn = document.getElementById('add')
+const saveBtn = document.getElementById('save')
+const cancelBtn = document.getElementById('cancel')
 let listOfExpenses;
+let isEditing = false;
 
 var userId;
 if (signupForm) {
@@ -100,7 +104,10 @@ if (form) {
 
             icon.classList.replace('fa-minus', 'fa-plus'); // Change back to plus
         } else {
-            icon.classList.replace('fa-plus', 'fa-minus'); // Change to minus
+            icon.classList.replace('fa-plus', 'fa-minus');// Change to minus
+            saveBtn.style.display = "none"
+            cancelBtn.style.display = "none";
+            addBtn.style.display = "block";
         }
     })
 
@@ -115,7 +122,9 @@ if (form) {
 
     let currentDay = today.getDate();
 
-    let daysinMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
+    function getDaysInMonth(year, month) {
+        return new Date(year, month + 1, 0).getDate();
+    }
 
     function formatDate(year, month, day) {
         let date = new Date(year, month, day);
@@ -148,10 +157,19 @@ if (form) {
 
     getExpensesOndate()
     nextBtn.addEventListener("click", () => {
+        let daysInCurrentMonth = getDaysInMonth(currentYear, currentMonth);
 
-
-        if (currentDay < daysinMonth) {
+        if (currentDay < daysInCurrentMonth) {
             currentDay++;
+            console.log("current day : ", currentDay);
+        } else {
+            currentDay = 1;
+            if (currentMonth < 11) {
+                currentMonth++;
+            } else {
+                currentMonth = 0;  //january
+                currentYear++;
+            }
         }
         updateDateDisplay();
         getExpensesOndate()
@@ -163,8 +181,15 @@ if (form) {
         console.log("current day: ", currentDay);  //16
         if (currentDay > 1) {
             currentDay--;
-            console.log("currentday on prev: ", currentDay); //15
-
+            console.log("currentday on prev: ", currentDay); //15  
+        } else {
+            if (currentMonth > 0) {
+                currentMonth--;
+            } else {
+                currentMonth = 11; //december
+                currentYear--;
+            }
+            currentDay = getDaysInMonth(currentYear, currentMonth);
         }
         updateDateDisplay();
         getExpensesOndate()
@@ -200,7 +225,6 @@ if (form) {
     console.log(container);
     form.addEventListener("submit", async (e) => {
         e.preventDefault()
-
         if (togBtn.textContent === "EXPENSE") {
             console.log("i am in expense mode");
             const Detail = {
@@ -229,6 +253,7 @@ if (form) {
                 description: e.target.description.value,
             }
             console.log("Income: ", incomeDetail);
+
             await axios.post(`${api_url}/api/income/?date=${prevdate}`, incomeDetail, {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -304,7 +329,6 @@ if (form) {
                 displayIncome(incomeDate, income.amount, income.id)
 
             }
-            // displayIncome(incomecreatedAt, incomeResponse.data.income.amount, incomeResponse.data.income.id)
 
             console.log("On refresh: ", incomeResponse.data.income.totalsaving);
             displaySavings(incomecreatedAt, incomeResponse.data.income.totalsaving)//for ke bahar
@@ -327,10 +351,6 @@ if (form) {
         expense_list.innerHTML = ""
         if (filteredExpenses.length > 0) {
             filteredExpenses.forEach(expense => displayExpenses(expense, expense.id))
-            // if (incomeResponse.data.income) {
-            //     // displaySavings(incomecreatedAt, incomeResponse.data.income.savings)
-            //     displaySavings(incomecreatedAt, incomeResponse.data.savings)
-            // } else {
             console.log("Expense on no income:: ", filteredExpenses.at(-1).currentsaving)
             displaySavings(date, filteredExpenses.at(-1).currentsaving) //bcz savings are being updated
             // }
@@ -383,11 +403,7 @@ if (form) {
                             Authorization: `Bearer ${token}`
                         }
                     })
-                // listOfExpenses.removeChild(delItem)
                 delItem.remove()
-                // const expensedisplayed = document.querySelector(`[data-id='${id}']`)
-                // console.log("expense to delete ",expensedisplayed);
-                // expensedisplayed.innerHTML=""
                 console.log("Delete API Response: ", deleteResponse.data);
             }
 
@@ -506,6 +522,7 @@ if (form) {
                 .then(async (response) => {
                     console.log("Response on delete: ", response);
                     incomeul.removeChild(deleteItem)
+                    // incomecol.innerHTML = ""
                     await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -524,21 +541,41 @@ if (form) {
     function openForm() {
         if (!form.classList.contains("show")) {
             showformbtn.click();
+
         }
         if (togBtn.textContent === "EXPENSE") {
             togBtn.click();
         }
     }
+
+    cancelBtn.addEventListener('click', () => {
+        console.log("cancel btn clicked");
+
+        isEditing = false;
+        console.log("is Editing:: ", isEditing);
+
+        cancelBtn.style.display = "none"
+        form.reset()
+        showformbtn.click()
+    })
     let editIncome = document.querySelector('.editIncome')
 
     document.addEventListener('click', async (e) => {
         try {
+            let editedIncome
+            let newIncomeDetail;
             if (e.target.closest('.editIncome')) {
                 console.log("Income edit button: ", editIncome);
                 const editItem = e.target.closest(".incomedisplayed")
                 const id = editItem.dataset.id
                 console.log("edit Button Clicked for item : ", editItem, "of id ", id);
+                // incomeul.removeChild(editItem)
                 openForm();
+                cancelBtn.style.display = "block";
+                saveBtn.style.display = "block";
+                addBtn.style.display = "none";
+
+                isEditing = true;
                 const getIncomeRes = await axios.get(
                     `${api_url}/api/income/${id}`, {
                     params: {
@@ -548,22 +585,55 @@ if (form) {
                         Authorization: `Bearer ${token}`
                     }
                 })
-                console.log("edit income response: ", getIncomeRes);
+                // console.log("edit income response: ",getIncomeRes);
 
                 let fetchedIncome = populateFields(getIncomeRes)
+                if (isEditing) {
+                    console.log("is editing in put: ", isEditing);
+                    saveBtn.addEventListener("click", async () => {
+                        incomeul.removeChild(editItem)
+                        newIncomeDetail = {
+                            amount: document.getElementById('amount').value,
+                            description: document.getElementById('description').value,
+                        }
+                        console.log("newIncome detail: ", newIncomeDetail);
 
-                const editedIncome = await axios.put(`${api_url}/api/income/${id}`, fetchedIncome, {
-                    params: {
-                        prevdate
-                    },
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-                console.log("Income after edit response: ", editedIncome);
+                        try {
+                            newIncome = await axios.put(`${api_url}/api/income/${id}`, newIncomeDetail, {
+                                params: {
+                                    prevdate
+                                },
+                                headers: {
+                                    Authorization: `Bearer ${token}`
+                                }
+                            })
+                            console.log("Income after edit response: ", newIncome.data);
+                            displayIncome(prevdate, newIncome.data.editedIncome.amount, newIncome.data.editedIncome.id)
+                            try {
+                                const getIncome = await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
+                                    headers: {
+                                        Authorization: `Bearer ${token}`
+                                    }
+                                })
+                                console.log("Response on getting the savings after delete: ", getIncome);
+                                displaySavings(prevdate, getIncome.data.savings)
+                            } catch (err) {
+                                console.log("error getting incomes after edit: ", err);
 
+                            }
 
+                            // displaySavings(prevdate, newIncome.data.editedIncome.totalsaving )
+                        } catch (err) {
+                            console.log("Error updating income: ", err);
+                        }
+                    })
+                }
             }
+
+
+
+
+
         } catch (err) {
             console.log("error in editing income: ", err);
 

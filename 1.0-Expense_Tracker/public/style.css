@@ -4,11 +4,21 @@
     border-radius: 10px;
 }
 
-#add {
+#add,
+#cancel,
+#save {
     margin-top: 2%;
     background-color: #74b174dc;
     padding: 8px;
     border-radius: 10px;
+    display: block;
+    flex-direction: column;
+    gap: 3px;
+}
+
+#cancel {
+    margin-bottom: 20%;
+    margin-right: 50%;
 }
 
 input {

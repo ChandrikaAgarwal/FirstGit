@@ -1,6 +1,7 @@
 const Expense = require('../models/expense')
 const User = require('../models/user')
 const Income = require('../models/income')
+const { jwtAuthMiddleware, generateToken } = require('../jwtmiddleware');
 const { Sequelize, Op } = require('sequelize');
 
 async function finduserIncome(incomedate, userId) {
@@ -86,13 +87,6 @@ exports.postAddExpense = async (req, res, next) => {
             currentsaving: latestsaving,
             createdAt: date //overriding default value of createdAt
         })
-
-        // if (lastExpense) {
-        //     while (lastExpense.createdAt > date) {
-        //         lastExpense.currentsaving -= amount;
-        //         lastExpense.save()
-        //     }
-        // }
 
         if (incomeonThatDate) {
             incomeonThatDate.totalsaving = latestsaving;
@@ -181,8 +175,12 @@ exports.getExpenses = async (req, res, next) => {
                 }
             })
         if (expenses.length > 0 && expenses.at(-1).currentsaving < 0) {
-            userIncome = incomeonThatDate ? incomeonThatDate : await finduserIncome(carouseldate, userid)
-            if (userIncome) {
+            // userIncome = incomeonThatDate ? incomeonThatDate : await finduserIncome(carouseldate, userid)
+            userIncome = await finduserIncome(carouseldate, userid)
+            console.log("user Income:: ", userIncome);
+            if (incomeonThatDate) {
+                expenses.at(-1).currentsaving = incomeonThatDate.totalsaving
+            } else if (userIncome) {
                 expenses.at(-1).currentsaving += userIncome.amount
             }
             await expenses.at(-1).save()
@@ -245,7 +243,6 @@ exports.deleteExpense = async (req, res, next) => {
                 expense.currentsaving += delamount
                 expense.save()
             }
-
 
         }
         if (incomeonThatDate) {
@@ -354,6 +351,18 @@ exports.updateExpense = async (req, res, next) => {
         await expense.save()
 
         res.status(200).json({ message: 'Updated expense', editexpense: expense })
+
+
+        // .then(result=>{
+        //     console.log("Expense to be edited removed from db");
+
+        // })
+        // .catch(err=>console.log(err))
+
+        // Update fields
+
+
+
 
     } catch (err) {
         res.status(500).json({ error: 'Failed to edit expense', details: err.message });

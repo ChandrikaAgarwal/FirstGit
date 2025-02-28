@@ -32,7 +32,7 @@ app.get('/monthly', (req, res) => {
 app.get('/yearly', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'yearly.html'));
 });
-// app.use(signupRoute)
+
 app.use('/', userRoute)
 app.use('/api/expenses', expenseRoute)
 app.use('/api/income', incomeRoute)

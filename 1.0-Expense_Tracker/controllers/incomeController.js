@@ -3,7 +3,6 @@ const User = require('../models/user')
 const Expense = require('../models/expense')
 const { Sequelize, Op } = require('sequelize')
 
-
 async function finduserIncome(incomedate, userId) {
     const lastIncome = await Income.findOne({
         where:
@@ -78,13 +77,13 @@ exports.postAddIncome = async (req, res, next) => {
             if (allexpensesOnDate.length > 0) {  //update the cs of all expenses on that date if present
                 for (let expense of allexpensesOnDate) {
                     expense.currentsaving += req.body.amount
-                    expense.save();
+                    await expense.save();
                 }
             }
         } else if (allexpensesOnDate.length > 0) {  //update the cs of all expenses on that date if present
             for (let expense of allexpensesOnDate) {
                 expense.currentsaving += req.body.amount
-                expense.save();
+                await expense.save();
             }
             latestSaving
         } else if (lastExpense) {
@@ -99,14 +98,14 @@ exports.postAddIncome = async (req, res, next) => {
 
         console.log("latestSaving:: ", latestSaving);
 
-
-
         const newIncome = await user.createIncome({
             amount,
             description,
             totalsaving: latestSaving,
             createdAt: date
         })
+        console.log("req.body.amount:: ", req.body.amount);
+
         await updateFutureIncomes(req.user.id, date, req.body.amount)
         console.log("New Income:", newIncome);
         res.status(200).json({ message: "New income created ", incomedetail: newIncome })
@@ -136,8 +135,17 @@ async function updateFutureIncomes(userId, updatedDate, addedAmount) {
             order: [['createdAt', 'ASC'], ['id', 'ASC']]
         })
 
-
+        let newaddedInc = await Income.findOne({
+            where: {
+                userId: userId,
+                createdAt: updatedDate
+            },
+            order: [['id', 'DESC']],
+            limit: 1
+        })
         console.log("new saving:: ", addedAmount);
+
+
         for (let expense of futureExpenses) {
             // date = expense.createdAt
             expense.currentsaving += addedAmount
@@ -256,12 +264,24 @@ exports.deleteIncome = async (req, res, next) => {
     try {
         const { id } = req.params
         const { prevdate } = req.query
+        await deleteInc(id, prevdate, req.user.id)
+        res.status(200).json({ message: "Income deleted successfully" })
+    } catch (err) {
+        console.log("error in delete income controller function:: ", err);
+
+        res.status(500).json({ error: "Failed to delete income", details: err })
+    }
+}
+
+async function deleteInc(id, date, userId) {
+    try {
         let finalsaving;
-        console.log("Date on deletion:: ", prevdate);
+        console.log("Date on deletion:: ", date);
+
 
         const incometoDel = await Income.findOne({
             where: {
-                userId: req.user.id,
+                userId: userId,
                 id: id
             },
         })
@@ -270,15 +290,18 @@ exports.deleteIncome = async (req, res, next) => {
 
         let incomesbeforeDel = await Income.findAll({
             where: {
-                userId: req.user.id,
-                createdAt: prevdate
+                userId: userId,
+                createdAt: date
             },
             order: [['id', 'ASC']],
         })
+
+        console.log("incomes before delete: ", incomesbeforeDel);
+
         const expensesOnDate = await Expense.findAll({
             where: {
-                userId: req.user.id,
-                createdAt: prevdate
+                userId: userId,
+                createdAt: date
             },
             order: [['id', 'ASC']], //smallest id will come first
         })
@@ -288,10 +311,92 @@ exports.deleteIncome = async (req, res, next) => {
         } else {
             for (let expense of expensesOnDate) {
                 expense.currentsaving -= delAmount
+                console.log("currentsaving : ", expense.currentsaving);
+
                 finalsaving = expense.currentsaving
                 await expense.save()
             }
             await incometoDel.destroy()
+        }
+
+        let incomeonThatDate = await Income.findOne({
+            where:
+            {
+                userId: userId,
+                createdAt: date
+            },
+            order: [['id', 'DESC']],
+            limit: 1
+        });
+
+        console.log("income on that date:: ", incomeonThatDate);
+
+        const remainingincomes = await Income.findAll({
+            where: {
+                userId: userId,
+                createdAt: date,
+                id: { [Op.gt]: id }
+            },
+            order: [['id', "ASC"]],
+            // limit: 1
+        })
+
+        console.log("remaining incomes: ", remainingincomes);
+
+        if (parseInt(id) !== incomesbeforeDel.at(-1).id) {
+            for (let income of remainingincomes) {
+                income.totalsaving -= delAmount
+                await income.save()
+            }
+        }
+
+        console.log("final saving: ", finalsaving);
+        console.log("income on that date after deletion: ", incomeonThatDate);
+        if (incomeonThatDate) {
+            incomeonThatDate.totalsaving = finalsaving
+            await incomeonThatDate.save()
+        }
+        await updateAfterDelete(userId, date, delAmount)
+
+    } catch (err) {
+        console.log("Error deleting income from backend ", err);
+
+
+    }
+}
+
+exports.editIncome = async (req, res, next) => {
+    try {
+        const { id } = req.params
+        const { prevdate } = req.query
+        const { amount, description } = req.body
+        let finalSaving;
+        console.log("amount: ", req.body.amount);
+        console.log("description", req.body.description);
+
+        const incometoEdit = await Income.findByPk(id)
+        console.log("Income to edit : ", incometoEdit);
+
+        let oldAmount = incometoEdit.amount
+        let difference = amount - oldAmount
+        console.log("difference: ", difference);
+
+        incometoEdit.amount = amount
+        incometoEdit.description = description
+        incometoEdit.totalsaving += difference
+        incometoEdit.save()
+
+        const allexpensesOnDate = await Expense.findAll({
+            where: {
+                userId: req.user.id,
+                createdAt: prevdate
+            },
+            order: [['id', 'ASC']]
+        })
+        for (let expense of allexpensesOnDate) {
+            expense.currentsaving += difference
+            finalSaving = expense.currentsaving
+            await expense.save()
         }
 
         const remainingincomes = await Income.findAll({
@@ -303,25 +408,18 @@ exports.deleteIncome = async (req, res, next) => {
             order: [['id', "ASC"]],
             // limit: 1
         })
-        if (parseInt(id) !== incomesbeforeDel.at(-1).id) {
-            for (let income of remainingincomes) {
-                income.totalsaving -= delAmount
-                await income.save()
-            }
+        console.log("remaining incomes: ", remainingincomes);
+
+        for (let income of remainingincomes) {
+            income.totalsaving += difference
+            await income.save()
         }
-        await updateAfterDelete(req.user.id, prevdate, delAmount)
-        res.status(200).json({ message: "Income deleted successfully" })
-    } catch (err) {
-        console.log("Error deleting income from backend ", err);
-
-        res.status(500).json({ error: "Failed to delete income", details: err })
-    }
-}
-
-exports.editIncome = async (req, res, next) => {
-    try {
+        updateFutureIncomes(req.user.id, prevdate, difference)
+        res.status(200).json({ message: "edited income.", editedIncome: incometoEdit })
 
     } catch (err) {
+        console.log("Error editing Income: ", err);
+        res.status(500).json({ error: "Failed to edit income", details: err })
 
     }
 }
