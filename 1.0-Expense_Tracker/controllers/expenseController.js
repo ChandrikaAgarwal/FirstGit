@@ -319,52 +319,58 @@ exports.updateExpense = async (req, res, next) => {
         const { prevdate } = req.query
         let oldAmount = 0
         const { amount, description, category } = req.body
-        const preExpenses = await Expense.findAll({
+        const allExpensesOnDate = await Expense.findAll({
             where:
             {
                 userId: req.user.id,
-                createdAt: Sequelize.literal(`DATE(createdAt)='${prevdate}'`)
+                createdAt: prevdate,
+                id: { [Op.gt]: id }
             },
-            order: [['createdAt', 'DESC']],
-            limit: 1
+            order: [['id', 'ASC']]
         })
-        console.log("PreExpenses:: ", preExpenses);
+        console.log("PreExpenses:: ", allExpensesOnDate);
 
-        const userIncome = await finduserIncome(prevdate, req.user.id)
-
-        const expense = await Expense.findByPk(id)
-
-        console.log(expense);
-        oldAmount = expense.amount
-        console.log("Old Amount", oldAmount);
-        userIncome.totalsaving = userIncome.totalsaving + oldAmount
-        await userIncome.save()
-        if (!expense) {
+        const allIncomesOnDate = await Income.findAll({
+            where:
+            {
+                userId: req.user.id,
+                createdAt: prevdate
+            },
+            order: [['id', 'ASC']]
+        })
+        const expenseToEdit = await Expense.findByPk(id)
+        console.log(expenseToEdit);
+        oldAmount = expenseToEdit.amount
+        const difference = oldAmount - amount
+        if (!expenseToEdit) {
             return res.status(404).json({ error: 'Expense not found' });
         }
-        await expense.destroy()
-        expense.amount = amount;
-        expense.description = description;
-        expense.category = category;
 
+        expenseToEdit.amount = amount
+        expenseToEdit.description = description
+        expenseToEdit.category = category
+        expenseToEdit.currentsaving += difference
+        await expenseToEdit.save()
+        console.log("expense edited: ", expenseToEdit);
 
-        await expense.save()
+        for (let expense of allExpensesOnDate) {
+            expense.currentsaving += difference
+            console.log("expense.currentsaving:: ", expense.currentsaving);
+            finalSaving = expense.currentsaving
+            await expense.save()
+        }
 
-        res.status(200).json({ message: 'Updated expense', editexpense: expense })
+        for (let income of allIncomesOnDate) {
+            income.totalsaving += difference
+            await income.save()
+        }
 
-
-        // .then(result=>{
-        //     console.log("Expense to be edited removed from db");
-
-        // })
-        // .catch(err=>console.log(err))
-
-        // Update fields
-
-
-
+        updateAfterDelete(req.user.id, prevdate, difference)
+        res.status(200).json({ message: 'Updated expense', editexpense: expenseToEdit })
 
     } catch (err) {
+        console.log("error in updateExpense:: ", err);
+
         res.status(500).json({ error: 'Failed to edit expense', details: err.message });
     }
 }

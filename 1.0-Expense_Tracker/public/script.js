@@ -440,57 +440,81 @@ if (form) {
 
     const editBtn = document.querySelector('.editExpense')
     expense_list.addEventListener('click', async (e) => {
-        const token = localStorage.getItem('token');
-        if (e.target.classList.contains('edit')) {
-            const editItem = e.target.parentElement;
-            const id = editItem.dataset.id
-            await axios.get(`${api_url}/api/expenses/${id}`, {
-                params: {
-                    prevdate
-                },
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-                .then(async (res) => {
-                    console.log("To edit expense: ", res.data.expense);
-                    expense_list.removeChild(editItem)
-                    let editExpense = populateFields(res.data.expense)
-                    const response = await axios.put(`${api_url}/api/expenses/${id}`, editExpense, {
-                        params: {
-                            prevdate
-                        },
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    })
-                    console.log("Response: ", response);
-                    const incomeResponse = await axios.get(`${api_url}/api/income/?carouseldate=${prevdate}`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    })
-                    if (incomeResponse.data.income) {
+        try {
+            let newExpenseDetail;
+            let key = "expense"
+            if (e.target.closest('.editExpense')) {
+                const editItem = e.target.closest(".expenseDisplayed");
+                const id = editItem.dataset.id
+                console.log("edit Button clicked for expense: ", editItem, "of id: ", id)
 
-                        console.log("Getting Data on refresh!!", incomeResponse.data);
-
-                        // const storedincome=localStorage.getItem(incomeResponse.data.income.userId)
-                        displayIncome(prevdate, incomeResponse.data.income.amount, incomeResponse.data.income.id)
-                        console.log("On refresh: ", incomeResponse.data.income.totalsaving);
-                        displaySavings(prevdate, incomeResponse.data.income.totalsaving) //to display the savings first
+                openFormtoEditExpense()
+                cancelBtn.style.display = "block";
+                saveBtn.style.display = "block";
+                addBtn.style.display = "none";
+                isEditing = true;
+                const expensebyId = await axios.get(`${api_url}/api/expenses/${id}`, {
+                    params: {
+                        prevdate
+                    },
+                    headers: {
+                        Authorization: `Bearer ${token}`
                     }
-
-
                 })
-                .catch(err => console.log(err))
-        }
-    });
+                console.log("To edit expense: ", expensebyId);
 
-    function populateFields(response) {
-        if (response.category) {
-            let amount = document.getElementById('amount').value = response.amount;
-            let description = document.getElementById('description').value = response.description;
-            let category = document.getElementById('category').value = response.category;
+                let fetchedExpense = populateFields(expensebyId, key)
+                if (isEditing) {
+                    console.log("is editing in put of expense: ", isEditing);
+                    saveBtn.addEventListener("click", async () => {
+                        newExpenseDetail = {
+                            amount: document.getElementById('amount').value,
+                            description: document.getElementById('description').value,
+                            category: document.getElementById('category').value,
+                        }
+                        expense_list.removeChild(editItem)
+                        console.log("new expense details: ", newExpenseDetail);
+                        try {
+                            const newExpense = await axios.put(`${api_url}/api/expenses/${id}`, newExpenseDetail, {
+                                params: {
+                                    prevdate
+                                },
+                                headers: {
+                                    Authorization: `Bearer ${token}`
+                                }
+                            })
+                            console.log("response from put request: ", newExpense);
+                            displayExpenses(newExpenseDetail, id)
+                            try {
+                                const getIncomeonDate = await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
+                                    headers: {
+                                        Authorization: `Bearer ${token}`
+                                    }
+                                })
+                                console.log("Response on getting the savings after delete: ", getIncomeonDate);
+                                displaySavings(prevdate, getIncomeonDate.data.savings)
+                            } catch (err) {
+                                console.log("error getting incomes after edit: ", err);
+
+                            }
+                        } catch (err) {
+                            console.log("error editing expense: ", err);
+
+                        }
+                    })
+                }
+            }
+        } catch (err) {
+            console.log("error in expense list: ", err);
+        }
+    })
+
+
+    function populateFields(response, identifier) {
+        if (identifier === "expense") {
+            let amount = document.getElementById('amount').value = response.data.expense.amount;
+            let description = document.getElementById('description').value = response.data.expense.description;
+            let category = document.getElementById('category').value = response.data.expense.category;
             return modifyExpense = { amount, description, category }
         } else {
             let amount = document.getElementById('amount').value = response.data.editincome.amount;
@@ -538,12 +562,21 @@ if (form) {
         }
     })
 
-    function openForm() {
+    function openFormtoEditIncome() {
         if (!form.classList.contains("show")) {
             showformbtn.click();
 
         }
         if (togBtn.textContent === "EXPENSE") {
+            togBtn.click();
+        }
+    }
+
+    function openFormtoEditExpense() {
+        if (!form.classList.contains("show")) {
+            showformbtn.click();
+        }
+        if (togBtn.textContent === "INCOME") {
             togBtn.click();
         }
     }
@@ -558,19 +591,20 @@ if (form) {
         form.reset()
         showformbtn.click()
     })
-    let editIncome = document.querySelector('.editIncome')
+
 
     document.addEventListener('click', async (e) => {
         try {
             let editedIncome
             let newIncomeDetail;
+            let key = "income";
             if (e.target.closest('.editIncome')) {
                 console.log("Income edit button: ", editIncome);
-                const editItem = e.target.closest(".incomedisplayed")
-                const id = editItem.dataset.id
-                console.log("edit Button Clicked for item : ", editItem, "of id ", id);
+                const editIncome = e.target.closest(".incomedisplayed")
+                const id = editIncome.dataset.id
+                console.log("edit Button Clicked for item : ", editIncome, "of id ", id);
                 // incomeul.removeChild(editItem)
-                openForm();
+                openFormtoEditIncome();
                 cancelBtn.style.display = "block";
                 saveBtn.style.display = "block";
                 addBtn.style.display = "none";
@@ -587,11 +621,11 @@ if (form) {
                 })
                 // console.log("edit income response: ",getIncomeRes);
 
-                let fetchedIncome = populateFields(getIncomeRes)
+                let fetchedIncome = populateFields(getIncomeRes, key)
                 if (isEditing) {
                     console.log("is editing in put: ", isEditing);
                     saveBtn.addEventListener("click", async () => {
-                        incomeul.removeChild(editItem)
+                        incomeul.removeChild(editIncome)
                         newIncomeDetail = {
                             amount: document.getElementById('amount').value,
                             description: document.getElementById('description').value,
