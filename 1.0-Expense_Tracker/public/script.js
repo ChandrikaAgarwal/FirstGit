@@ -276,7 +276,7 @@ if (form) {
 
     function displayIncome(createdAt, income, incomeid) {
         const incomeLi = document.createElement('li')
-        // incomecol.innerHTML = "";
+        // incomeul.innerHTML = "";
         if (createdAt === prevdate) {
             incomeLi.innerHTML = `${income} <button class="editIncome"><i class="fa-solid fa-pen"></i></button><button class="deleteIncome"><i class="fa-solid fa-trash"></i></button>`
         }
@@ -322,6 +322,7 @@ if (form) {
 
         if (incomeResponse.data.income && incomeResponse.data.allincomesonDate.length > 0) {
             incomecreatedAt = incomeResponse.data.income.createdAt.split('T')[0]
+            incomeul.innerHTML = "";
             console.log("Getting Data on refresh!!", incomeResponse.data.savings);
             let arrofincomes = incomeResponse.data.allincomesonDate
             for (let income of arrofincomes) {

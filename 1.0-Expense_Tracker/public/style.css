@@ -205,7 +205,9 @@ button {
     color: black;
 }
 
-#dateDisplay {
+#dateDisplay,
+#monthDisplay,
+#yearDisplay {
     color: white;
     text-align: center;
     font-weight: bold;
@@ -213,10 +215,9 @@ button {
     margin-top: 1.5%;
 }
 
-#monthDisplay {
-    margin-top: 4.5%;
-}
-
-#yearDisplay {
-    margin-top: 4.5%;
+.monthlyOverView {
+    align-items: center;
+    border: 2px, solid, #154b05;
+    border-radius: 10px;
+    /* outline: #007bff; */
 }

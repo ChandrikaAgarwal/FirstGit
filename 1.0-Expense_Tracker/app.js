@@ -7,6 +7,7 @@ const Income = require('./models/income')
 const expenseRoute = require('./routes/expenseRoute')
 const userRoute = require('./routes/userRouter')
 const incomeRoute = require('./routes/incomeRoute')
+const monthlyRoute = require('./routes/monthlyRoute')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const path = require('path')
@@ -36,6 +37,8 @@ app.get('/yearly', (req, res) => {
 app.use('/', userRoute)
 app.use('/api/expenses', expenseRoute)
 app.use('/api/income', incomeRoute)
+app.use('/api/monthly', monthlyRoute)
+
 
 User.hasMany(Expense, { constraints: true, onDelete: 'CASCADE' })
 Expense.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
