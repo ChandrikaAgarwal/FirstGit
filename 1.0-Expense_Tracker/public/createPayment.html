@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+</head>
+
+<body>
+    <h1> payment page reached</h1>
+    <script>
+        const api_url = "http://localhost:5000"
+        const token = localStorage.getItem("token");
+        async function checkStatus(orderId) {
+            try {
+                const cashfree = new window.Cashfree({ mode: "sandbox" });
+                const response = await fetch(`${api_url}/api/payment/check-status/${orderId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                console.log("response of checkStatus: ", response);
+
+                const data = await response.json();
+                console.log("Payment status updated:", data);
+                if (data.orderStatus === "FAILURE") {
+                    alert("Payment failed");
+                    window.location.href = `${api_url}/expenses`
+                } else if (data.orderStatus === "SUCCESS") {
+                    alert("Payment successful");
+                }
+            } catch (error) {
+                console.log("Error in checkStatus: ", error);
+            }
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        console.log("url Params:!! ", urlParams);
+
+        const orderId = urlParams.get("orderId");
+        console.log("the order Id is: ", orderId);
+
+        if (orderId) {
+            checkStatus(orderId); // Call function if order_id exists
+        } else {
+            console.log("INVALID ORDER ID");
+        }
+    </script>
+</body>
+<!-- <script src="script.js"></script> -->
+
+</html>

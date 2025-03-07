@@ -19,7 +19,7 @@ exports.getAllExpenses = async (req, res, next) => {
         month = parseInt(month)
         year = parseInt(year)
         let carryForward = 0;
-        let balance;
+        let balance=0;
         console.log("month number is: ", month, "of type: ", typeof (month));
 
         const user = await User.findByPk(req.user.id)

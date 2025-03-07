@@ -11,6 +11,7 @@ exports.postAddUser = async (req, res, next) => {
     try {
         const name = req.body.name
         const email = req.body.email
+        const phone = req.body.phone
         const password = req.body.password
         const user = await User.findOne({ where: { email: email } })
         if (user) {
@@ -22,9 +23,10 @@ exports.postAddUser = async (req, res, next) => {
         const newUser = await User.create({
             name: name,
             email: email,
+            phone: phone,
             password: hashedPassword
         })
-        const token = generateToken({ id: newUser.id, email: newUser.email })
+        const token = generateToken({ id: newUser.id, email: newUser.email, phone: newUser.phone }) //we call this function when the user has successfully logged in
         console.log("New User Created: ", newUser, "Token :", token);
 
         return res.status(200).json({ message: "New user created ", userdetail: newUser, token: token })
@@ -45,6 +47,7 @@ exports.getUser = async (req, res, next) => {
         if (!user) {
             return res.status(400).json({ message: "Not a user. Kindly signup" });
         }
+        console.log("users contact:: ", typeof (user.contact));
 
         const isMatch = await bcrypt.compare(password, user.password)
         if (!isMatch) {
@@ -52,7 +55,7 @@ exports.getUser = async (req, res, next) => {
             return res.status(401).json({ message: "Password is incorrect" })
 
         }
-        const token = generateToken({ id: user.id, email: user.email })
+        const token = generateToken({ id: user.id, email: user.email, phone: user.phone })
         console.log("Existing User:", user, "Token: ", token);
         return res.status(200).json({ message: "Login successful", existinguser: user, token })
         // console.log("New user: ",newUser);

@@ -29,6 +29,7 @@ if (signupForm) {
         const newuserDetail = {
             name: e.target.name.value,
             email: e.target.email.value,
+            phone: e.target.phone.value,
             password: e.target.password.value
         }
 
@@ -141,21 +142,6 @@ if (form) {
 
     }
 
-    function getExpensesOndate() {
-
-        axios.get(`${api_url}/api/expenses/?carouseldate=${prevdate}`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-            .then(response => {
-                console.log("Getting Expenses:: ", response);
-            })
-            .catch(err => console.log("error getting expenses ", err))
-
-    }
-
-    getExpensesOndate()
     nextBtn.addEventListener("click", () => {
         let daysInCurrentMonth = getDaysInMonth(currentYear, currentMonth);
 
@@ -172,7 +158,7 @@ if (form) {
             }
         }
         updateDateDisplay();
-        getExpensesOndate()
+
         filterExpenses(prevdate)
 
     })
@@ -192,7 +178,7 @@ if (form) {
             currentDay = getDaysInMonth(currentYear, currentMonth);
         }
         updateDateDisplay();
-        getExpensesOndate()
+
         filterExpenses(prevdate)
     })
 
@@ -233,7 +219,7 @@ if (form) {
                 category: e.target.category.value,
                 // createdAt:prevdate- to send the date of creation of expense witht he request body
             }
-            getExpensesOndate()
+
             await axios.post(`${api_url}/api/expenses/?date=${prevdate}`, Detail, { //sending date of creation as a query parameter
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -276,7 +262,7 @@ if (form) {
 
     function displayIncome(createdAt, income, incomeid) {
         const incomeLi = document.createElement('li')
-        // incomeul.innerHTML = "";
+        // incomecol.innerHTML = "";
         if (createdAt === prevdate) {
             incomeLi.innerHTML = `${income} <button class="editIncome"><i class="fa-solid fa-pen"></i></button><button class="deleteIncome"><i class="fa-solid fa-trash"></i></button>`
         }
@@ -305,7 +291,7 @@ if (form) {
     async function filter(targetArr, carouseldate) {
         let filteredArray = await targetArr.filter(item => {
             let dateCreatedAt = item.createdAt.split("T")[0]
-            console.log("Checking expense date ", dateCreatedAt);
+            console.log("Checking date ", dateCreatedAt);
             return dateCreatedAt === carouseldate;
         })
         return filteredArray
@@ -321,8 +307,8 @@ if (form) {
         console.log("incomeResponse on Specific date of carousel: ", incomeResponse.data);
 
         if (incomeResponse.data.income && incomeResponse.data.allincomesonDate.length > 0) {
-            incomecreatedAt = incomeResponse.data.income.createdAt.split('T')[0]
             incomeul.innerHTML = "";
+            incomecreatedAt = incomeResponse.data.income.createdAt.split('T')[0]
             console.log("Getting Data on refresh!!", incomeResponse.data.savings);
             let arrofincomes = incomeResponse.data.allincomesonDate
             for (let income of arrofincomes) {
@@ -600,11 +586,9 @@ if (form) {
             let newIncomeDetail;
             let key = "income";
             if (e.target.closest('.editIncome')) {
-                console.log("Income edit button: ", editIncome);
                 const editIncome = e.target.closest(".incomedisplayed")
                 const id = editIncome.dataset.id
                 console.log("edit Button Clicked for item : ", editIncome, "of id ", id);
-                // incomeul.removeChild(editItem)
                 openFormtoEditIncome();
                 cancelBtn.style.display = "block";
                 saveBtn.style.display = "block";
@@ -656,8 +640,6 @@ if (form) {
                                 console.log("error getting incomes after edit: ", err);
 
                             }
-
-                            // displaySavings(prevdate, newIncome.data.editedIncome.totalsaving )
                         } catch (err) {
                             console.log("Error updating income: ", err);
                         }
@@ -665,13 +647,49 @@ if (form) {
                 }
             }
 
-
-
-
-
         } catch (err) {
             console.log("error in editing income: ", err);
 
         }
     })
+
+    document.querySelector('.premium_member').addEventListener("click", async () => {
+        try {
+            // const response = await fetch(`${api_url}/create-payment`, {
+            const response = await fetch(`${api_url}/api/payment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            console.log("response: ", response);
+
+            const data = await response.json();
+            console.log("Response from frontend for payment: ", data);
+            const orderId = data.orderId
+            console.log("orderId in frontend: ", orderId);
+
+            if (data.paymentSessionId) {
+
+                const cashfree = new window.Cashfree({ mode: "sandbox" });
+
+                const result = await cashfree.checkout({
+                    paymentSessionId: data.paymentSessionId,
+                    redirectTarget: "_self",
+                });
+
+            } else {
+                alert("Payment initiation failed!");
+            }
+            console.log("response from create-payment: ", data);
+
+
+        } catch (err) {
+            console.log("the error in payment:: ", err);
+
+        }
+    })
+
+
 }

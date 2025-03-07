@@ -9,7 +9,7 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 </head>
 
 <body>
@@ -18,7 +18,7 @@
         <a class="navbar-brand" href="http://localhost:5000/expenses">
             <img src="expense tracker logo-resized.png" alt=""> <sup class="daytodayexpenses"> Day to Day Expenses</sup>
         </a>
-
+        <button type="button" class="premium_member">Buy Premium Membership</button>
         <ul class="nav nav-underline ">
             <li class="nav-item daily "><a class="flex-sm-fill text-sm-center nav-link active "
                     href="/expenses">Daily</a></li>
@@ -33,14 +33,6 @@
                 <div class="carousel-item active" id="dateDisplay">
 
                 </div>
-
-                <!-- <div class="carousel-item">
-                        <p class="d-block w-50">second slide</p>
-                    </div>
-
-                    <div class="carousel-item">
-                        <p class="d-block w-50">third slide</p>
-                    </div> -->
             </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#myslideshow" data-bs-slide="prev"
                 id="prevbtn">
@@ -87,7 +79,8 @@
                     <br />
                 </div>
                 <div class="g-col-0 offset-sm-9">
-                    <button type="button" id="cancel" class="rounded-5 p-3" style="display: none;">CANCEL</button>
+                    <button type="button" id="cancel" class="rounded-5 p-3" style="display: none;"><i
+                            class="fa-solid fa-xmark"></i></button>
                     <button type="button" id="save" class="rounded-5 p-3" style="display: none;">SAVE</button>
                     <button type="submit" id="add" class="rounded-5 p-3" style="display: block;"><i
                             class="fa-solid fa-check"></i></button>
@@ -105,6 +98,7 @@
         </div>
 
     </div>
+
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

@@ -221,3 +221,17 @@ button {
     border-radius: 10px;
     /* outline: #007bff; */
 }
+
+.premium_member {
+    background-color: rgb(105, 48, 202);
+    position: absolute;
+    top: 10px;
+    left: 85%;
+    display: flex;
+    gap: 45px;
+    border-radius: 8px;
+    font-weight: 400;
+
+}
+
+/* 8e65d1da */
