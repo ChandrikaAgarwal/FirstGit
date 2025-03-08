@@ -31,6 +31,8 @@ async function finduserIncome(incomedate, userId) {
 exports.postAddExpense = async (req, res, next) => {
     console.log("expense controller activated!!");
     try {
+        // let total_expense = 0;
+        // let lastTotal;
         const user = await User.findByPk(req.user.id)
         if (!user) {
             return res.status(404).json({ message: "User not found" })
@@ -101,8 +103,8 @@ exports.postAddExpense = async (req, res, next) => {
             incomeonThatDate.totalsaving = latestsaving;
             await incomeonThatDate.save();
         }
-
-
+       user.totalExpense+=req.body.amount
+       await user.save()
         // await updateFutureExpenses(req.user.id, date,latestsaving);
         await updateFutureExpenses(req.user.id, date, req.body.amount);
 
@@ -213,6 +215,10 @@ exports.deleteExpense = async (req, res, next) => {
         const { id } = req.params
         const { prevdate } = req.query
         let userIncome;
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
         const expensetodel = await Expense.findOne({ where: { id, userId: req.user.id } })
         console.log("Expense to be deleted: ", expensetodel);
 
@@ -240,7 +246,8 @@ exports.deleteExpense = async (req, res, next) => {
         let delcurrSave = expensetodel.currentsaving
         console.log("Del amount:: ", delamount);
         await expensetodel.destroy()
-
+        user.totalExpense -= delamount
+        await user.save()
         let remainingExpenses = await Expense.findAll({
             where: {
                 userId: req.user.id,
@@ -333,6 +340,10 @@ exports.updateExpense = async (req, res, next) => {
         const { id } = req.params
         const { prevdate } = req.query
         let oldAmount = 0
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
         const { amount, description, category } = req.body
         const allExpensesOnDate = await Expense.findAll({
             where:
@@ -360,7 +371,13 @@ exports.updateExpense = async (req, res, next) => {
         if (!expenseToEdit) {
             return res.status(404).json({ error: 'Expense not found' });
         }
-
+        if (difference < 0) {
+            user.totalExpense += Math.abs(difference)
+            await user.save()
+        } else {
+            user.totalExpense -= Math.abs(difference)
+            await user.save()
+        }
         expenseToEdit.amount = amount
         expenseToEdit.description = description
         expenseToEdit.category = category

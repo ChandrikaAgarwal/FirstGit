@@ -10,14 +10,14 @@ exports.compareExpenses = async (req, res, next) => {
         const usersWithExpenses = await User.findAll({
             attributes: ["id", "name",
                 [sequelize.fn("COALESCE", sequelize.fn('SUM', sequelize.col('expenses.amount')), 0), 'total_expenses']
-            ],
-            include: [
+            ], //yeh hume last mein chahiye as result
+            include: [   //by default left outer join hota hai
                 {
                     model: Expense,
                     attributes: [],
                 },
             ],
-            group: ["user.id"],
+            group: ["user.id"], //padhna ki user.id ku use kiya expense.id ki jagah
             order: [[sequelize.Sequelize.literal('total_expenses'), "DESC"]]
         })
         console.log("Sorted user expenses: ", usersWithExpenses);
