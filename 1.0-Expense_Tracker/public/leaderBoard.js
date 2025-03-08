@@ -19,7 +19,7 @@ const showAllExpenses = document.querySelector('.showAllExpenses')
 async function displayLeader(allExpenditures) {
     for (let expense of allExpenditures) {
         const leaderLi = document.createElement('li')
-        leaderLi.innerHTML = `${expense.name}-Total Expense - ${expense.total_expenses}`
+        leaderLi.innerHTML = `${expense.name}-Total Expense - ${expense.totalExpense}`
         showAllExpenses.appendChild(leaderLi)
     }
 }
