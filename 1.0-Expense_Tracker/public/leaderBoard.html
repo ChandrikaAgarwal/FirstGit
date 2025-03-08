@@ -24,37 +24,22 @@
             </li>
             <li class="nav-item monthly"><a class="flex-sm-fill text-sm-center nav-link" href="/monthly">Monthly</a>
             </li>
-            <li class="nav-item yearly"><a class="flex-sm-fill text-sm-center nav-link active" href="/yearly">Yearly</a>
-            </li>
-            <li class="nav-item leaderBoard"><a class="flex-sm-fill text-sm-center nav-link " href="/premium">LeaderBoard</a></li>
+            <li class="nav-item yearly"><a class="flex-sm-fill text-sm-center nav-link " href="/yearly">Yearly</a></li>
+            <li class="nav-item leaderBoard"><a class="flex-sm-fill text-sm-center nav-link active"
+                    href="/premium">LeaderBoard</a></li>
         </ul>
     </nav>
 
-    <div class="container slider">
-        <div id="myslideshow" class="carousel slide" data-bs-ride="false">
-            <div class="carousel-inner">
-                <div class="carousel-item active" id="yearDisplay">
-                </div>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#myslideshow" data-bs-slide="prev"
-                id="prevbtn">
-                <span class="carousel-control-prev-icon p-3 rounded-circle" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-
-            <button class="carousel-control-next" type="button" data-bs-target="#myslideshow" data-bs-slide="next"
-                id="nextbtn">
-                <span class="carousel-control-next-icon p-3 rounded-circle" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        </div>
+    <div class="container">
+        <ul class="showAllExpenses"></ul>
     </div>
+
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
-
-<script src="yearly.js"></script>
+<!-- <script src="script.js"></script> -->
+<script src="leaderBoard.js"></script>
 
 </html>

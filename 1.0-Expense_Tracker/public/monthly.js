@@ -3,6 +3,7 @@ const prevBtn = document.getElementById('prevbtn')
 const nextBtn = document.getElementById('nextbtn')
 const api_url = 'http://localhost:5000'
 const displayExpenses = document.querySelector('.display_expenses')
+const leaderBoard = document.querySelector('.leaderBoard a')
 const ul = document.createElement('ul')
 displayExpenses.appendChild(ul)
 ul.className = "monthly_expense_list"
@@ -77,6 +78,14 @@ async function getExpensesByMonth() {
         console.log("Error in monthly expenses:  ", err);
     }
     displayMonthlyExpenses(monthlyResponse.data.allExpenses, monthlyResponse.data.totalInc, monthlyResponse.data.totalExp, monthlyResponse.data.carryforward, monthlyResponse.data.balance)
+    if (!monthlyResponse.data.isPremium) {
+        leaderBoard.style.color = "gray"
+        leaderBoard.style.cursor = "not-allowed"
+        leaderBoard.addEventListener("click", function (event) {
+            event.preventDefault();
+            alert("This is a premium feature. Please upgrade to access!");
+        });
+    }
 
 }
 let totalIncomeDisplay = document.querySelector('.totalIncomeDisplay')

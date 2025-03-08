@@ -126,7 +126,7 @@ exports.getAllExpenses = async (req, res, next) => {
         console.log("total Income: ", totalIncome);
         console.log("total Expense: ", totalExpense);
 
-        res.status(200).json({ message: "getting all expenses", allExpenses: allexpenses, allincomes: allincomes, totalInc: totalIncome, totalExp: totalExpense, carryforward: carryForward, balance: balance })
+        res.status(200).json({ message: "getting all expenses", allExpenses: allexpenses, allincomes: allincomes, totalInc: totalIncome, totalExp: totalExpense, carryforward: carryForward, balance: balance,isPremium:user.premium })
     } catch (err) {
         console.log("Error in getting all expenses: ", err);
         res.status(400).json({ message: "error in getting expenses ", details: err })

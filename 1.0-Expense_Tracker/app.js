@@ -10,6 +10,7 @@ const userRoute = require('./routes/userRouter')
 const incomeRoute = require('./routes/incomeRoute')
 const monthlyRoute = require('./routes/monthlyRoute')
 const payRoute = require('./routes/paymentRoute')
+const boardRoute = require('./routes/leaderBoardRoute')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const path = require('path')
@@ -18,7 +19,7 @@ const app = express();
 
 app.use(cors())
 app.use(bodyParser.json())
-app.use(express.static('public'))
+app.use(express.static('public'))  //iske baare mein bhi padh lena
 
 app.get('/users', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
@@ -39,11 +40,17 @@ app.get('/yearly', (req, res) => {
 app.get('/create-payment', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'createPayment.html'));
 })
+
+app.get('/premium', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'leaderBoard.html'));
+})
+
 app.use('/', userRoute)
 app.use('/api/expenses', expenseRoute)
 app.use('/api/income', incomeRoute)
 app.use('/api/monthly', monthlyRoute)
 app.use('/api/payment', payRoute)
+app.use('/api/leader', boardRoute)
 
 
 User.hasMany(Expense, { constraints: true, onDelete: 'CASCADE' })

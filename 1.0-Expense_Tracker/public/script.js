@@ -16,6 +16,7 @@ const row = document.querySelector('.incomedisplay')
 const addBtn = document.getElementById('add')
 const saveBtn = document.getElementById('save')
 const cancelBtn = document.getElementById('cancel')
+const leaderBoard = document.querySelector('.leaderBoard a')
 let listOfExpenses;
 let isEditing = false;
 
@@ -340,6 +341,13 @@ if (form) {
             console.log("Premium user", response.data.isPremium);
             const paidUser = document.querySelector('.premiumUser')
             paidUser.textContent = "You are premium user"
+        } else {
+            leaderBoard.style.color = "gray"
+            leaderBoard.style.cursor = "not-allowed"
+            leaderBoard.addEventListener("click", function (event) {
+                event.preventDefault();
+                alert("This is a premium feature. Please upgrade to access!");
+            });
         }
         if (filteredExpenses.length > 0) {
             filteredExpenses.forEach(expense => displayExpenses(expense, expense.id))
