@@ -220,19 +220,21 @@ if (form) {
                 category: e.target.category.value,
                 // createdAt:prevdate- to send the date of creation of expense witht he request body
             }
-
-            await axios.post(`${api_url}/api/expenses/?date=${prevdate}`, Detail, { //sending date of creation as a query parameter
+            try{
+            const response=await axios.post(`${api_url}/api/expenses/?date=${prevdate}`, Detail, { //sending date of creation as a query parameter
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
-            })
-                .then((response) => {
+            })            
                     console.log("Expense Detail: ", response);
                     displayExpenses(response.data.expensedetail, response.data.expensedetail.id)
                     displaySavings(prevdate, response.data.expensedetail.currentsaving)
 
 
-                }).catch(err => console.log(err))
+            } catch (err) {
+                console.log("error posting an expense: ", err);
+                
+                }
         } else {
             console.log("i am in income mode");
             const incomeDetail = {
@@ -240,19 +242,21 @@ if (form) {
                 description: e.target.description.value,
             }
             console.log("Income: ", incomeDetail);
-
-            await axios.post(`${api_url}/api/income/?date=${prevdate}`, incomeDetail, {
+          try{
+           const response= await axios.post(`${api_url}/api/income/?date=${prevdate}`, incomeDetail, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
-            }).then((response) => {
+            })
                 console.log("Income Details ", response.data);
                 console.log("User id::", response.data.incomedetail.userId);
                 userId = response.data.incomedetail.userId
                 localStorage.setItem(userId, response.data.incomedetail.amount)
                 displayIncome(prevdate, response.data.incomedetail.amount, response.data.incomedetail.id)
                 displaySavings(prevdate, response.data.incomedetail.totalsaving)
-            }).catch(err => console.log(err))
+            } catch (err) {
+                console.log("Error posting income:: ",err);
+            }
             form.reset()
         }
 
@@ -534,7 +538,8 @@ if (form) {
             const deleteItem = e.target.closest(".incomedisplayed")
             const id = deleteItem.dataset.id
             console.log("Delete Button Clicked for item : ", deleteItem, "of id ", id);
-            axios.delete(
+            try{
+           const response= await axios.delete(
                 `${api_url}/api/income/${id}`, {
                 params: {
                     prevdate
@@ -543,22 +548,26 @@ if (form) {
                     Authorization: `Bearer ${token}`
                 }
             })
-                .then(async (response) => {
+                
                     console.log("Response on delete: ", response);
                     incomeul.removeChild(deleteItem)
-                    // incomecol.innerHTML = ""
-                    await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
+                // incomecol.innerHTML = ""
+                try {
+                    const res = await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
                     })
-                        .then(response => {
-                            console.log("Response on getting the savings after delete: ", response);
-                            displaySavings(prevdate, response.data.savings)
+                    console.log("Response on getting the savings after delete: ", res);
+                    displaySavings(prevdate, res.data.savings)
 
-                        }).catch(err => console.log("Error in getting after deletion: ", err))
+                } catch (err) {
+                    console.log("Error in getting after deletion: ", err)
+                 } 
 
-                }).catch(err => console.log("Error deleting income ", err))
+            } catch (err) {
+                console.log("Error in deleting income: ", err);
+                }
         }
     })
 
