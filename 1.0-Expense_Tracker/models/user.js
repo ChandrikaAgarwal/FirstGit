@@ -24,6 +24,10 @@ const User = sequelize.define('user', {
     phone: {
         type: Sequelize.STRING(15),
         allowNull: false
+    },
+    premium: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
     }
 });
 

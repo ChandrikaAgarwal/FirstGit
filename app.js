@@ -47,9 +47,8 @@ Order.belongsToMany(Product, {through:OrderItem});
 
 
 //now sync will not only create models but also relations in our database as we define them here
-sequelize
-// .sync({force:true})
-.sync()
+// sequelize.sync({force:true})
+//sequelize.sync()
 .then(result=>{ 
     return User.findByPk(1)
     // console.log(result);

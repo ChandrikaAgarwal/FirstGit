@@ -4,6 +4,15 @@ const Income = require('../models/income')
 const { jwtAuthMiddleware, generateToken } = require('../jwtmiddleware');
 const { Sequelize, Op } = require('sequelize');
 
+async function isPremiumUser(usertocheck) {
+    console.log("usertocheck:: ", usertocheck);
+
+    if (usertocheck.premium === true) {
+        return true;
+    }
+    return false;
+}
+
 async function finduserIncome(incomedate, userId) {
     return await Income.findOne({
         where:
@@ -155,7 +164,13 @@ exports.getExpenses = async (req, res, next) => {
     try {
         const { carouseldate } = req.query
         const userid = req.user.id
+        const user = await User.findByPk(userid)
+        console.log("got use in get Expenses!!! ", user);
         console.log("Response ", res);
+        let isPremium = await isPremiumUser(user)
+        console.log("isPremium", isPremium);
+
+
         let userIncome;
         let incomeonThatDate = await Income.findOne({
             where:
@@ -185,7 +200,7 @@ exports.getExpenses = async (req, res, next) => {
             }
             await expenses.at(-1).save()
         }
-        res.status(200).json({ expenses })
+        res.status(200).json({ expenses, isPremium })
 
     } catch (err) {
         console.log("Error in getExpenses: ", err);

@@ -336,6 +336,11 @@ if (form) {
         console.log("filtered Expenses:: ", filteredExpenses);
 
         expense_list.innerHTML = ""
+        if (response.data.isPremium) {
+            console.log("Premium user", response.data.isPremium);
+            const paidUser = document.querySelector('.premiumUser')
+            paidUser.textContent = "You are premium user"
+        }
         if (filteredExpenses.length > 0) {
             filteredExpenses.forEach(expense => displayExpenses(expense, expense.id))
             console.log("Expense on no income:: ", filteredExpenses.at(-1).currentsaving)

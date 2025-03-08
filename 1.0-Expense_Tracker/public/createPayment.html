@@ -9,7 +9,6 @@
 </head>
 
 <body>
-    <h1> payment page reached</h1>
     <script>
         const api_url = "http://localhost:5000"
         const token = localStorage.getItem("token");
@@ -29,10 +28,11 @@
                 console.log("Payment status updated:", data);
                 if (data.orderStatus === "FAILURE") {
                     alert("Payment failed");
-                    window.location.href = `${api_url}/expenses`
+                    
                 } else if (data.orderStatus === "SUCCESS") {
                     alert("Payment successful");
                 }
+                window.location.href = `${api_url}/expenses`
             } catch (error) {
                 console.log("Error in checkStatus: ", error);
             }

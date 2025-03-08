@@ -226,12 +226,22 @@ button {
     background-color: rgb(105, 48, 202);
     position: absolute;
     top: 10px;
-    left: 85%;
+    left: 86%;
     display: flex;
     gap: 45px;
     border-radius: 8px;
     font-weight: 400;
+    font-size: 14px;
+    padding: 6px 10px;
 
+}
+
+.premiumUser {
+    color: gold;
+    position: absolute;
+    top: 60px;
+    left: 85%;
+    font-weight: bold;
 }
 
 /* 8e65d1da */

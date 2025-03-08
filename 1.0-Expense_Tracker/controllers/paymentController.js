@@ -65,6 +65,10 @@ exports.getPayment = async (req, res, next) => {
         console.log("order Status: ", orderStatus);
         ordertoupdate.order_status = orderStatus
         await ordertoupdate.save()
+        if (orderStatus === "SUCCESS") {
+            user.premium = true
+            user.save()
+        }
 
         res.status(200).json({ orderId, orderStatus })
     } catch (err) {
