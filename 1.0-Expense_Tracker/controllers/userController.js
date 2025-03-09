@@ -1,4 +1,6 @@
 const User = require('../models/user')
+const ResetPassword = require('../models/forgotPasswordReq')
+const { v4: uuidv4 } = require('uuid');
 const { jwtAuthMiddleware, generateToken } = require('../jwtmiddleware');
 const { Sequelize, Op } = require('sequelize');
 require('dotenv').config()
@@ -77,6 +79,18 @@ exports.getUser = async (req, res, next) => {
 exports.forgotPassword = async (req, res, next) => {
     try {
         const newEmail = req.body.email
+        const user = await User.findOne({ where: { email: newEmail } })
+        if (!user) {
+            alert("Not a user. Kindly Signup")
+            // return res.status(400).json({ message: "Not a user. Kindly signup" })
+        }
+        const userId = user.id
+        const resetId=uuidv4()
+        const resetPassRequest = await user.createResetPassword({
+            id:resetId,
+            isActive:true,
+        })
+        const resetLink =`http://localhost:5000/password/resetpassword/form/${resetId}`
         const sender = {
             email: 'chandrikaagarwal086@gmail.com'
         }
@@ -89,14 +103,30 @@ exports.forgotPassword = async (req, res, next) => {
             sender,
             to: receivers,
             subject: "Password resetting",
-            textContent:`This is a password resetting message!! enjoy `
+            textContent: `Click on the link to reset your password: ${resetLink}`
         })
         
         console.log("Reset password mail sent:", response);
-        res.status(200).json({message:"Email sent",email:newEmail})
+        res.status(200).json({message:"Email sent",email:newEmail,request:resetPassRequest})
     } catch (err) {
         console.log("failed to send email: ", err);
         res.status(500).json({ error: "Failed to send email", details: err });
         
     }
+}
+
+exports.checkActiveStatus = async (req, res, next) => {
+    try { 
+        const requestId = req.params.reqId //bcoz requestId ek object hai
+        const isPresent = await ResetPassword.findOne({ where: { id: requestId } })
+        if (isPresent && isPresent.isActive === true) {
+            res.status(200).json({ message: "Reset password link is active", details: isPresent,active:true })
+        } else {
+            res.status(400).json({ message: "Reset password link is not active", details: null, active: false })
+        }
+    } catch (err) {
+        console.log("error checking status of request: ", err);
+        res.status(500).json({ error: "Failed to check status of request", details: err })
+        
+     }
 }
