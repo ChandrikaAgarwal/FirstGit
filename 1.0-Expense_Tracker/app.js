@@ -34,8 +34,8 @@ app.get('/monthly', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'monthly.html'));
 });
 
-app.get('/yearly', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'yearly.html'));
+app.get('/weekly', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'weekly.html'));
 });
 
 app.get('/create-payment', (req, res) => {

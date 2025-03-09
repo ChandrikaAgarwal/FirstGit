@@ -1,37 +1,48 @@
-const yearDisplay = document.getElementById('yearDisplay')
+const weekDisplay = document.getElementById('weekDisplay')
 const prevBtn = document.getElementById('prevbtn')
 const nextBtn = document.getElementById('nextbtn')
 const api_url = 'http://localhost:5000'
 let today = new Date()
-let currentDay = today.getDate();
-let currentMonth = today.getMonth()
-let currentYear = today.getFullYear()
-console.log("current Year: ", currentYear);
+let currentWeekStart = getStartOfWeek(today)
+let currentWeekEnd = getEndOfWeek(today);
 const token = localStorage.getItem('token')
 
-function formatYear(year, month, day) {
-    let date = new Date(year, month, day)
-    let yearName = date.toLocaleString('default', { year: 'numeric' })
-    let options = { year: "numeric" };
-    return date.toLocaleDateString('en-US', options);
+function getStartOfWeek(date) {
+    const start = new Date(date)
+    const day = start.getDay() // Sunday = 0, Monday = 1, ...
+    start.setDate(start.getDate() - day);
+    return start;
+}
+function getEndOfWeek(date) { 
+    const end = new Date(date);
+    const day = end.getDay();
+    end.setDate(end.getDate() + (6 - day));// Shift to end of the week (Saturday)
+    return end;
+}
+function formatDate(date) {
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-function updateYearDisplay() {
-    yearDisplay.textContent = formatYear(currentYear, currentMonth, currentDay)
-    console.log("year display textContent: ", yearDisplay.textContent);
+function updateWeekDisplay() {
+    weekDisplay.textContent = `${formatDate(currentWeekStart)} - ${formatDate(currentWeekEnd)}`
+    console.log("week display textContent: ", weekDisplay.textContent);
 }
 
 nextBtn.addEventListener("click", () => {
-    currentYear++
-    updateYearDisplay()
+    currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+    currentWeekEnd.setDate(currentWeekEnd.getDate() + 7);
+
+    updateWeekDisplay()
 })
 
 prevBtn.addEventListener("click", () => {
-    currentYear--;
-    updateYearDisplay();
+    currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+    currentWeekEnd.setDate(currentWeekEnd.getDate() - 7);
+
+    updateWeekDisplay()
 })
 
-updateYearDisplay();
+updateWeekDisplay();
 
 document.querySelector('.premium_member').addEventListener("click", async () => {
     try {
