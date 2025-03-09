@@ -1,8 +1,10 @@
 const form = document.getElementById('expense-form')
 const loginForm = document.getElementById('login-form')
 const signupForm = document.getElementById('signup-form')
+const passwordForm = document.querySelector('#forgotPasswordForm')
 const loginBtn = document.getElementById('loginBtn')
 const signupBtn = document.getElementById('signUpBtn')
+const forgotPasswordBtn = document.querySelector('#forgotPasswordBtn')
 const togBtn = document.getElementById("toggle")
 const cat = document.getElementById("category")
 const catlabel = document.getElementById("catlabel")
@@ -19,6 +21,7 @@ const cancelBtn = document.getElementById('cancel')
 const leaderBoard = document.querySelector('.leaderBoard a')
 let listOfExpenses;
 let isEditing = false;
+
 
 var userId;
 if (signupForm) {
@@ -59,6 +62,25 @@ if (signupForm) {
     });
 }
 if (loginForm) {
+    forgotPasswordBtn.addEventListener("click", async (e) => {
+        passwordForm.style.display="flex"
+    })
+    passwordForm.addEventListener('submit', async (event) => {
+        event.preventDefault()
+        const emailtoSend={
+            email: event.target.email.value
+        }
+        console.log("email id: ",emailtoSend);
+        passwordForm.style.display = "none"
+        try { 
+            const forgotpassres = await axios.post(`${api_url}/password/forgotpassword`, emailtoSend)
+            console.log("forgot password response: ",forgotpassres);
+            
+        } catch (err) { 
+            console.log("error in forgt password: ",err);
+            
+        }
+    })
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault()
         const userDetail = {

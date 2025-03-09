@@ -20,10 +20,17 @@
             <button type="submit">Login</button>
         </form>
         <label for="signUpBtn">Not a user? </label>
-        <button type="button" id="signUpBtn"> SignUp </button>
+        <button type="button" id="signUpBtn"> SignUp </button><br /><br />
+    </div>
+    <div class="mx-auto" style="width: 200px;">
+        <button type="button" id="forgotPasswordBtn">Forgot Password</button>
+        <form id="forgotPasswordForm" style="display: none;">
+            <label for="email">Email: </label>
+            <input type="text" name="email" id="forgotEmail"><br /><br />
+            <button type="submit" class="sendEmail">Send</button>
+        </form>
     </div>
     <div id="users" style="display:none"></div>
-
     </div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>

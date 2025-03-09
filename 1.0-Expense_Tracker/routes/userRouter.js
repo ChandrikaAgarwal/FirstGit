@@ -4,6 +4,7 @@ const router = express.Router()
 
 router.post('/', userControl.postAddUser)
 router.post('/users', userControl.getUser)
+router.post('/password/forgotpassword',userControl.forgotPassword)
 
 
 module.exports = router;

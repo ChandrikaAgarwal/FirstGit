@@ -1,15 +1,15 @@
 const User = require('../models/user')
 const { jwtAuthMiddleware, generateToken } = require('../jwtmiddleware');
 const { Sequelize, Op } = require('sequelize');
-require('dotenv').config()
 const bcrypt = require('bcryptjs')
-const Sib = require('sib-api-v3-sdk')
-const client=Sib.ApiClient.instance
-const apiKey=client.authentications['api-key']
+const Brevo = require('@getbrevo/brevo')
+require('dotenv').config();
+
+const defaultClient = Brevo.ApiClient.instance;
+const apiKey = defaultClient.authentications['api-key']
 apiKey.apiKey = process.env.BREVO_API_KEY
-const tranEmailApi = new Sib.TransactionalEmailsApi()
 
-
+const apiInstance = new Brevo.TransactionalEmailsApi()
 
 
 exports.postAddUser = async (req, res, next) => {
@@ -80,18 +80,14 @@ exports.forgotPassword = async (req, res, next) => {
         const sender = {
             email: 'chandrikaagarwal086@gmail.com'
         }
-        const receivers = [
-            {
-                email: newEmail
-            }
-        ]
-        const response=await tranEmailApi.sendTransacEmail({
+        const receivers = [{ email: newEmail }]
+        const emailData={
             sender,
             to: receivers,
-            subject: "Password resetting",
-            textContent:`This is a password resetting message!! enjoy `
-        })
-        
+            subject: 'Reset Password',
+            textContent: `This is a mail for resetting your password. Happy resetting!!!`
+        }
+        const response = await apiInstance.sendTransacEmail(emailData)
         console.log("Reset password mail sent:", response);
         res.status(200).json({message:"Email sent",email:newEmail})
     } catch (err) {
