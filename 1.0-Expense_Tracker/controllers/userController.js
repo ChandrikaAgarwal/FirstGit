@@ -130,3 +130,31 @@ exports.checkActiveStatus = async (req, res, next) => {
         
      }
 }
+
+exports.updatePassword = async (req, res, next) => {
+    try {
+        console.log("updating password");
+        
+        const requestId = req.params.reqId
+        const { newPassword, confirmPassword } = req.body
+        const resetRequest = await ResetPassword.findOne({ where: { id: requestId } })
+        const userId = resetRequest.userId
+        const requiredUser = await User.findOne({ where: { id: userId } })
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(confirmPassword, saltRounds)
+        requiredUser.password = hashedPassword
+
+        await requiredUser.save();
+        console.log("user password updated");
+        
+        resetRequest.isActive = false
+        console.log("resetRequest isActive: ", resetRequest.isActive);
+            
+        await resetRequest.save();
+        res.status(200).json({ message: "Password updated successfully", User: requiredUser , request:resetRequest})
+    } catch (err) {
+        console.log("error updating passwords :",err);
+        res.status(500).json({ error: "Failed to update password", details: err })
+        
+    }
+}
