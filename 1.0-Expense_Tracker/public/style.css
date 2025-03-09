@@ -202,9 +202,17 @@ button {
     align-items: center;
     border: 2px, solid, #154b05;
     border-radius: 10px;
+    padding: 10px;
+    font-family: 'Times New Roman';
+    font-weight: bold;
     /* outline: #007bff; */
 }
-
+.totalIncomeDisplay,.totalExpenseDisplay,.cfDisplay,.balanceDisplay{
+    margin-left: 20%;
+    margin-bottom: 5px;
+    font-family: cursive;
+    
+}
 .premium_member {
     background-color: rgb(105, 48, 202);
     position: absolute;
@@ -227,4 +235,29 @@ button {
     font-weight: bold;
 }
 
-/* 8e65d1da */
+table{
+    border-radius: 30px;
+    box-shadow: 0 4px 8px rgba(8, 8, 8, 0.1);
+}
+th,
+td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+    /* Border color */
+}
+th:first-child {
+    border-top-left-radius: 10px;
+}
+
+th:last-child {
+    border-top-right-radius: 10px;
+}
+
+tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+}
+
+tr:last-child td:last-child {
+    border-bottom-right-radius: 10px;
+}
