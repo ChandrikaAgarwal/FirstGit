@@ -430,7 +430,7 @@ exports.getPaginatedData = async (req, res, next) => {
         const user = await User.findByPk(userid)
         let { page, limit, carouseldate } = req.query
         page = parseInt(page) || 1;
-        limit = parseInt(limit) || 2;
+        limit = parseInt(limit) || 10;
         let offset = (page - 1) * limit
 
         const { count, rows } = await Expense.findAndCountAll({

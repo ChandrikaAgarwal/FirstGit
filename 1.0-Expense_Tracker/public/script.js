@@ -11,6 +11,7 @@ const catlabel = document.getElementById("catlabel")
 const api_url = 'http://localhost:5000'
 const containerfluid = document.querySelector('.expense-Div')
 const container = document.querySelector('.savingsandIncome')
+const paginationContainer = document.getElementById("pagination");
 const expense_list = document.createElement('ul')
 expense_list.className = "allExpenses"
 const usersDiv = document.getElementById('users')
@@ -19,6 +20,8 @@ const addBtn = document.getElementById('add')
 const saveBtn = document.getElementById('save')
 const cancelBtn = document.getElementById('cancel')
 const leaderBoard = document.querySelector('.leaderBoard a')
+const selectLimit = document.createElement('select')
+selectLimit.id ="expenseLimit"
 let listOfExpenses;
 let isEditing = false;
 
@@ -136,7 +139,24 @@ if (form) {
             addBtn.style.display = "block";
         }
     })
-
+    const limitLabel = document.createElement('label')
+    limitLabel.setAttribute('for', 'selectLimit')
+    limitLabel.textContent = "Rows per page:"
+    paginationContainer.appendChild(limitLabel)
+    for (let i = 1; i <= 100; i++){
+        let option = document.createElement('option')
+        option.value = i;
+        option.textContent = i;
+        selectLimit.appendChild(option)
+    }
+    paginationContainer.appendChild(selectLimit)
+    let expensesPerPage = localStorage.getItem('expensesPerPage') || 10;
+    selectLimit.value = expensesPerPage
+    selectLimit.addEventListener('change', () => { 
+        expensesPerPage = selectLimit.value
+        localStorage.setItem('expensesPerPage', expensesPerPage)
+        fetchExpenses(1)
+    })
     const dateDisplay = document.getElementById('dateDisplay')
     const prevBtn = document.getElementById('prevbtn')
     const nextBtn = document.getElementById('nextbtn')
@@ -409,7 +429,7 @@ if (form) {
     // }
 
     function displayExp(expenses, totalPages, currentPage) {
-        const paginationContainer = document.getElementById("pagination");
+        
         expense_list.innerHTML = "";
         // paginationContainer.innerHTML = "";
         expenses.forEach(expense => {
@@ -759,10 +779,10 @@ if (form) {
         }
     })
    
-    const limit = 2;
+    // const limit = 2;
     async function fetchExpenses(page) {
         try {
-            const response = await axios.get(`${api_url}/api/expenses/paginate?page=${page}&limit=${limit}&carouseldate=${prevdate}`, {
+            const response = await axios.get(`${api_url}/api/expenses/paginate?page=${page}&limit=${expensesPerPage}&carouseldate=${prevdate}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
