@@ -261,3 +261,23 @@ tr:last-child td:first-child {
 tr:last-child td:last-child {
     border-bottom-right-radius: 10px;
 }
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+    background-color: grey;
+    cursor: not-allowed;
+}
+
+#pagination{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+}
+
+#pagination button:hover {
+    background-color: #7656eb;
+}

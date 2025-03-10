@@ -112,6 +112,7 @@ if (loginForm) {
 }
 
 if (form) {
+    let currentPage = 1;
     let prevdate = new Date();
     prevdate = prevdate.toISOString().split('T')[0];
     const token = localStorage.getItem('token')
@@ -127,6 +128,7 @@ if (form) {
         if (showformbtn.classList.contains('collapsed')) {
 
             icon.classList.replace('fa-minus', 'fa-plus'); // Change back to plus
+            form.reset()
         } else {
             icon.classList.replace('fa-plus', 'fa-minus');// Change to minus
             saveBtn.style.display = "none"
@@ -165,7 +167,7 @@ if (form) {
 
     }
 
-    nextBtn.addEventListener("click", () => {
+    nextBtn.addEventListener("click", async() => {
         let daysInCurrentMonth = getDaysInMonth(currentYear, currentMonth);
 
         if (currentDay < daysInCurrentMonth) {
@@ -180,9 +182,10 @@ if (form) {
                 currentYear++;
             }
         }
+        currentPage = 1;
         updateDateDisplay();
-
         filterExpenses(prevdate)
+       await fetchExpenses(currentPage)
 
     })
 
@@ -200,9 +203,10 @@ if (form) {
             }
             currentDay = getDaysInMonth(currentYear, currentMonth);
         }
+        currentPage = 1;
         updateDateDisplay();
-
         filterExpenses(prevdate)
+       await fetchExpenses(currentPage)
     })
 
     //initial display
@@ -242,21 +246,22 @@ if (form) {
                 category: e.target.category.value,
                 // createdAt:prevdate- to send the date of creation of expense witht he request body
             }
-            try{
-            const response=await axios.post(`${api_url}/api/expenses/?date=${prevdate}`, Detail, { //sending date of creation as a query parameter
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })            
-                    console.log("Expense Detail: ", response);
-                    displayExpenses(response.data.expensedetail, response.data.expensedetail.id)
-                    displaySavings(prevdate, response.data.expensedetail.currentsaving)
-
+            try {
+                const response = await axios.post(`${api_url}/api/expenses/?date=${prevdate}`, Detail, { //sending date of creation as a query parameter
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                console.log("Expense Detail: ", response);
+                // displayExpenses(response.data.expensedetail, response.data.expensedetail.id)
+                await fetchExpenses(1);
+                displaySavings(prevdate, response.data.expensedetail.currentsaving)
+                form.reset()
 
             } catch (err) {
                 console.log("error posting an expense: ", err);
                 
-                }
+            }
         } else {
             console.log("i am in income mode");
             const incomeDetail = {
@@ -264,12 +269,12 @@ if (form) {
                 description: e.target.description.value,
             }
             console.log("Income: ", incomeDetail);
-          try{
-           const response= await axios.post(`${api_url}/api/income/?date=${prevdate}`, incomeDetail, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
+            try {
+                const response = await axios.post(`${api_url}/api/income/?date=${prevdate}`, incomeDetail, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
                 console.log("Income Details ", response.data);
                 console.log("User id::", response.data.incomedetail.userId);
                 userId = response.data.incomedetail.userId
@@ -277,7 +282,7 @@ if (form) {
                 displayIncome(prevdate, response.data.incomedetail.amount, response.data.incomedetail.id)
                 displaySavings(prevdate, response.data.incomedetail.totalsaving)
             } catch (err) {
-                console.log("Error posting income:: ",err);
+                console.log("Error posting income:: ", err);
             }
             form.reset()
         }
@@ -302,8 +307,8 @@ if (form) {
     }
 
     window.addEventListener("DOMContentLoaded", async () => {
-
-        filterExpenses(prevdate)
+       await fetchExpenses(currentPage)
+       await filterExpenses(prevdate)
 
     })
     function displaySavings(createdAt, savingsdone) {
@@ -353,7 +358,7 @@ if (form) {
         listOfExpenses = document.querySelector('.allExpenses')
         console.log("List of expenses: ", listOfExpenses);
 
-        const response = await axios.get(`${api_url}/api/expenses/?carouseldate=${date}`, {
+        const response = await axios.get(`${api_url}/api/expenses?carouseldate=${date}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -376,7 +381,8 @@ if (form) {
             });
         }
         if (filteredExpenses.length > 0) {
-            filteredExpenses.forEach(expense => displayExpenses(expense, expense.id))
+            await fetchExpenses(currentPage)
+            // filteredExpenses.forEach(expense => displayExpenses(expense, expense.id))
             console.log("Expense on no income:: ", filteredExpenses.at(-1).currentsaving)
             displaySavings(date, filteredExpenses.at(-1).currentsaving) //bcz savings are being updated
             // }
@@ -390,16 +396,32 @@ if (form) {
         }
     }
 
-    function displayExpenses(expenseDetail, id) {
-        const newExpense = document.createElement('li')
-        const details = [`${expenseDetail.amount}-${expenseDetail.description}-${expenseDetail.category}`]
-        newExpense.innerHTML = details + '<button class="editExpense"><i class="fa-solid fa-pen"></i></button> <button class="deleteExpense"><i class="fa-solid fa-trash"></i></button> '
-        newExpense.dataset.id = id
-        newExpense.className = "expenseDisplayed"
-        expense_list.appendChild(newExpense)
+    // function displayExpenses(expenseDetail, id) {
+    //     const newExpense = document.createElement('li')
+    //     const details = [`${expenseDetail.amount}-${expenseDetail.description}-${expenseDetail.category}`]
+    //     newExpense.innerHTML = details + '<button class="editExpense"><i class="fa-solid fa-pen"></i></button> <button class="deleteExpense"><i class="fa-solid fa-trash"></i></button> '
+    //     newExpense.dataset.id = id
+    //     newExpense.className = "expenseDisplayed"
+    //     expense_list.appendChild(newExpense)
 
-        form.reset()
+    //     form.reset()
 
+    // }
+
+    function displayExp(expenses, totalPages, currentPage) {
+        const paginationContainer = document.getElementById("pagination");
+        expense_list.innerHTML = "";
+        // paginationContainer.innerHTML = "";
+        expenses.forEach(expense => {
+            const newExpense = document.createElement('li');
+            newExpense.innerHTML = `${expense.amount} - ${expense.description} - ${expense.category}
+            <button class="editExpense"><i class="fa-solid fa-pen"></i></button>
+            <button class="deleteExpense"><i class="fa-solid fa-trash"></i></button>
+        `;
+            newExpense.dataset.id = expense.id;
+            newExpense.className = "expenseDisplayed";
+            expense_list.appendChild(newExpense);
+        })
     }
 
     const delBtn = document.querySelector('.deleteExpense')
@@ -510,7 +532,9 @@ if (form) {
                                 }
                             })
                             console.log("response from put request: ", newExpense);
-                            displayExpenses(newExpenseDetail, id)
+                            await fetchExpenses(currentPage)
+                            form.reset()
+                            // displayExpenses(newExpenseDetail, id)
                             try {
                                 const getIncomeonDate = await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
                                     headers: {
@@ -560,19 +584,19 @@ if (form) {
             const deleteItem = e.target.closest(".incomedisplayed")
             const id = deleteItem.dataset.id
             console.log("Delete Button Clicked for item : ", deleteItem, "of id ", id);
-            try{
-           const response= await axios.delete(
-                `${api_url}/api/income/${id}`, {
-                params: {
-                    prevdate
-                },
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
+            try {
+                const response = await axios.delete(
+                    `${api_url}/api/income/${id}`, {
+                    params: {
+                        prevdate
+                    },
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
                 
-                    console.log("Response on delete: ", response);
-                    incomeul.removeChild(deleteItem)
+                console.log("Response on delete: ", response);
+                incomeul.removeChild(deleteItem)
                 // incomecol.innerHTML = ""
                 try {
                     const res = await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
@@ -585,11 +609,11 @@ if (form) {
 
                 } catch (err) {
                     console.log("Error in getting after deletion: ", err)
-                 } 
+                }
 
             } catch (err) {
                 console.log("Error in deleting income: ", err);
-                }
+            }
         }
     })
 
@@ -734,6 +758,60 @@ if (form) {
 
         }
     })
+   
+    const limit = 2;
+    async function fetchExpenses(page) {
+        try {
+            const response = await axios.get(`${api_url}/api/expenses/paginate?page=${page}&limit=${limit}&carouseldate=${prevdate}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            const data = response.data;
+            console.log("response from get request in fetchExpenses:: ", response, data);
+            const expenses = data.expenses;
+            console.log("expenses fetched from fetchExpenses: ", expenses);
 
+            document.getElementById("pageNumber").innerText = data.currentPage;
+            document.getElementById("prevPage").disabled = data.currentPage === 1;
+            document.getElementById("nextPage").disabled = data.currentPage === data.totalPages;
+            displayExp(expenses, data.totalPages, currentPage)
+            updatePaginationButtons(data.totalPages);
+            return response.data.expenses
+        } catch (err) {
+            console.log("Error fetching expenses:", err);
+        }
+    }
+    
 
+    function updatePaginationButtons(totalPages) {
+        let prevPageBtn = document.getElementById("prevPage")
+        let nextPageBtn = document.getElementById("nextPage")
+        if (currentPage === 1) {
+            prevPageBtn.disabled = true;
+            prevPageBtn.classList.add('disabled');
+        } else {
+            prevPageBtn.disabled = false;
+            prevPageBtn.classList.remove('disabled');
+        }
+        if (currentPage >= totalPages) {
+            nextPageBtn.disabled = true;
+            nextPageBtn.classList.add('disabled');
+        } else {
+            nextPageBtn.disabled = false;
+            nextPageBtn.classList.remove('disabled');
+        }
+    }
+    
+    document.getElementById("prevPage").addEventListener("click", async() => {
+        if (currentPage > 1) {
+            currentPage--;
+            await fetchExpenses(currentPage);
+        }
+    });
+    document.getElementById("nextPage").addEventListener("click", async () => {
+        currentPage++;
+        await fetchExpenses(currentPage);
+    });
+    fetchExpenses(currentPage);
 }

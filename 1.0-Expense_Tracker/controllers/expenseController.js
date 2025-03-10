@@ -274,7 +274,7 @@ exports.deleteExpense = async (req, res, next) => {
         if (parseInt(id) !== expensesbeforeDel.at(-1).dataValues.id) {
             for (let expense of remainingExpenses) {
                 expense.currentsaving += delamount
-                expense.save({ transaction: t })
+               await expense.save({ transaction: t })
             }
 
         }
@@ -282,9 +282,9 @@ exports.deleteExpense = async (req, res, next) => {
             incomeonThatDate.totalsaving += delamount
             await incomeonThatDate.save({ transaction: t })
         }
+        updateAfterDelete(req.user.id, prevdate, delamount)
        await t.commit();
         res.status(200).json({ message: "Deleted successfully!", expensetodelete: expensetodel });
-        updateAfterDelete(req.user.id, prevdate, delamount)
     } catch (err) {
         console.log("delete error!!! ", err);
        await t.rollback();
@@ -294,14 +294,14 @@ exports.deleteExpense = async (req, res, next) => {
 
 async function updateAfterDelete(userId, updatedDate, addedAmount) {
     try {
-        
+        const t = await sequelize.transaction()
         let futureExpenses = await Expense.findAll({
             where: {
                 userId: userId,
                 createdAt: { [Op.gt]: updatedDate }  // Get expenses after the updated date
             },
             order: [['createdAt', 'ASC'], ['id', 'ASC']],
-           
+            transaction: t
         });
 
         let futureIncomes = await Income.findAll({
@@ -310,7 +310,7 @@ async function updateAfterDelete(userId, updatedDate, addedAmount) {
                 createdAt: { [Op.gt]: updatedDate }
             },
             order: [['createdAt', 'ASC'], ['id', 'ASC']],
-            
+            transaction: t
         })
 
 
@@ -318,19 +318,19 @@ async function updateAfterDelete(userId, updatedDate, addedAmount) {
         for (let expense of futureExpenses) {
             // date = expense.createdAt
             expense.currentsaving += addedAmount
-            await expense.save(); // Save updated expense
+            await expense.save({ transaction: t }); // Save updated expense
         }
         console.log("New Saving from update function in income::: ", addedAmount);
 
         for (let income of futureIncomes) {
             income.totalsaving += addedAmount
-            await income.save()
+            await income.save({ transaction: t })
         }
-
+        await t.commit();
         console.log("Future expenses updated successfully");
     } catch (err) {
         console.log("update error!! ", err);
-
+        await t.rollback();
         console.log("Error in updating future incomes:: ", err);
     }
 }
@@ -421,5 +421,34 @@ exports.updateExpense = async (req, res, next) => {
         console.log("error in updateExpense:: ", err);
         await t.rollback();
         res.status(500).json({ error: 'Failed to edit expense', details: err.message });
+    }
+}
+
+exports.getPaginatedData = async (req, res, next) => {
+    try {
+        const userid = req.user.id
+        const user = await User.findByPk(userid)
+        let { page, limit, carouseldate } = req.query
+        page = parseInt(page) || 1;
+        limit = parseInt(limit) || 2;
+        let offset = (page - 1) * limit
+
+        const { count, rows } = await Expense.findAndCountAll({
+            where: {
+                userId: req.user.id,
+                createdAt: carouseldate
+            },
+            offset: offset,
+            limit: limit,
+            order: [['id', 'DESC']]
+        });
+        console.log("fetching expenses page by page");
+        console.log("count: ", count, "Rows ", rows);
+
+        res.status(200).json({ totalItems: count, totalPages: Math.ceil(count / limit), currentPage: page, expenses: rows })
+
+    } catch (err) {
+        console.log("error in getPaginatedData:: ", err);
+        res.status(500).json({ error: 'Failed to get paginated data', details: err })
     }
 }
