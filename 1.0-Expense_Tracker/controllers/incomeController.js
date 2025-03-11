@@ -54,6 +54,8 @@ exports.postAddIncome = async (req, res, next) => {
         })
 
         const lastIncome = await finduserIncome(date, req.user.id)
+        console.log("lastIncome: ",lastIncome);
+        
         console.log("lastExpense ", lastExpense);
         // const expenseonDate = await Expense.findOne({
         //     where: {
@@ -84,8 +86,8 @@ exports.postAddIncome = async (req, res, next) => {
             for (let expense of allexpensesOnDate) {
                 expense.currentsaving += req.body.amount
                 await expense.save();
+                latestSaving=expense.currentsaving
             }
-            latestSaving
         } else if (lastExpense) {
             latestSaving = lastExpense.currentsaving + req.body.amount;
 

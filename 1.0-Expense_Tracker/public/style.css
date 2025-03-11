@@ -200,12 +200,16 @@ button {
 
 .monthlyOverView {
     align-items: center;
-    border: 2px, solid, #154b05;
-    border-radius: 10px;
+    /* border: 2px, solid, #154b05; */
+    /* border-radius: 10px; */
     padding: 10px;
     font-family: 'Times New Roman';
     font-weight: bold;
     /* outline: #007bff; */
+}
+hr{
+    border-top: 2px solid black;
+    /* margin: 20px auto; */
 }
 .totalIncomeDisplay,.totalExpenseDisplay,.cfDisplay,.balanceDisplay{
     margin-left: 20%;
