@@ -72,16 +72,25 @@ a:hover {
 .nav-underline {
     position: absolute;
     bottom: 1%;
-    left: 41%;
+    left: 30%;
     display: flex;
     gap: 45px;
     /* justify-content: space-evenly;
     width: 40%;  */
 }
 
+
+.navbar{
+       display: flex;
+        justify-content: start;
+        /* Left align */
+        align-items: center;
+        padding-left: 20px;
+}
 .daily,.monthly,.weekly,.leaderBoard,.report {
     font-family: 'Times New Roman', Times, serif;
     font-size: 20px;
+    margin-left: 20px;
 }
 
 
@@ -276,4 +285,13 @@ tr:last-child td:last-child {
 
 #pagination button:hover {
     background-color: #7656eb;
+}
+
+#year,#month{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1%;
+    color: red;
+    position: relative;
+    top: -20px;
 }
