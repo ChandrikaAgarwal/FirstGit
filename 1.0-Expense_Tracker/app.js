@@ -5,7 +5,8 @@ const Expense = require('./models/expense')
 const User = require('./models/user')
 const Income = require('./models/income')
 const Order = require('./models/orders')
-const ForgotPassRequest=require('./models/forgotPasswordReq')
+const ForgotPassRequest = require('./models/forgotPasswordReq')
+const Month=require('./models/monthly')
 const expenseRoute = require('./routes/expenseRoute')
 const userRoute = require('./routes/userRouter')
 const incomeRoute = require('./routes/incomeRoute')
@@ -46,6 +47,10 @@ app.get('/premium', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'leaderBoard.html'));
 })
 
+app.get('/report', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'report.html'));
+})
+
 app.get('/password/resetpassword/form/:requestId', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'resetPassword.html'));
 })
@@ -66,6 +71,8 @@ Order.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
 User.hasMany(Order, { constraints: true, onDelete: 'CASCADE' })
 ForgotPassRequest.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
 User.hasMany(ForgotPassRequest, { constraints: true, onDelete: 'CASCADE' })
+Month.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
+User.hasMany(Month, { constraints: true, onDelete: 'CASCADE' })
 
 // sequelize.sync({force:true})
 sequelize.sync()

@@ -74,7 +74,7 @@ async function getExpensesByMonth() {
     } catch (err) {
         console.log("Error in monthly expenses:  ", err);
     }
-    displayMonthlyExpenses(monthlyResponse.data.allExpenses, monthlyResponse.data.allincomes, monthlyResponse.data.totalInc, monthlyResponse.data.totalExp, monthlyResponse.data.carryforward, monthlyResponse.data.balance)
+    await displayMonthlyExpenses(monthlyResponse.data.allExpenses, monthlyResponse.data.allincomes, monthlyResponse.data.totalInc, monthlyResponse.data.totalExp, monthlyResponse.data.carryforward, monthlyResponse.data.balance)
     if (!monthlyResponse.data.isPremium) {
         leaderBoard.style.color = "gray"
         leaderBoard.style.cursor = "not-allowed"

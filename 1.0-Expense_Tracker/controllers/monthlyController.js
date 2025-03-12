@@ -1,6 +1,7 @@
 const Income = require('../models/income')
 const User = require('../models/user')
 const Expense = require('../models/expense')
+const Month=require('../models/monthly')
 const { Sequelize, Op } = require('sequelize')
 
 
@@ -121,13 +122,17 @@ exports.getAllExpenses = async (req, res, next) => {
             balance = -totalExpense
         } else if (carryForward) {
             balance = carryForward
+        } else if (totalIncome) {
+            balance = totalIncome
         }
+
         console.log("balance:: ",balance);
         
         console.log("Filtered Expenses: ", allexpenses);
         console.log("total Income: ", totalIncome);
         console.log("total Expense: ", totalExpense);
-
+ 
+        
         res.status(200).json({ message: "getting all expenses", allExpenses: allexpenses, allincomes: allincomes, totalInc: totalIncome, totalExp: totalExpense, carryforward: carryForward, balance: balance,isPremium:user.premium })
     } catch (err) {
         console.log("Error in getting all expenses: ", err);
@@ -201,7 +206,7 @@ exports.getExpensesWeekly = async (req, res, next) => {
         if (!totalExpense) {
             totalExpense = 0;
         }
-        
+
         const lastWeekExpense = await Expense.findOne({
             where: {
                 userId: req.user.id,

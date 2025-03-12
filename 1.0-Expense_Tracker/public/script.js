@@ -416,17 +416,7 @@ if (form) {
         }
     }
 
-    // function displayExpenses(expenseDetail, id) {
-    //     const newExpense = document.createElement('li')
-    //     const details = [`${expenseDetail.amount}-${expenseDetail.description}-${expenseDetail.category}`]
-    //     newExpense.innerHTML = details + '<button class="editExpense"><i class="fa-solid fa-pen"></i></button> <button class="deleteExpense"><i class="fa-solid fa-trash"></i></button> '
-    //     newExpense.dataset.id = id
-    //     newExpense.className = "expenseDisplayed"
-    //     expense_list.appendChild(newExpense)
-
-    //     form.reset()
-
-    // }
+    
 
     function displayExp(expenses, totalPages, currentPage) {
         
@@ -540,7 +530,7 @@ if (form) {
                             description: document.getElementById('description').value,
                             category: document.getElementById('category').value,
                         }
-                        expense_list.removeChild(editItem)
+                        listOfExpenses.removeChild(editItem)
                         console.log("new expense details: ", newExpenseDetail);
                         try {
                             const newExpense = await axios.put(`${api_url}/api/expenses/${id}`, newExpenseDetail, {
@@ -677,6 +667,7 @@ if (form) {
                 const editIncome = e.target.closest(".incomedisplayed")
                 const id = editIncome.dataset.id
                 console.log("edit Button Clicked for item : ", editIncome, "of id ", id);
+                console.log("incomeul: ", incomeul);
                 openFormtoEditIncome();
                 cancelBtn.style.display = "block";
                 saveBtn.style.display = "block";
@@ -692,12 +683,14 @@ if (form) {
                         Authorization: `Bearer ${token}`
                     }
                 })
-                // console.log("edit income response: ",getIncomeRes);
+                console.log("edit income response: ",getIncomeRes);
 
                 let fetchedIncome = populateFields(getIncomeRes, key)
                 if (isEditing) {
                     console.log("is editing in put: ", isEditing);
                     saveBtn.addEventListener("click", async () => {
+                        console.log("incomeul: ",incomeul);
+                        
                         incomeul.removeChild(editIncome)
                         newIncomeDetail = {
                             amount: document.getElementById('amount').value,
@@ -715,6 +708,7 @@ if (form) {
                                 }
                             })
                             console.log("Income after edit response: ", newIncome.data);
+                            // editIncome.textContent = `${newIncome.data.editedIncome.amount} `;
                             displayIncome(prevdate, newIncome.data.editedIncome.amount, newIncome.data.editedIncome.id)
                             try {
                                 const getIncome = await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {

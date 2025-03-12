@@ -14,6 +14,7 @@
     display: block;
     flex-direction: column;
     gap: 3px;
+    cursor: pointer;
 }
 
 #cancel {
@@ -65,7 +66,7 @@ input {
 }
 
 a:hover {
-    cursor: default;
+    cursor: pointer;
 }
 
 .nav-underline {
@@ -78,20 +79,11 @@ a:hover {
     width: 40%;  */
 }
 
-.daily {
+.daily,.monthly,.weekly,.leaderBoard,.report {
     font-family: 'Times New Roman', Times, serif;
     font-size: 20px;
 }
 
-.monthly {
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 20px;
-}
-
-.weekly {
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 20px;
-}
 
 p {
     text-align: center;
