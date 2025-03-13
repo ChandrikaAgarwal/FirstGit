@@ -6,7 +6,8 @@ const yearSelect = document.getElementById("yearSelect");
 const submitBtn = document.querySelector(".submitBtn")
 const h5Year = document.querySelector("#year")
 const h5Month = document.querySelector("#month")
-const tableBody = document.querySelector('.displayReport')
+const tableBody = document.querySelector('.displayMonthReport')
+const yearTable = document.querySelector('.displayYearReport')
 let reportDetails;
 for (let i = 0; i < 12; i++) {
     const monthName = new Date(2000, i).toLocaleString('en-US', { month: 'long' });
@@ -32,6 +33,7 @@ reportForm.addEventListener("submit", async (e) => {
     }
     console.log("report Details: ", reportDetails);
     await getMonthReport(reportDetails.year, reportDetails.month)
+    await getYearlyReport(reportDetails.year)
     h5Year.textContent = reportDetails.year
     let monthIndex = parseInt(reportDetails.month)
     console.log("monthIndex: ",monthIndex);
@@ -48,14 +50,15 @@ window.addEventListener("DOMContentLoaded", async () => {
     monthSelect.value = String(currentMonth).padStart(2, "0"); 
     h5Year.textContent = freshYear
     h5Month.textContent = monthSelect.options[monthSelect.selectedIndex].text+" "+freshYear
-    await getMonthReport(freshYear,currentMonth)
+    await getMonthReport(freshYear, currentMonth)
+    await getYearlyReport(freshYear)
     
    
 })
 
 async function getMonthReport(year,month) {
     try {
-        const monthReport = await axios.get(`${api_url}/api/monthly/report/?month=${month}&year=${year}`, {
+        const monthReport = await axios.get(`${api_url}/api/monthly/monthReport/?month=${month}&year=${year}`, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
@@ -117,4 +120,44 @@ async function displayMonthlyReport(allExpenses, allIncomes, monthlyInc, monthly
     } catch (err) {
         console.log("error displaying monthly report: ", err);
     }
+}
+
+async function getYearlyReport(year) {
+    try { 
+        const yearReport = await axios.get(`${api_url}/api/monthly/yearReport/?year=${year}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+        console.log("year report : ", yearReport);
+        await displayYearlyReport(yearReport.data.allMonths, yearReport.data.totalIncome, yearReport.data.totalExpense, yearReport.data.totalcf,yearReport.data.totalBalance)
+    } catch (err) { 
+        console.log("Error getting yearly report:  ", err);
+    }
+}
+
+async function displayYearlyReport(yearReport,yearInc,yearExp,yearCf,yearBalance) {
+    try {
+        yearTable.innerHTML = ""
+        yearReport.forEach(entry => {
+            let monthName = new Date(2000, entry.monthNum - 1).toLocaleString('en-US', { month: 'long' })
+            const row = document.createElement('tr')
+            row.innerHTML = `<td>${monthName}</td>
+            <td>${entry.totalIncome}</td>
+            <td>${entry.totalExpense}</td>
+            <td>${entry.carryForward}</td>
+            <td>${entry.balance}</td>`;
+            yearTable.appendChild(row);
+        })
+        yearTable.innerHTML += ` <tr style="font-weight: bold; background-color: #333; color: white;">
+        <td>Total</td>
+        <td>${yearInc}</td>
+        <td>${yearExp}</td>
+        <td>${yearCf}</td>
+        <td>${yearBalance}</td>
+         `
+    } catch (err) { 
+        console.log("error displaying yearly report: ", err);
+
+     }
 }

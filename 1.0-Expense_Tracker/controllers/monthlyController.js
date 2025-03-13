@@ -43,47 +43,6 @@ exports.getAllExpenses = async (req, res, next) => {
             },
         })
 
-        // const lastExpenseDate = await Expense.findOne({
-        //     where: {
-        //         userId: req.user.id,
-        //         createdAt: { [Op.lt]: new Date(`${year}-${month}`) }  // Before current month
-        //     },
-        //     order: [['createdAt', 'DESC'], ['id', 'DESC']],
-        //     // attributes:['createdAt']
-        // })
-
-        // console.log("Last expense date : ", lastExpenseDate)
-
-        // const lastIncomeDate = await Income.findOne({
-        //     where: {
-        //         userId: req.user.id,
-        //         createdAt: { [Op.lt]: new Date(`${year}-${month}`) }  // Before current month
-        //     },
-        //     order: [['createdAt', 'DESC'], ['id', 'DESC']],
-        //     // attributes: ['createdAt']
-        // })
-
-        // console.log("Last expense date: ", lastExpenseDate?.createdAt);
-        // console.log("Last income date: ", lastIncomeDate?.createdAt);
-
-        // if (!lastExpenseDate && !lastIncomeDate) {
-        //     carryForward = 0;
-        // }
-
-        // let lastDate = lastExpenseDate?.createdAt || lastIncomeDate?.createdAt;
-        // if (lastExpenseDate && lastIncomeDate) {
-        //     lastDate = lastExpenseDate.createdAt > lastIncomeDate.createdAt ? lastExpenseDate.createdAt : lastIncomeDate.createdAt;
-        // }
-
-        // console.log("last Date: ", lastDate);
-
-        // if (lastDate === lastExpenseDate?.createdAt) {
-        //     carryForward = lastExpenseDate?.currentsaving || 0;
-        // } else if (lastDate === lastIncomeDate?.createdAt) {
-        //     carryForward = lastIncomeDate?.totalsaving || 0;
-        // }
-        // console.log("carry Forward: ", carryForward);
-
         const allexpenses = await Expense.findAll({
             where: {
                 userId: req.user.id,
@@ -100,47 +59,6 @@ exports.getAllExpenses = async (req, res, next) => {
             order: [["id", "DESC"]]
         })
 
-        // let totalIncome = await Income.sum("amount", {
-        //     where: {
-        //         userId: req.user.id,
-        //         createdAt: { [Op.between]: [startDate, endDate] }
-        //     },
-        // })
-        // if (!totalIncome) {
-        //     totalIncome = 0;
-        // }
-
-        // let totalExpense = await Expense.sum("amount", {
-        //     where: {
-        //         userId: req.user.id,
-        //         createdAt: { [Op.between]: [new Date(startDate), new Date(endDate)] }
-        //     },
-        // })
-        // if (!totalExpense) {
-        //     totalExpense = 0;
-        // }
-
-        // if (totalExpense && totalIncome && carryForward) {
-        //     balance = (totalIncome + carryForward) - totalExpense
-        // } else if (totalIncome && totalExpense) {
-        //     balance = totalIncome - totalExpense
-        // } else if (totalExpense && carryForward) {
-        //     balance = carryForward - totalExpense
-        // } else if (totalIncome && carryForward) {
-        //     balance = totalIncome + carryForward
-        // } else if (totalExpense) {
-        //     balance = -totalExpense
-        // } else if (carryForward) {
-        //     balance = carryForward
-        // } else if (totalIncome) {
-        //     balance = totalIncome
-        // }
-
-        // console.log("balance:: ",balance);
-        
-        // console.log("Filtered Expenses: ", allexpenses);
-        // console.log("total Income: ", totalIncome);
-        // console.log("total Expense: ", totalExpense);
         if (existingMonth) {
             totalIncome = existingMonth.totalIncome
             totalExpense = existingMonth.totalExpense
@@ -281,5 +199,40 @@ exports.getExpensesWeekly = async (req, res, next) => {
     } catch (err) {
         console.log("Error in getting all weekly expenses: ", err);
         res.status(400).json({ message: "error in getting expenses ", details: err })
+    }
+}
+
+exports.getYearlyReport = async (req, res, next) => {
+    try { 
+        let { year } = req.query
+        year = parseInt(year)
+        console.log("year is: ", year, "of type: ", typeof (year));
+        let totalIncome = 0
+        let totalExpense = 0
+        let totalcf = 0
+        let totalBalance=0
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        const allMonths = await Month.findAll({
+            where: {
+                userId: req.user.id,
+                year:year
+            },
+            order:[["monthNum","ASC"]]
+        })
+        for (let month of allMonths) {
+            totalIncome += month.totalIncome
+            totalExpense += month.totalExpense
+            totalcf += month.carryForward
+            totalBalance += month.balance
+        }
+        console.log(totalIncome,totalExpense,totalcf,totalBalance);
+        
+        res.status(200).json({ message: "all months in this year: ", allMonths, totalIncome, totalExpense, totalcf, totalBalance });
+    } catch (err) { 
+        console.log("Error in getting all months in this year: ", err);
+        res.status(400).json({ message: "error in getting months ", details: err })
     }
 }
