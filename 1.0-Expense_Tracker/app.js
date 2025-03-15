@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const fs=require('fs')
 const sequelize = require('./util/database')
 const Expense = require('./models/expense')
 const User = require('./models/user')
@@ -16,10 +17,15 @@ const boardRoute = require('./routes/leaderBoardRoute')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const path = require('path')
+const morgan=require('morgan')
 const app = express();
 
-
+const accessLogsStream = fs.createWriteStream(
+    path.join(__dirname, 'access.log'),
+    { flags: 'a' } //means append to append new data to file and not overwrite it
+);
 app.use(cors())
+app.use(morgan('combined',{stream:accessLogsStream}))
 app.use(bodyParser.json())
 app.use(express.static('public'))  //iske baare mein bhi padh lena
 
@@ -77,7 +83,7 @@ User.hasMany(Month, { constraints: true, onDelete: 'CASCADE' })
 // sequelize.sync({force:true})
 sequelize.sync()
     .then(() => {
-        app.listen(5000, () => {
+        app.listen(process.env.PORT||5000, () => {
             console.log("Server running on  http://localhost:5000");
 
         })
