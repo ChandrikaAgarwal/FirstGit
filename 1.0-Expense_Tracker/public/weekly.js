@@ -4,7 +4,6 @@ const nextBtn = document.getElementById('nextbtn')
 const api_url = 'http://localhost:5000'
 const tableBody = document.querySelector('.weeklyExpenses')
 let today = new Date()
-
 let currentWeekStart = getStartOfWeek(today)
 let currentWeekEnd = getEndOfWeek(today);
 let currentYear=today.getFullYear()
@@ -81,9 +80,14 @@ async function getExpensesByWeek() {
             }
         })
         console.log("Getting expenses weekly: ", weeklyResponse);
+        if (weeklyResponse.data.isPremium === true) {
+            console.log("Premium user", weeklyResponse.data.isPremium);
+            const paidUser = document.querySelector('.premiumUser')
+            paidUser.textContent = "You are premium user"
+        }
         await displayWeeklyExpenses(weeklyResponse.data.allExpenses, weeklyResponse.data.allincomes, weeklyResponse.data.totalExpense, weeklyResponse.data.totalIncome, weeklyResponse.data.carryForward, weeklyResponse.data.balance)
     } catch (error) { 
-        console.log("Error in weekly expenses:  ", err);
+        console.log("Error in weekly expenses:  ", error);
     }
 
 }

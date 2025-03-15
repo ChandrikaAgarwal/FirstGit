@@ -19,11 +19,14 @@ const row = document.querySelector('.incomedisplay')
 const addBtn = document.getElementById('add')
 const saveBtn = document.getElementById('save')
 const cancelBtn = document.getElementById('cancel')
-const leaderBoard = document.querySelector('.leaderBoard a')
+let premiumLinks=document.querySelectorAll('.leaderBoard a, .monthly a, .weekly a, .report a')
+console.log("premiumLinks: ",premiumLinks);
+const rowsPerPageform = document.createElement('form')
 const selectLimit = document.createElement('select')
-selectLimit.id ="expenseLimit"
+selectLimit.id = "expenseLimit"
 let listOfExpenses;
 let isEditing = false;
+console.log("Bootstrap ",bootstrap);
 
 
 var userId;
@@ -121,13 +124,17 @@ if (form) {
     const token = localStorage.getItem('token')
     const showformbtn = document.querySelector('#show-form');
     console.log("Show form btn!!", showformbtn);
+    let icon = showformbtn.getElementsByTagName('i')[0];
+    console.log("icon: ",icon);
+    
 
     if (!showformbtn) {
         console.error("Button not found!");
 
     }
-    let icon = showformbtn.getElementsByTagName('i')[0];
     showformbtn.addEventListener('click', () => {
+        console.log("show form button clicked");
+        
         if (showformbtn.classList.contains('collapsed')) {
 
             icon.classList.replace('fa-minus', 'fa-plus'); // Change back to plus
@@ -139,8 +146,23 @@ if (form) {
             addBtn.style.display = "block";
         }
     })
+    // showformbtn.addEventListener('click', () => {
+    //     console.log("show form button clicked");
+
+    //     if (form.classList.contains("show")) {
+    //         console.log("form showing ");
+    //         console.log("icon :",icon);           
+    //         icon.classList.replace('fa-minus', 'fa-plus'); // Change back to plus
+    //         form.reset()
+    //     } else if (!form.classList.contains("show")) {
+    //         icon.classList.replace('fa-plus', 'fa-minus');// Change to minus
+    //         saveBtn.style.display = "none"
+    //         cancelBtn.style.display = "none";
+    //         addBtn.style.display = "block";
+    //     }
+    // })
     const limitLabel = document.createElement('label')
-    limitLabel.setAttribute('for', 'selectLimit')
+    limitLabel.setAttribute('for', 'expenseLimit')
     limitLabel.textContent = "Rows per page:"
     paginationContainer.appendChild(limitLabel)
     for (let i = 1; i <= 100; i++){
@@ -247,14 +269,14 @@ if (form) {
     })
     container.appendChild(expense_list)
     const savingsDiv = document.createElement('div')
-    savingsDiv.className = 'row savingsdisplay'
-    savingsDiv.innerHTML = `<div class="col"><h4>Savings</h4></div> <div class="col savingsAmount"></div>`
+    savingsDiv.className = 'container d-flex savingsdisplay'
+    savingsDiv.innerHTML = `<div class="container col savingsHead"><h4>Savings</h4><h4 class="savingsAmount"></h4></div>`
     container.insertBefore(savingsDiv, row)
     const savingcol = document.querySelector('.savingsAmount')
     const incomeDiv = document.createElement('div')
-    incomeDiv.className = 'col incomecol'
-    row.appendChild(incomeDiv)
-    const incomecol = document.querySelector('.incomecol')
+    // incomeDiv.className = 'col incomecol'
+    // row.appendChild(incomeDiv)
+    // const incomecol = document.querySelector('.incomecol')
     console.log(container);
     form.addEventListener("submit", async (e) => {
         e.preventDefault()
@@ -299,7 +321,7 @@ if (form) {
                 console.log("User id::", response.data.incomedetail.userId);
                 userId = response.data.incomedetail.userId
                 localStorage.setItem(userId, response.data.incomedetail.amount)
-                displayIncome(prevdate, response.data.incomedetail.amount, response.data.incomedetail.id)
+                displayIncome(prevdate, response.data.incomedetail.amount, response.data.incomedetail.id,response.data.incomedetail.description)
                 displaySavings(prevdate, response.data.incomedetail.totalsaving)
             } catch (err) {
                 console.log("Error posting income:: ", err);
@@ -308,22 +330,25 @@ if (form) {
         }
 
     })
-    const incomeul = document.createElement('ul')
-    incomeul.className = "incomeul"
-    incomecol.appendChild(incomeul)
+    const incomeul = document.querySelector('#incomeul')
+    console.log("incomeUL table:: ",incomeul);
+    const incomeTable = document.querySelector('.incomeTable')
 
-    function displayIncome(createdAt, income, incomeid) {
-        const incomeLi = document.createElement('li')
+
+    function displayIncome(createdAt, income, incomeid,description) {
+        const incomeLi = document.createElement('tr')
         // incomecol.innerHTML = "";
         if (createdAt === prevdate) {
-            incomeLi.innerHTML = `${income} <button class="editIncome"><i class="fa-solid fa-pen"></i></button><button class="deleteIncome"><i class="fa-solid fa-trash"></i></button>`
+            incomeLi.innerHTML = `<td>${description}</td> <td>${income} <button class="editIncome"><i class="fa-solid fa-pen"></i></button><button class="deleteIncome"><i class="fa-solid fa-trash"></i></button> </td>`
+            // incomeLi.innerHTML = `${income} <button class="editIncome"><i class="fa-solid fa-pen"></i></button><button class="deleteIncome"><i class="fa-solid fa-trash"></i></button>`
         }
         incomeLi.className = "incomedisplayed"
         incomeLi.dataset.id = incomeid
         incomeul.appendChild(incomeLi)
-        console.log("income col innerhtml: ", incomecol.innerHTML);
+        // console.log("income col innerhtml: ", incomecol.innerHTML);
 
         container.insertBefore(row, expense_list)
+        container.insertBefore(row, incomeTable)
     }
 
     window.addEventListener("DOMContentLoaded", async () => {
@@ -365,7 +390,7 @@ if (form) {
             let arrofincomes = incomeResponse.data.allincomesonDate
             for (let income of arrofincomes) {
                 let incomeDate = income.createdAt.split('T')[0]
-                displayIncome(incomeDate, income.amount, income.id)
+                displayIncome(incomeDate, income.amount, income.id,income.description)
 
             }
 
@@ -383,22 +408,32 @@ if (form) {
                 Authorization: `Bearer ${token}`
             }
         })
+        console.log("response for is Premium: ",response);
+        
         let allexpenses = response.data.expenses || [];
         let filteredExpenses = await filter(allexpenses, date)
         console.log("filtered Expenses:: ", filteredExpenses);
 
         expense_list.innerHTML = ""
-        if (response.data.isPremium) {
+        if (response.data.isPremium===true) {
             console.log("Premium user", response.data.isPremium);
             const paidUser = document.querySelector('.premiumUser')
             paidUser.textContent = "You are premium user"
         } else {
-            leaderBoard.style.color = "gray"
-            leaderBoard.style.cursor = "not-allowed"
-            leaderBoard.addEventListener("click", function (event) {
-                event.preventDefault();
-                alert("This is a premium feature. Please upgrade to access!");
-            });
+            console.log("not a premium user");
+            premiumLinks.forEach(link=> {
+                console.log("link: ",link);
+                
+                link.style.color = "grey";
+                link.style.cursor = "not-allowed";
+                
+                link.addEventListener("click", function (event) {
+                    console.log("Leaderboard Clicked! Preventing default...");
+                    event.preventDefault();
+                    
+                    alert("This is a premium feature. Please upgrade to access!");
+                });
+            })
         }
         if (filteredExpenses.length > 0) {
             await fetchExpenses(currentPage)
@@ -709,7 +744,7 @@ if (form) {
                             })
                             console.log("Income after edit response: ", newIncome.data);
                             // editIncome.textContent = `${newIncome.data.editedIncome.amount} `;
-                            displayIncome(prevdate, newIncome.data.editedIncome.amount, newIncome.data.editedIncome.id)
+                            displayIncome(prevdate, newIncome.data.editedIncome.amount, newIncome.data.editedIncome.id,newIncome.data.editedIncome.description)
                             try {
                                 const getIncome = await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
                                     headers: {

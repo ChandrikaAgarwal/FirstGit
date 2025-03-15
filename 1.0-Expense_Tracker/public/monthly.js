@@ -3,7 +3,7 @@ const prevBtn = document.getElementById('prevbtn')
 const nextBtn = document.getElementById('nextbtn')
 const api_url = 'http://localhost:5000'
 const displayExpenses = document.querySelector('.display_expenses')
-const leaderBoard = document.querySelector('.leaderBoard a')
+
 const tableBody = document.querySelector('.monthExpenses')
 let today = new Date()
 let currentDay = today.getDate();
@@ -70,19 +70,17 @@ async function getExpensesByMonth() {
             }
         })
         console.log("Getting Expenses:: ", monthlyResponse.data);
-
+        if (monthlyResponse.data.isPremium === true) {
+            console.log("Premium user", monthlyResponse.data.isPremium);
+            const paidUser = document.querySelector('.premiumUser')
+            paidUser.textContent = "You are premium user"
+        }
+        
     } catch (err) {
         console.log("Error in monthly expenses:  ", err);
     }
     await displayMonthlyExpenses(monthlyResponse.data.allExpenses, monthlyResponse.data.allincomes, monthlyResponse.data.totalInc, monthlyResponse.data.totalExp, monthlyResponse.data.carryforward, monthlyResponse.data.balance)
-    if (!monthlyResponse.data.isPremium) {
-        leaderBoard.style.color = "gray"
-        leaderBoard.style.cursor = "not-allowed"
-        leaderBoard.addEventListener("click", function (event) {
-            event.preventDefault();
-            alert("This is a premium feature. Please upgrade to access!");
-        });
-    }
+    
 
 }
 let totalIncomeDisplay = document.querySelector('.totalIncomeDisplay')

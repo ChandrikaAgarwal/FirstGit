@@ -9,6 +9,11 @@ window.addEventListener("DOMContentLoaded", async () => {
             }
         })
         console.log("all users and expenses: ", allExpenses.data);
+        if (allExpenses.data.isPremium === true) {
+            console.log("Premium user", allExpenses.data.isPremium);
+            const paidUser = document.querySelector('.premiumUser')
+            paidUser.textContent = "You are premium user"
+        }
         await displayLeader(allExpenses.data.userExpenses)
     } catch (err) {
         console.log("error in fetching leaderboard details: ", err);

@@ -64,6 +64,11 @@ async function getMonthReport(year,month) {
             }
         })
         console.log("Getting month Report: ", monthReport);
+        if (monthReport.data.isPremium === true) {
+            console.log("Premium user", monthReport.data.isPremium);
+            const paidUser = document.querySelector('.premiumUser')
+            paidUser.textContent = "You are premium user"
+        }
         displayMonthlyReport(monthReport.data.allExpenses, monthReport.data.allincomes, monthReport.data.totalInc, monthReport.data.totalExp, monthReport.data.carryforward,monthReport.data.balance)
     } catch (error) { 
         console.log("Error getting monthly report:  ", error);

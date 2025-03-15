@@ -195,7 +195,7 @@ exports.getExpensesWeekly = async (req, res, next) => {
         }
         console.log("Balance of this week: ",balance);
         
-        res.status(200).json({message:"getting all weekly expenses: ",allExpenses,allincomes,totalIncome,totalExpense,carryForward,balance,});
+        res.status(200).json({message:"getting all weekly expenses: ",allExpenses,allincomes,totalIncome,totalExpense,carryForward,balance,isPremium:user.premium});
     } catch (err) {
         console.log("Error in getting all weekly expenses: ", err);
         res.status(400).json({ message: "error in getting expenses ", details: err })
@@ -230,7 +230,7 @@ exports.getYearlyReport = async (req, res, next) => {
         }
         console.log(totalIncome,totalExpense,totalcf,totalBalance);
         
-        res.status(200).json({ message: "all months in this year: ", allMonths, totalIncome, totalExpense, totalcf, totalBalance });
+        res.status(200).json({ message: "all months in this year: ", allMonths, totalIncome, totalExpense, totalcf, totalBalance,isPremium:user.premium });
     } catch (err) { 
         console.log("Error in getting all months in this year: ", err);
         res.status(400).json({ message: "error in getting months ", details: err })

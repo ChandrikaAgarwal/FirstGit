@@ -14,60 +14,36 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary py-4 py-lg-0 shadow">
-      <div class="container px-4">
-        <a class="navbar-brand d-flex align-items-center" href="http://localhost:5000/expenses">
-        </a>
-        <img src="navBarLogo.png" alt="" class="nav_logo"> <sup class="daytodayexpenses">Day to Day Expenses</sup>
-        </div>
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#top-navbar"
-            aria-controls="top-navbar">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-        
-        <button type="button" class="premium_member">Buy Premium Membership</button>
-        <h5 class="premiumUser"></h5><br ><br >
+    <nav class="navbar navbar-expand-lg bg-body-tertiary d-flex justify-content-between align-items-center p-2">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="http://localhost:5000/expenses">
+                <img src="navBarLogo.png" alt="" class="nav_logo"> <sup class="daytodayexpenses">Day to Day
+                    Expenses</sup>
+            </a>
 
-           
-    <div class="collapse navbar-collapse justify-content-center d-none d-lg-flex" id="navbarNav">
-        <ul class="navbar-nav nav-underline ">
-            <li class="nav-item"><a class="flex-sm-fill text-sm-center nav-link active "
-            href="/expenses">Daily</a></li>
-            <li class="nav-item"><a class="flex-sm-fill text-sm-center nav-link" href="/monthly">Monthly</a>
-            </li>
-            <li class="nav-item"><a class="flex-sm-fill text-sm-center nav-link" href="/weekly">Weekly</a></li>
-            <li class="nav-item"><a class="flex-sm-fill text-sm-center nav-link" href="/report">Report</a></li>
-            <li class="nav-item"><a class="flex-sm-fill text-sm-center nav-link" href="/premium">LeaderBoard</a></li>
-        </ul>
-    </div>
-    
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="top-navbar" aria-labelledby="top-navbarLabel">
-        
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#top-navbar"
-            aria-controls="top-navbar">
-            <div class="d-flex justify-content-between p-3">
-                <i class="fa-solid fa-bars"></i>
+            <button type="button" class="premium_member">Buy Premium Membership</button>
+            <h5 class="premiumUser"></h5><br><br>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                style="outline: auto; display: flex;"><span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav nav-underline d-flex">
+                    <li class="nav-item daily "><a class="flex-sm-fill text-sm-center nav-link active "
+                            href="/expenses">Daily</a></li>
+                    <li class="nav-item monthly"><a class="flex-sm-fill text-sm-center nav-link"
+                            href="/monthly">Monthly</a>
+                    </li>
+                    <li class="nav-item weekly"><a class="flex-sm-fill text-sm-center nav-link "
+                            href="/weekly">Weekly</a></li>
+                    <li class="nav-item report"><a class="flex-sm-fill text-sm-center nav-link "
+                            href="/report">Report</a></li>
+                    <li class="nav-item leaderBoard"><a class="flex-sm-fill text-sm-center nav-link "
+                            href="/premium">LeaderBoard</a></li>
+                </ul>
             </div>
-    
-        </button>
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="top-navbarLabel">Menu</h5>
-        </div>
-        <div class="offcanvas-body">
-            <div class="mobile-logo d-none">
-                <img src="navBarLogo.png" alt="Logo" width="70">
-                <span>Day to Day Expenses</span>
-            </div>
-            <ul class="navbar-nav nav-underline navbarLinks">
-                <li class="nav-item daily"><a class="nav-link active" href="/expenses">Daily</a></li>
-                <li class="nav-item monthly"><a class="nav-link" href="/monthly">Monthly</a></li>
-                <li class="nav-item weekly"><a class="nav-link" href="/weekly">Weekly</a></li>
-                <li class="nav-item report"><a class="nav-link" href="/report">Report</a></li>
-                <li class="nav-item leaderBoard"><a class="nav-link" href="/premium">LeaderBoard</a></li>
-            </ul>
-           
-        </div>
-    </div>
+
     </nav>
     <div class="container slider">
         <div id="myslideshow" class="carousel slide" data-bs-ride="false">
@@ -132,35 +108,24 @@
     </div>
 
     <div class="container savingsandIncome">
-        <div class="incomedisplay">
+        <div class="d-flex incomedisplay">
             <div class="col incomeHead">
                 <h4>Total Income</h4>
             </div>
-            </div>
-            
-        <div class="incomeTable">
-        <table class="table-container table-striped">
-            <thead>
-                <tr>
-                    <th class="incomeDesc" scope="col">Description</th>
-                    <th class="incomeAmount" scope="col">Amount</th>
-                </tr>
-            </thead>
-            <tbody id="incomeul"></tbody>
-        </table>
+
         </div>
     </div>
-<div class="container fixed-bottom pb-3" id="pagination">
-    <button id="prevPage"><i class="fa-solid fa-backward"></i></button>
-    <span id="pageNumber">1</span>
-    <button id="nextPage"><i class="fa-solid fa-forward"></i></button>
-</div>
+    <div class="container fixed-bottom pb-3" id="pagination">
+        <button id="prevPage"><i class="fa-solid fa-backward"></i></button>
+        <span id="pageNumber">1</span>
+        <button id="nextPage"><i class="fa-solid fa-forward"></i></button>
+    </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"></script>
-<script src="script.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="script.js"></script>
 </body>
+
 </html>
