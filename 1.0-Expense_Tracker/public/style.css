@@ -601,3 +601,7 @@ td {
 }
 
 /* Mobile Mode (Offcanvas ke andar show karne ke liye) */
+.displayYearReport {
+    margin-bottom: 20px;
+    /* Adjust space between heading and table */
+}

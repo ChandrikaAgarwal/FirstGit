@@ -110,16 +110,18 @@ async function displayMonthlyReport(allExpenses, allIncomes, monthlyInc, monthly
         })
         tableBody.innerHTML += `
     <tr style="font-weight: bold; background-color: #333; color: white;">
-        <td colspan="3">Total</td>
+        <td colspan="3" class="total">Total</td>
         <td>${monthlyInc.toFixed(2)}</td>
         <td>${monthlyExp.toFixed(2)}</td>
     </tr>
     <tr style="font-weight: bold; background-color: #333; color: white;">
-    <td colspan="4">Carry Forward (C/F)</td>
+    <td colspan="3" class="cf">Carry Forward (C/F)</td>
+    <td></td>
         <td>${carryForward.toFixed(2)}</td>
     </tr>
     <tr style="font-weight: bold; background-color: #444; color: lightgreen;">
-        <td colspan="4">Savings</td>
+        <td colspan="3" class="save">Savings</td>
+        <td></td>
         <td>${balance.toFixed(2)}</td>
     </tr>`;
     } catch (err) {
@@ -166,3 +168,62 @@ async function displayYearlyReport(yearReport,yearInc,yearExp,yearCf,yearBalance
 
      }
 }
+
+document.getElementById("download-report").addEventListener("click", () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    //title
+    doc.setFontSize(18);
+    doc.text(`Expense Report -${h5Month.textContent}`, 10, 10);
+
+    let monthlyData = [
+        ["Date", "Description", "Category", "Income", "Expense"]
+    ];
+    
+    let tableRows = document.querySelectorAll(".displayMonthReport tr")
+    tableRows.forEach(row => { 
+        let cells = row.querySelectorAll('td');
+        let rowData = [];
+        cells.forEach(cell => rowData.push(cell.textContent));
+        monthlyData.push(rowData);
+    })
+    if (monthlyData.length > 1) {
+        doc.autoTable({
+            head: [monthlyData[0]], // Header row
+            body: monthlyData.slice(1), // Data rows
+            startY: 20, // Adjust the starting position
+            columnStyles: {
+                3: { halign: "right" },
+                4:{halign:"right"}
+            }
+        });
+        
+    } else {
+        doc.setFontSize(14);
+        doc.text("No data available", 10, 20);
+    }
+    
+    doc.text(`Yearly Report - ${yearSelect.value}`, 10, doc.lastAutoTable.finalY + 10);
+    let yearlyData = [
+        ["Month", "Total Income", "Total Expense", "Carry Forward", "Balance"]
+    ];
+    let yearTableRows = document.querySelectorAll(".displayYearReport tr")
+    yearTableRows.forEach(row => { 
+        let cells = row.querySelectorAll('td');
+        let rowData = [];
+        cells.forEach(cell => rowData.push(cell.textContent));
+        yearlyData.push(rowData);
+    })
+    if (yearlyData.length > 1) { 
+        doc.autoTable({
+            head: [yearlyData[0]],
+            body: yearlyData.slice(1),
+            startY: doc.lastAutoTable.finalY + 20
+        });
+    } else {
+        doc.setFontSize(14);
+        doc.text("No data available", 10, 20);
+    }
+    doc.save(`Expense_Report_${h5Month.textContent}.pdf`);
+})
