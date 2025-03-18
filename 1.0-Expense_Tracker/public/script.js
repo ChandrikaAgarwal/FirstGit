@@ -108,7 +108,7 @@ if (loginForm) {
             console.error("Error: ", err.response)
             if (err.response && err.response.data.message) {
                 alert(err.response.data.message)
-                window.location.href = "http://localhost:5000";
+                window.location.href = api_url;
             } else {
                 alert("An error occured, please try again!!")
             }
