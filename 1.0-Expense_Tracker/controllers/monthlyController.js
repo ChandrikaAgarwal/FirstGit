@@ -211,6 +211,8 @@ exports.getExpensesWeekly = async (req, res, next) => {
             balance = -totalExpense
         } else if (carryForward) {
             balance = carryForward
+        } else {
+            balance=totalIncome
         }
         console.log("Balance of this week: ", balance);
 
