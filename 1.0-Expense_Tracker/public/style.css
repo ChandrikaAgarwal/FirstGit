@@ -173,7 +173,7 @@ ul{
 .nav-item,.nav-link{
        font-family: 'Bodoni Moda',serif;
         font-size: 20px;
-        margin-left: 20px;
+        margin-left: 13px;
         font-weight: bolder;
         color: black !important;
 }
@@ -394,9 +394,9 @@ hr{
     .premium_member {
         position: relative;
         /* Absolute ki jagah fixed kiya */
-        top: 10px;
+        top: -30px;
         /* Top par fix */
-        left:20%;
+        left:45%;
         /* right:2%; */
         /* Right corner pe fix */
         font-size: 12px;
@@ -505,7 +505,7 @@ tr:last-child td:last-child {
     background-color: #7656eb;
 }
 
-#year,#month,#yearReporthead{
+#year,#month,#yearReporthead,#downloadedReports{
     display: flex;
     justify-content: center;
     margin-bottom: 1%;
@@ -513,7 +513,10 @@ tr:last-child td:last-child {
     position: relative;
     top: -20px;
 }
-
+.report-container{
+    position: relative;
+    top:-15px;
+}
 /* .savingsandIncome{
     display: flex;
     flex-direction: column;

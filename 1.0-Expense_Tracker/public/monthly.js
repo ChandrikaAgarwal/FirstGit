@@ -70,7 +70,7 @@ async function getExpensesByMonth() {
             }
         })
         console.log("Getting Expenses:: ", monthlyResponse.data);
-        if (monthlyResponse.data.isPremium === true) {
+        if (monthlyResponse.data.responseData.isPremium === true) {
             console.log("Premium user", monthlyResponse.data.isPremium);
             const paidUser = document.querySelector('.premiumUser')
             paidUser.textContent = "You are premium user"
@@ -79,7 +79,7 @@ async function getExpensesByMonth() {
     } catch (err) {
         console.log("Error in monthly expenses:  ", err);
     }
-    await displayMonthlyExpenses(monthlyResponse.data.allExpenses, monthlyResponse.data.allincomes, monthlyResponse.data.totalInc, monthlyResponse.data.totalExp, monthlyResponse.data.carryforward, monthlyResponse.data.balance)
+    await displayMonthlyExpenses(monthlyResponse.data.responseData.allexpenses, monthlyResponse.data.responseData.allincomes, monthlyResponse.data.responseData.totalIncome, monthlyResponse.data.responseData.totalExpense, monthlyResponse.data.responseData.carryForward, monthlyResponse.data.responseData.balance)
     
 
 }

@@ -9,6 +9,8 @@ const h5Month = document.querySelector("#month")
 const tableBody = document.querySelector('.displayMonthReport')
 const yearTable = document.querySelector('.displayYearReport')
 let reportDetails;
+let selectedMonth
+let selectedYear
 for (let i = 0; i < 12; i++) {
     const monthName = new Date(2000, i).toLocaleString('en-US', { month: 'long' });
     monthSelect.innerHTML += `<option value="${String(i + 1).padStart(2, "0")}">${monthName}</option>`;
@@ -37,8 +39,9 @@ reportForm.addEventListener("submit", async (e) => {
     h5Year.textContent = reportDetails.year
     let monthIndex = parseInt(reportDetails.month)
     console.log("monthIndex: ",monthIndex);
-    
     h5Month.textContent = new Date(2000, monthIndex - 1).toLocaleString('en-US', { month: 'long' }) + " " + reportDetails.year;
+    selectedMonth = monthIndex
+    selectedYear = reportDetails.year
    
 })
 
@@ -49,9 +52,14 @@ window.addEventListener("DOMContentLoaded", async () => {
     yearSelect.value = freshYear
     monthSelect.value = String(currentMonth).padStart(2, "0"); 
     h5Year.textContent = freshYear
-    h5Month.textContent = monthSelect.options[monthSelect.selectedIndex].text+" "+freshYear
+    h5Month.textContent = monthSelect.options[monthSelect.selectedIndex].text + " " + freshYear
+    selectedMonth = currentMonth
+    selectedYear = freshYear
+    console.log("selected values: ",selectedMonth,selectedYear);
+    
     await getMonthReport(freshYear, currentMonth)
     await getYearlyReport(freshYear)
+    await loadReports();
     
    
 })
@@ -64,12 +72,12 @@ async function getMonthReport(year,month) {
             }
         })
         console.log("Getting month Report: ", monthReport);
-        if (monthReport.data.isPremium === true) {
-            console.log("Premium user", monthReport.data.isPremium);
+        if (monthReport.data.responseData.isPremium === true) {
+            console.log("Premium user", monthReport.data.responseData.isPremium);
             const paidUser = document.querySelector('.premiumUser')
             paidUser.textContent = "You are premium user"
         }
-        displayMonthlyReport(monthReport.data.allExpenses, monthReport.data.allincomes, monthReport.data.totalInc, monthReport.data.totalExp, monthReport.data.carryforward,monthReport.data.balance)
+        displayMonthlyReport(monthReport.data.responseData.allexpenses, monthReport.data.responseData.allincomes, monthReport.data.responseData.totalIncome, monthReport.data.responseData.totalExpense, monthReport.data.responseData.carryForward, monthReport.data.responseData.balance)
     } catch (error) { 
         console.log("Error getting monthly report:  ", error);
     }
@@ -137,7 +145,7 @@ async function getYearlyReport(year) {
             }
         })
         console.log("year report : ", yearReport);
-        await displayYearlyReport(yearReport.data.allMonths, yearReport.data.totalIncome, yearReport.data.totalExpense, yearReport.data.totalcf,yearReport.data.totalBalance)
+        await displayYearlyReport(yearReport.data.responseData.allMonths, yearReport.data.responseData.totalIncome, yearReport.data.responseData.totalExpense, yearReport.data.responseData.totalcf, yearReport.data.responseData.totalBalance)
     } catch (err) { 
         console.log("Error getting yearly report:  ", err);
     }
@@ -168,62 +176,109 @@ async function displayYearlyReport(yearReport,yearInc,yearExp,yearCf,yearBalance
 
      }
 }
-
-document.getElementById("download-report").addEventListener("click", () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    //title
-    doc.setFontSize(18);
-    doc.text(`Expense Report -${h5Month.textContent}`, 10, 10);
-
-    let monthlyData = [
-        ["Date", "Description", "Category", "Income", "Expense"]
-    ];
-    
-    let tableRows = document.querySelectorAll(".displayMonthReport tr")
-    tableRows.forEach(row => { 
-        let cells = row.querySelectorAll('td');
-        let rowData = [];
-        cells.forEach(cell => rowData.push(cell.textContent));
-        monthlyData.push(rowData);
-    })
-    if (monthlyData.length > 1) {
-        doc.autoTable({
-            head: [monthlyData[0]], // Header row
-            body: monthlyData.slice(1), // Data rows
-            startY: 20, // Adjust the starting position
-            columnStyles: {
-                3: { halign: "right" },
-                4:{halign:"right"}
+//allexpensereportbucket 
+document.getElementById("download-report").addEventListener("click", async () => {
+    try {
+        const dwnldReport = await axios.get(`${api_url}/api/monthly/downloadRep/?month=${selectedMonth}&year=${selectedYear}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
             }
-        });
+        })
+        console.log("Response on clicking Download: ", dwnldReport);
+        if (dwnldReport.status === 200) {
+            var a = document.createElement('a')
+            a.href = dwnldReport.data.fileURL
+            a.download = 'myexpense.csv';
+            a.click()
+            await loadReports()
+        } else {
+            throw new Error(dwnldReport.data.message)
+        }
+    } catch (err) {
+        console.log("error downloading report: ",err);
         
-    } else {
-        doc.setFontSize(14);
-        doc.text("No data available", 10, 20);
     }
-    
-    doc.text(`Yearly Report - ${yearSelect.value}`, 10, doc.lastAutoTable.finalY + 10);
-    let yearlyData = [
-        ["Month", "Total Income", "Total Expense", "Carry Forward", "Balance"]
-    ];
-    let yearTableRows = document.querySelectorAll(".displayYearReport tr")
-    yearTableRows.forEach(row => { 
-        let cells = row.querySelectorAll('td');
-        let rowData = [];
-        cells.forEach(cell => rowData.push(cell.textContent));
-        yearlyData.push(rowData);
-    })
-    if (yearlyData.length > 1) { 
-        doc.autoTable({
-            head: [yearlyData[0]],
-            body: yearlyData.slice(1),
-            startY: doc.lastAutoTable.finalY + 20
-        });
-    } else {
-        doc.setFontSize(14);
-        doc.text("No data available", 10, 20);
-    }
-    doc.save(`Expense_Report_${h5Month.textContent}.pdf`);
 })
+
+async function loadReports() {
+    try {
+        const linkRes = await axios.get(`${api_url}/api/monthly/reportLinks`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+        console.log("Response on clicking load reports: ", linkRes);
+        //link-list
+        let fileUrls=linkRes.data.fileUrls
+        const tableBody = document.getElementById("link-list");
+        tableBody.innerHTML = "";
+        fileUrls.forEach((file, index)=> {
+            const row = `<tr>
+          <td>${index + 1}</td>
+          <td>${new Date(file.createdAt).toLocaleString()}</td>
+          <td><a href="${file.url}">Download Report</a></td>
+          </tr>`  
+            tableBody.innerHTML += row;
+        })
+     } catch (err) {
+        console.log("error loading all links: ",err);
+        
+    }
+}
+    
+    // const { jsPDF } = window.jspdf;
+    // const doc = new jsPDF();
+
+    // //title
+    // doc.setFontSize(18);
+    // doc.text(`Expense Report -${h5Month.textContent}`, 10, 10);
+
+    // let monthlyData = [
+    //     ["Date", "Description", "Category", "Income", "Expense"]
+    // ];
+    
+    // let tableRows = document.querySelectorAll(".displayMonthReport tr")
+    // tableRows.forEach(row => { 
+    //     let cells = row.querySelectorAll('td');
+    //     let rowData = [];
+    //     cells.forEach(cell => rowData.push(cell.textContent));
+    //     monthlyData.push(rowData);
+    // })
+    // if (monthlyData.length > 1) {
+    //     doc.autoTable({
+    //         head: [monthlyData[0]], // Header row
+    //         body: monthlyData.slice(1), // Data rows
+    //         startY: 20, // Adjust the starting position
+    //         columnStyles: {
+    //             3: { halign: "right" },
+    //             4:{halign:"right"}
+    //         }
+    //     });
+        
+    // } else {
+    //     doc.setFontSize(14);
+    //     doc.text("No data available", 10, 20);
+    // }
+    
+    // doc.text(`Yearly Report - ${yearSelect.value}`, 10, doc.lastAutoTable.finalY + 10);
+    // let yearlyData = [
+    //     ["Month", "Total Income", "Total Expense", "Carry Forward", "Balance"]
+    // ];
+    // let yearTableRows = document.querySelectorAll(".displayYearReport tr")
+    // yearTableRows.forEach(row => { 
+    //     let cells = row.querySelectorAll('td');
+    //     let rowData = [];
+    //     cells.forEach(cell => rowData.push(cell.textContent));
+    //     yearlyData.push(rowData);
+    // })
+    // if (yearlyData.length > 1) { 
+    //     doc.autoTable({
+    //         head: [yearlyData[0]],
+    //         body: yearlyData.slice(1),
+    //         startY: doc.lastAutoTable.finalY + 20
+    //     });
+    // } else {
+    //     doc.setFontSize(14);
+    //     doc.text("No data available", 10, 20);
+    // }
+    // doc.save(`Expense_Report_${h5Month.textContent}.pdf`);

@@ -1,13 +1,14 @@
 require('dotenv').config();
 const express = require('express');
-const fs=require('fs')
+const fs = require('fs')
 const sequelize = require('./util/database')
 const Expense = require('./models/expense')
 const User = require('./models/user')
 const Income = require('./models/income')
 const Order = require('./models/orders')
 const ForgotPassRequest = require('./models/forgotPasswordReq')
-const Month=require('./models/monthly')
+const Month = require('./models/monthly')
+const FileUrl = require('./models/fileUrl')
 const expenseRoute = require('./routes/expenseRoute')
 const userRoute = require('./routes/userRouter')
 const incomeRoute = require('./routes/incomeRoute')
@@ -17,7 +18,7 @@ const boardRoute = require('./routes/leaderBoardRoute')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const path = require('path')
-const morgan=require('morgan')
+const morgan = require('morgan')
 const app = express();
 
 const accessLogsStream = fs.createWriteStream(
@@ -25,7 +26,7 @@ const accessLogsStream = fs.createWriteStream(
     { flags: 'a' } //means append to append new data to file and not overwrite it
 );
 app.use(cors())
-app.use(morgan('combined',{stream:accessLogsStream}))
+app.use(morgan('combined', { stream: accessLogsStream }))
 app.use(bodyParser.json())
 app.use(express.static('public'))  //iske baare mein bhi padh lena
 
@@ -79,11 +80,14 @@ ForgotPassRequest.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
 User.hasMany(ForgotPassRequest, { constraints: true, onDelete: 'CASCADE' })
 Month.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
 User.hasMany(Month, { constraints: true, onDelete: 'CASCADE' })
+FileUrl.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
+User.hasMany(FileUrl, { constraints: true, onDelete: 'CASCADE' })
+
 
 // sequelize.sync({force:true})
 sequelize.sync()
     .then(() => {
-        app.listen(process.env.PORT||5000, () => {
+        app.listen(process.env.PORT || 5000, () => {
             console.log("Server running on  http://localhost:5000");
 
         })

@@ -79,7 +79,7 @@
     </form>
     <button id="download-report" class="btn btn-primary d-flex">Download Report</button>
 
-    <div class="container">
+    <div class="container report-container">
         <div class="displayYear">
             <h5 id="year"></h5>
         </div> <br >
@@ -112,6 +112,19 @@
             </thead>
             <tbody class="displayYearReport"></tbody>
         </table>
+        <h5 id="downloadedReports" style="margin-top: 3%;">Your Downloaded Reports</h5>
+        <div class="report-links">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Sr</th>
+                        <th>Date</th>
+                        <th>Report</th>
+                    </tr>
+                </thead>
+                <tbody id="link-list"></tbody>
+            </table>
+        </div>
         </div>
     </div>
     
