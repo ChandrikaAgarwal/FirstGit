@@ -115,7 +115,7 @@ if (loginForm) {
         }
     })
     signupBtn.addEventListener('click', () => {
-        window.location.href = "http://localhost:5000";
+        window.location.href = "http://13.200.253.246:5000";
     });
 }
 
