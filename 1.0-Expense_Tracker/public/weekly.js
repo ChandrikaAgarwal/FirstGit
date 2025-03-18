@@ -1,7 +1,9 @@
 const weekDisplay = document.getElementById('weekDisplay')
 const prevBtn = document.getElementById('prevbtn')
 const nextBtn = document.getElementById('nextbtn')
-const api_url = 'http://localhost:5000'
+// const api_url = 'http://localhost:5000'
+const api_url = "http://13.200.253.246:5000";
+
 const tableBody = document.querySelector('.weeklyExpenses')
 let today = new Date()
 let currentWeekStart = getStartOfWeek(today)
