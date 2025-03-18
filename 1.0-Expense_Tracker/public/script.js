@@ -108,7 +108,7 @@ if (loginForm) {
             console.error("Error: ", err.response)
             if (err.response && err.response.data.message) {
                 alert(err.response.data.message)
-                window.location.href = api_url;
+                window.location.href = "http://13.200.253.246:5000";
             } else {
                 alert("An error occured, please try again!!")
             }
