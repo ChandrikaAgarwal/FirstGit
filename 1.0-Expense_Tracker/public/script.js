@@ -54,6 +54,8 @@ if (signupForm) {
             signupForm.reset()
             window.location.href = "/users"
         } catch (err) {
+            console.log("error in signing up: ",err);
+            
             console.error("Error: ", err.response)
             if (err.response && err.response.data.message) {
                 alert(err.response.data.message)
@@ -105,6 +107,8 @@ if (loginForm) {
             localStorage.setItem('token', res.data.token);
             window.location.href = "/expenses"
         } catch (err) {
+            console.log("error in logging in: ",err);
+            
             console.error("Error: ", err.response)
             if (err.response && err.response.data.message) {
                 alert(err.response.data.message)
