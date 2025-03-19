@@ -1,5 +1,5 @@
-// const api_url = 'http://13.200.253.246:5000'
-const api_url = "http://13.200.253.246:5000";
+// const api_url = 'http://localhost:5000'
+const api_url = "http://localhost:5000";
 
 const token = localStorage.getItem('token')
 const reportForm = document.querySelector("#reportForm")

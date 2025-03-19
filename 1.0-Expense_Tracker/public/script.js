@@ -8,8 +8,8 @@ const forgotPasswordBtn = document.querySelector('#forgotPasswordBtn')
 const togBtn = document.getElementById("toggle")
 const cat = document.getElementById("category")
 const catlabel = document.getElementById("catlabel")
-// const api_url = 'http://13.200.253.246:5000'
-const api_url = "http://13.200.253.246:5000";
+// const api_url = 'http://localhost:5000'
+const api_url = "http://localhost:5000";
 
 const containerfluid = document.querySelector('.expense-Div')
 const container = document.querySelector('.savingsandIncome')
@@ -112,14 +112,14 @@ if (loginForm) {
             console.error("Error: ", err.response)
             if (err.response && err.response.data.message) {
                 alert(err.response.data.message)
-                window.location.href = "http://13.200.253.246:5000";
+                window.location.href = "http://localhost:5000";
             } else {
                 alert("An error occured, please try again!!")
             }
         }
     })
     signupBtn.addEventListener('click', () => {
-        window.location.href = "http://13.200.253.246:5000";
+        window.location.href = "http://localhost:5000";
     });
 }
 
