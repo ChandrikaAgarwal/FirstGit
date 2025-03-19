@@ -87,7 +87,7 @@ User.hasMany(FileUrl, { constraints: true, onDelete: 'CASCADE' })
 // sequelize.sync({force:true})
 sequelize.sync()
     .then(() => {
-        app.listen(process.env.PORT || 5000, '0.0.0.0', () => {
+        app.listen(process.env.PORT || 5000, () => {
             console.log("Server running on  http://13.200.253.246:5000");
 
         })
