@@ -1,6 +1,6 @@
 const { Cashfree } = require('cashfree-pg')
 console.log("loading cashfree.js");
-const api_url = "http://13.200.253.246:5000"
+const api_url = "http://localhost:5000"
 
 const clientId = process.env.CASHFREE_API_ID;
 const secretKey = process.env.CASHFREE_SECRET_KEY;
