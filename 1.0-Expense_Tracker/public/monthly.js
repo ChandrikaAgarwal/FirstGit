@@ -1,8 +1,8 @@
 const monthDisplay = document.getElementById('monthDisplay')
 const prevBtn = document.getElementById('prevbtn')
 const nextBtn = document.getElementById('nextbtn')
-// const api_url = 'http://localhost:5000'
-const api_url = "http://localhost:5000";
+// const api_url = 'http://52.66.9.15:5000'
+const api_url = "http://52.66.9.15:5000";
 
 const displayExpenses = document.querySelector('.display_expenses')
 
