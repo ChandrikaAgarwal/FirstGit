@@ -8,9 +8,6 @@ const forgotPasswordBtn = document.querySelector('#forgotPasswordBtn')
 const togBtn = document.getElementById("toggle")
 const cat = document.getElementById("category")
 const catlabel = document.getElementById("catlabel")
-//const api_url = 'http://localhost:5000'
-//const api_url = "http://52.66.9.15:5000";
-// const api_url = 'http://52.66.9.15:5000'
 const api_url = "http://15.206.27.247:5000";
 
 const containerfluid = document.querySelector('.expense-Div')
@@ -23,14 +20,14 @@ const row = document.querySelector('.incomedisplay')
 const addBtn = document.getElementById('add')
 const saveBtn = document.getElementById('save')
 const cancelBtn = document.getElementById('cancel')
-let premiumLinks=document.querySelectorAll('.leaderBoard a, .monthly a, .weekly a, .report a')
-console.log("premiumLinks: ",premiumLinks);
+let premiumLinks = document.querySelectorAll('.leaderBoard a, .monthly a, .weekly a, .report a')
+console.log("premiumLinks: ", premiumLinks);
 const rowsPerPageform = document.createElement('form')
 const selectLimit = document.createElement('select')
 selectLimit.id = "expenseLimit"
 let listOfExpenses;
 let isEditing = false;
-console.log("Bootstrap ",bootstrap);
+console.log("Bootstrap ", bootstrap);
 
 
 var userId;
@@ -56,8 +53,8 @@ if (signupForm) {
             signupForm.reset()
             window.location.href = "/users"
         } catch (err) {
-            console.log("error in signing up: ",err);
-            
+            console.log("error in signing up: ", err);
+
             console.error("Error: ", err.response)
             if (err.response && err.response.data.message) {
                 alert(err.response.data.message)
@@ -75,22 +72,22 @@ if (signupForm) {
 }
 if (loginForm) {
     forgotPasswordBtn.addEventListener("click", async (e) => {
-        passwordForm.style.display="flex"
+        passwordForm.style.display = "flex"
     })
     passwordForm.addEventListener('submit', async (event) => {
         event.preventDefault()
-        const emailtoSend={
+        const emailtoSend = {
             email: event.target.email.value
         }
-        console.log("email id: ",emailtoSend);
+        console.log("email id: ", emailtoSend);
         passwordForm.style.display = "none"
-        try { 
+        try {
             const forgotpassres = await axios.post(`${api_url}/password/forgotpassword`, emailtoSend)
-            console.log("forgot password response: ",forgotpassres);
-            
-        } catch (err) { 
-            console.log("error in forgt password: ",err);
-            
+            console.log("forgot password response: ", forgotpassres);
+
+        } catch (err) {
+            console.log("error in forgt password: ", err);
+
         }
     })
     loginForm.addEventListener('submit', async (e) => {
@@ -109,12 +106,13 @@ if (loginForm) {
             localStorage.setItem('token', res.data.token);
             window.location.href = "/expenses"
         } catch (err) {
-            console.log("error in logging in: ",err);
-            
+            console.log("error in logging in: ", err);
+
             console.error("Error: ", err.response)
             if (err.response && err.response.data.message) {
                 alert(err.response.data.message)
                 window.location.href = "/"
+                window.location.href = "http://15.206.27.247:5000";
             } else {
                 alert("An error occured, please try again!!")
             }
@@ -122,6 +120,7 @@ if (loginForm) {
     })
     signupBtn.addEventListener('click', () => {
         window.location.href = "/";
+       
     });
 }
 
@@ -133,8 +132,8 @@ if (form) {
     const showformbtn = document.querySelector('#show-form');
     console.log("Show form btn!!", showformbtn);
     let icon = showformbtn.getElementsByTagName('i')[0];
-    console.log("icon: ",icon);
-    
+    console.log("icon: ", icon);
+
 
     if (!showformbtn) {
         console.error("Button not found!");
@@ -142,7 +141,7 @@ if (form) {
     }
     showformbtn.addEventListener('click', () => {
         console.log("show form button clicked");
-        
+
         if (showformbtn.classList.contains('collapsed')) {
 
             icon.classList.replace('fa-minus', 'fa-plus'); // Change back to plus
@@ -173,7 +172,7 @@ if (form) {
     limitLabel.setAttribute('for', 'expenseLimit')
     limitLabel.textContent = "Rows per page:"
     paginationContainer.appendChild(limitLabel)
-    for (let i = 1; i <= 100; i++){
+    for (let i = 1; i <= 100; i++) {
         let option = document.createElement('option')
         option.value = i;
         option.textContent = i;
@@ -182,7 +181,7 @@ if (form) {
     paginationContainer.appendChild(selectLimit)
     let expensesPerPage = localStorage.getItem('expensesPerPage') || 10;
     selectLimit.value = expensesPerPage
-    selectLimit.addEventListener('change', () => { 
+    selectLimit.addEventListener('change', () => {
         expensesPerPage = selectLimit.value
         localStorage.setItem('expensesPerPage', expensesPerPage)
         fetchExpenses(1)
@@ -217,7 +216,7 @@ if (form) {
 
     }
 
-    nextBtn.addEventListener("click", async() => {
+    nextBtn.addEventListener("click", async () => {
         let daysInCurrentMonth = getDaysInMonth(currentYear, currentMonth);
 
         if (currentDay < daysInCurrentMonth) {
@@ -235,7 +234,7 @@ if (form) {
         currentPage = 1;
         updateDateDisplay();
         filterExpenses(prevdate)
-       await fetchExpenses(currentPage)
+        await fetchExpenses(currentPage)
 
     })
 
@@ -256,7 +255,7 @@ if (form) {
         currentPage = 1;
         updateDateDisplay();
         filterExpenses(prevdate)
-       await fetchExpenses(currentPage)
+        await fetchExpenses(currentPage)
     })
 
     //initial display
@@ -310,7 +309,7 @@ if (form) {
 
             } catch (err) {
                 console.log("error posting an expense: ", err);
-                
+
             }
         } else {
             console.log("i am in income mode");
@@ -329,7 +328,7 @@ if (form) {
                 console.log("User id::", response.data.incomedetail.userId);
                 userId = response.data.incomedetail.userId
                 localStorage.setItem(userId, response.data.incomedetail.amount)
-                displayIncome(prevdate, response.data.incomedetail.amount, response.data.incomedetail.id,response.data.incomedetail.description)
+                displayIncome(prevdate, response.data.incomedetail.amount, response.data.incomedetail.id, response.data.incomedetail.description)
                 displaySavings(prevdate, response.data.incomedetail.totalsaving)
             } catch (err) {
                 console.log("Error posting income:: ", err);
@@ -339,11 +338,11 @@ if (form) {
 
     })
     const incomeul = document.querySelector('#incomeul')
-    console.log("incomeUL table:: ",incomeul);
+    console.log("incomeUL table:: ", incomeul);
     const incomeTable = document.querySelector('.incomeTable')
 
 
-    function displayIncome(createdAt, income, incomeid,description) {
+    function displayIncome(createdAt, income, incomeid, description) {
         const incomeLi = document.createElement('tr')
         // incomecol.innerHTML = "";
         if (createdAt === prevdate) {
@@ -360,8 +359,8 @@ if (form) {
     }
 
     window.addEventListener("DOMContentLoaded", async () => {
-       await fetchExpenses(currentPage)
-       await filterExpenses(prevdate)
+        await fetchExpenses(currentPage)
+        await filterExpenses(prevdate)
 
     })
     function displaySavings(createdAt, savingsdone) {
@@ -398,7 +397,7 @@ if (form) {
             let arrofincomes = incomeResponse.data.allincomesonDate
             for (let income of arrofincomes) {
                 let incomeDate = income.createdAt.split('T')[0]
-                displayIncome(incomeDate, income.amount, income.id,income.description)
+                displayIncome(incomeDate, income.amount, income.id, income.description)
 
             }
 
@@ -416,29 +415,29 @@ if (form) {
                 Authorization: `Bearer ${token}`
             }
         })
-        console.log("response for is Premium: ",response);
-        
+        console.log("response for is Premium: ", response);
+
         let allexpenses = response.data.expenses || [];
         let filteredExpenses = await filter(allexpenses, date)
         console.log("filtered Expenses:: ", filteredExpenses);
 
         expense_list.innerHTML = ""
-        if (response.data.isPremium===true) {
+        if (response.data.isPremium === true) {
             console.log("Premium user", response.data.isPremium);
             const paidUser = document.querySelector('.premiumUser')
             paidUser.textContent = "You are premium user"
         } else {
             console.log("not a premium user");
-            premiumLinks.forEach(link=> {
-                console.log("link: ",link);
-                
+            premiumLinks.forEach(link => {
+                console.log("link: ", link);
+
                 link.style.color = "grey";
                 link.style.cursor = "not-allowed";
-                
+
                 link.addEventListener("click", function (event) {
                     console.log("Leaderboard Clicked! Preventing default...");
                     event.preventDefault();
-                    
+
                     alert("This is a premium feature. Please upgrade to access!");
                 });
             })
@@ -459,10 +458,10 @@ if (form) {
         }
     }
 
-    
+
 
     function displayExp(expenses, totalPages, currentPage) {
-        
+
         expense_list.innerHTML = "";
         // paginationContainer.innerHTML = "";
         expenses.forEach(expense => {
@@ -647,7 +646,7 @@ if (form) {
                         Authorization: `Bearer ${token}`
                     }
                 })
-                
+
                 console.log("Response on delete: ", response);
                 incomeul.removeChild(deleteItem)
                 // incomecol.innerHTML = ""
@@ -726,14 +725,14 @@ if (form) {
                         Authorization: `Bearer ${token}`
                     }
                 })
-                console.log("edit income response: ",getIncomeRes);
+                console.log("edit income response: ", getIncomeRes);
 
                 let fetchedIncome = populateFields(getIncomeRes, key)
                 if (isEditing) {
                     console.log("is editing in put: ", isEditing);
                     saveBtn.addEventListener("click", async () => {
-                        console.log("incomeul: ",incomeul);
-                        
+                        console.log("incomeul: ", incomeul);
+
                         incomeul.removeChild(editIncome)
                         newIncomeDetail = {
                             amount: document.getElementById('amount').value,
@@ -752,7 +751,7 @@ if (form) {
                             })
                             console.log("Income after edit response: ", newIncome.data);
                             // editIncome.textContent = `${newIncome.data.editedIncome.amount} `;
-                            displayIncome(prevdate, newIncome.data.editedIncome.amount, newIncome.data.editedIncome.id,newIncome.data.editedIncome.description)
+                            displayIncome(prevdate, newIncome.data.editedIncome.amount, newIncome.data.editedIncome.id, newIncome.data.editedIncome.description)
                             try {
                                 const getIncome = await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
                                     headers: {
@@ -815,7 +814,7 @@ if (form) {
 
         }
     })
-   
+
     // const limit = 2;
     async function fetchExpenses(page) {
         try {
@@ -839,7 +838,7 @@ if (form) {
             console.log("Error fetching expenses:", err);
         }
     }
-    
+
 
     function updatePaginationButtons(totalPages) {
         let prevPageBtn = document.getElementById("prevPage")
@@ -859,8 +858,8 @@ if (form) {
             nextPageBtn.classList.remove('disabled');
         }
     }
-    
-    document.getElementById("prevPage").addEventListener("click", async() => {
+
+    document.getElementById("prevPage").addEventListener("click", async () => {
         if (currentPage > 1) {
             currentPage--;
             await fetchExpenses(currentPage);
