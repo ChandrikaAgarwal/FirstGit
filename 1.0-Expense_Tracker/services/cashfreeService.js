@@ -1,6 +1,6 @@
 const { Cashfree } = require('cashfree-pg')
 console.log("loading cashfree.js");
-const api_url = "http://52.66.9.15:5000"
+const api_url = "http://15.206.27.247:5000"
 
 const clientId = process.env.CASHFREE_API_ID;
 const secretKey = process.env.CASHFREE_SECRET_KEY;
@@ -35,7 +35,7 @@ exports.createOrder = async (
                 customer_email: customerEmail,
             },
             order_meta: {
-                return_url: `${api_url}/create-payment/?orderId=${orderId}`,
+                return_url: `http://15.206.27.247:5000/create-payment/?orderId=${orderId}`,
                 payment_methods: "cc,dc,upi"
             },
             order_expiry_time: formattedExpiryDate  //optional
