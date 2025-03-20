@@ -11,7 +11,7 @@ const catlabel = document.getElementById("catlabel")
 //const api_url = 'http://localhost:5000'
 //const api_url = "http://52.66.9.15:5000";
 // const api_url = 'http://52.66.9.15:5000'
-const api_url = " http://52.66.9.15:5000";
+const api_url = "http://15.206.27.247:5000";
 
 const containerfluid = document.querySelector('.expense-Div')
 const container = document.querySelector('.savingsandIncome')
@@ -49,7 +49,7 @@ if (signupForm) {
 
         console.log("newuserdetail ", newuserDetail);
         try {
-            const res = await axios.post(`${api_url}`, newuserDetail)
+            const res = await axios.post(`${api_url}/`, newuserDetail)
             console.log("New User Detail: ", res.data);
             localStorage.setItem('token', res.data.token);
             alert("Signup successful! Please log in.");
@@ -114,14 +114,14 @@ if (loginForm) {
             console.error("Error: ", err.response)
             if (err.response && err.response.data.message) {
                 alert(err.response.data.message)
-                window.location.href = "http://52.66.9.15:5000";
+                window.location.href = "/"
             } else {
                 alert("An error occured, please try again!!")
             }
         }
     })
     signupBtn.addEventListener('click', () => {
-        window.location.href = "http://52.66.9.15:5000";
+        window.location.href = "/";
     });
 }
 
@@ -780,7 +780,7 @@ if (form) {
 
     document.querySelector('.premium_member').addEventListener("click", async () => {
         try {
-            // const response = await fetch(`${api_url}/create-payment`, {
+           
             const response = await fetch(`${api_url}/api/payment`, {
                 method: 'POST',
                 headers: {
