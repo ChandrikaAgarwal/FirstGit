@@ -10,8 +10,8 @@
 
 <body>
     <script>
-        const api_url = "http://15.206.27.247:5000"
-        // const api_url = "http://15.206.27.247:5000";
+        const api_url = "http://15.206.27.247"
+        // const api_url = "http://15.206.27.247";
 
         const token = localStorage.getItem("token");
         async function checkStatus(orderId) {
@@ -34,7 +34,7 @@
                 } else if (data.orderStatus === "SUCCESS") {
                     alert("Payment successful");
                 }
-                window.location.href = `${api_url}/expenses`
+                // window.location.href = `${api_url}/expenses`
             } catch (error) {
                 console.log("Error in checkStatus: ", error);
             }

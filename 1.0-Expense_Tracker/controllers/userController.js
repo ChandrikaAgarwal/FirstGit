@@ -90,7 +90,7 @@ exports.forgotPassword = async (req, res, next) => {
             id:resetId,
             isActive:true,
         })
-        const resetLink =`http://localhost:5000/password/resetpassword/form/${resetId}`
+        const resetLink =`http://15.206.27.247/password/resetpassword/form/${resetId}`
         const sender = {
             email: 'chandrikaagarwal086@gmail.com'
         }

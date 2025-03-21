@@ -19,7 +19,7 @@ const jwtAuthMiddleware = (req, res, next) => {  //to figure out who the user is
         next()
 
     } catch (err) {
-        console.error(err.message);
+        console.error(err);
         res.status(401).json({ error: 'Invalid token' })
 
     }
