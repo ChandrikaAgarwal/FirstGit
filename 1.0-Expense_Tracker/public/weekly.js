@@ -2,7 +2,7 @@ const weekDisplay = document.getElementById('weekDisplay')
 const prevBtn = document.getElementById('prevbtn')
 const nextBtn = document.getElementById('nextbtn')
 // const api_url = 'http://15.206.27.247:5000'
-const api_url = "http://15.206.27.247:5000";
+const api_url = "http://15.206.27.247";
 
 const tableBody = document.querySelector('.weeklyExpenses')
 let today = new Date()

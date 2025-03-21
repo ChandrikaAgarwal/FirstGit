@@ -1,6 +1,6 @@
 // const allExpenseDisplay = document.querySelector('.showAllExpenses')
 // const api_url = 'http://15.206.27.247:5000'
-const api_url = "http://15.206.27.247:5000";
+const api_url = "http://15.206.27.247";
 
 const token = localStorage.getItem('token')
 window.addEventListener("DOMContentLoaded", async () => {
