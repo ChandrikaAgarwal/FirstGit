@@ -1,2 +1,4 @@
 .env
 access.log
+node_modules/
+config.json
