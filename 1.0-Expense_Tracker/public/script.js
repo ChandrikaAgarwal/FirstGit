@@ -50,7 +50,6 @@ if (signupForm) {
             console.log("entering if");
             
             alert("Enter a valid phone number")
-            return
         }
         console.log("newuserdetail ", newuserDetail);
         try {
