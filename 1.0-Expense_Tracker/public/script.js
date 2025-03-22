@@ -44,7 +44,10 @@ if (signupForm) {
             phone: e.target.phone.value,
             password: e.target.password.value
         }
-
+        if (phone.length !== 10) {
+            alert("Enter a valid phone number")
+            return
+        }
         console.log("newuserdetail ", newuserDetail);
         try {
             const res = await axios.post(`${api_url}`, newuserDetail)
