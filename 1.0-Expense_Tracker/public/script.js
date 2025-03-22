@@ -51,7 +51,7 @@ if (signupForm) {
         let hasSpace=newPhone.indexOf(" ")
         if (newPhone.length !== 10 || hasSpace >= 0) {
             console.log("entering if");
-            alert("Enter a valid phone number")
+            alert("Enter a valid phone number!!")
             return
         }
         console.log("newuserdetail ", newuserDetail);
