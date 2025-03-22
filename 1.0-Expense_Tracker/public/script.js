@@ -46,10 +46,10 @@ if (signupForm) {
         }
         console.log("phone length: ",(newuserDetail.phone.length));
         
-        if (phone.length !== 10) {
+        if (newuserDetail.phone.length !== 10) {
             console.log("entering if");
-            
             alert("Enter a valid phone number")
+            return
         }
         console.log("newuserdetail ", newuserDetail);
         try {
