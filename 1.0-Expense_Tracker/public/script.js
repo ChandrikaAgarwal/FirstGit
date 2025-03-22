@@ -44,7 +44,7 @@ if (signupForm) {
             phone: e.target.phone.value,
             password: e.target.password.value
         }
-        console.log("phone length: ",typeof(phone.length));
+        console.log("phone length: ",typeof(newuserDetail.phone.length));
         
         if (phone.length !== 10) {
             console.log("entering if");
