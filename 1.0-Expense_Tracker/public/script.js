@@ -45,11 +45,11 @@ if (signupForm) {
             password: e.target.password.value
         }
         console.log("phone length: ", (newuserDetail.phone.length));
-        let newPhone=newuserDetail.phone.trim()
-        let hasSpace = newPhone.indexOf(" ")
-        console.log("has space: ",hasSpace);
+        let newPhone = newuserDetail.phone.trim()
+        console.log("new phone length :",newPhone.length);
         
-        if (newuserDetail.phone.length !== 10 || hasSpace >= 0) {
+        let hasSpace=newPhone.indexOf(" ")
+        if (newuserDetail.phone.length !== 10 || hasSpace !== -1) {
             console.log("entering if");
             alert("Enter a valid phone number")
             return
