@@ -44,9 +44,10 @@ if (signupForm) {
             phone: e.target.phone.value,
             password: e.target.password.value
         }
-        console.log("phone length: ",(newuserDetail.phone.length));
-        
-        if (newuserDetail.phone.length !== 10) {
+        console.log("phone length: ", (newuserDetail.phone.length));
+        let newPhone=newuserDetail.phone.trim()
+        let hasSpace=newPhone.indexOf(" ")
+        if (newuserDetail.phone.length !== 10 || hasSpace >= 0) {
             console.log("entering if");
             alert("Enter a valid phone number")
             return
