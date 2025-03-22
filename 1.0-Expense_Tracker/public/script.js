@@ -49,7 +49,7 @@ if (signupForm) {
         console.log("new phone length :",newPhone.length);
         
         let hasSpace=newPhone.indexOf(" ")
-        if (newuserDetail.phone.length !== 10 || hasSpace !== -1) {
+        if (newPhone.length !== 10 || hasSpace >= 0) {
             console.log("entering if");
             alert("Enter a valid phone number")
             return
