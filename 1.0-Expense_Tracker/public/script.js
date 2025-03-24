@@ -9,8 +9,7 @@ const togBtn = document.getElementById("toggle")
 const cat = document.getElementById("category")
 const catlabel = document.getElementById("catlabel")
 // const api_url = 'http://15.206.27.247'
-// const api_url = "http://15.206.27.247";
-const api_url="http://127.0.0.1:5000"
+const api_url = "http://15.206.27.247";
 
 const containerfluid = document.querySelector('.expense-Div')
 const container = document.querySelector('.savingsandIncome')
@@ -66,7 +65,7 @@ if (signupForm) {
         } catch (err) {
             console.log("error in signing up: ", err);
 
-            console.error("Error: ", err)
+            console.error("Error: ", err.response)
             if (err.response && err.response.data.message) {
                 alert(err.response.data.message)
                 if (err.response.data.message === "User already exists.Please log in.") {
