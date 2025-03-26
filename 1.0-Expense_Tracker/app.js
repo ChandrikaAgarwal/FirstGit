@@ -27,7 +27,8 @@ const accessLogsStream = fs.createWriteStream(
 );
 app.use(cors())
 app.use(morgan('combined', { stream: accessLogsStream }))
-app.use(bodyParser.json())
+// app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.static('public'))  //iske baare mein bhi padh lena
 
 app.get('/users', (req, res) => {
