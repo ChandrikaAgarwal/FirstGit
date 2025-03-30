@@ -12,10 +12,10 @@
     class="max-w-md mx-auto relative overflow-hidden z-10 bg-gray-800 p-8 rounded-lg shadow-md before:w-24 before:h-24 before:absolute before:bg-purple-600 before:rounded-full before:-z-10 before:blur-2xl after:w-32 after:h-32 after:absolute after:bg-sky-400 after:rounded-full after:-z-10 after:blur-xl after:top-24 after:-right-12 m-6">
     <h2 class="text-2xl font-bold text-white mb-6">Create Your Profile</h2>
 
-    <form method="post" action="#">
+    <form method="post" action="/" id="signup-form">
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-300" for="name">Full Name</label>
-            <input class="mt-1 p-2 w-full bg-gray-700 border border-gray-600 rounded-md text-white" type="text" />
+            <input class="mt-1 p-2 w-full bg-gray-700 border border-gray-600 rounded-md text-white" type="text" name="name" id="name"/>
 
         </div>
 
@@ -26,27 +26,32 @@
         </div>
 
         <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-300" for="bio">Mobile No.</label>
+            <label class="block text-sm font-medium text-gray-300" for="phone">Mobile No.</label>
         <input class="mt-1 p-2 w-full bg-gray-700 border border-gray-600 rounded-md text-white" name="phone" id="phone"
             type="tel" />
         </div>
 
         <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-300" for="bio">Password</label>
+            <label class="block text-sm font-medium text-gray-300" for="password">Password</label>
             <input class="mt-1 p-2 w-full bg-gray-700 border border-gray-600 rounded-md text-white" name="password" id="password"
                 type="password" />
         </div>
 
-        <div class="flex justify-end">
+        <div>
             <button
-                class="bg-gradient-to-r from-purple-600 via-purple-400 to-blue-500 text-white px-4 py-2 font-bold rounded-md hover:opacity-80"
+                class="create-profBtn bg-gradient-to-r from-purple-600 via-purple-400 to-blue-500 text-white px-4 py-2 font-bold rounded-md hover:opacity-80"
                 type="submit">
                 Create Profile
             </button>
         </div>
+        <div class="flex justify-end">
+            <p class="text-white m-3 text-lg">Already a user?</p>
+            <button 
+            class="loginBtn bg-gradient-to-r from-purple-600 via-purple-400 to-blue-500 text-white px-4 py-1 font-bold rounded-md hover:opacity-80" type="button">Login</button>
+        </div>
     </form>
 </div>
-
-
 </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script src="script.js"></script>
 </html>
