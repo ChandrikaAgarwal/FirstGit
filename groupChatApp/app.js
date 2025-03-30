@@ -9,6 +9,9 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 app.use(express.static('public'))
+app.get('/users', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
 app.use('/',userRoute)
 // sequelize.sync({force:true})
 sequelize.sync()

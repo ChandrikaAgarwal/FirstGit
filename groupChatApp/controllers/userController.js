@@ -33,9 +33,20 @@ exports.signupUser = async (req, res, next) => {
 
 exports.getUser = async (req, res, next) => {
     try {
-        
+        const { email, password } = req.body
+        const existingUser = await User.findOne({ where: { email: email } })
+        if (!existingUser) { 
+            return res.status(400).json({message:"User not found, please sign up"})
+        }
+        const isValid = await bcrypt.compare(password, existingUser.password)
+        if (!isValid) {
+            return res.status(400).json({message:"Incorrect password"})
+        }
+        const token = generateToken(existingUser)
+        return res.status(200).json({message:"Login successful"})
         
     } catch (err) {
-        console.log("error while getting user: ",err);
+        console.log("error while getting user: ", err);
+        res.status(500).json({ message: "Failed to log in", details: err })
     }
 }

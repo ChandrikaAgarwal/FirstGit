@@ -1,10 +1,11 @@
 const signupForm = document.querySelector("#signup-form")
 const createProfBtn = document.querySelector(".createProfBtn")
 const loginBtn = document.querySelector('.loginBtn')
+const loginForm = document.querySelector('#login-form')
+const submitLogin = document.querySelector('.login-submit')
 // const api_url=process.env.API_URL
-const api_url ="http://localhost:3000/"
+const api_url ="http://localhost:3000"
 if (signupForm) {
-    
         signupForm.addEventListener("submit", async (e) => {
             try {
                 e.preventDefault();
@@ -33,9 +34,36 @@ if (signupForm) {
             if (err.response && err.response.data.message) {
                 alert(err.response.data.message)
                 if (err.response.data.message === "User already exists, please log in") {
-                    window.location.href="/"
+                    window.location.href="/users"
                 } else {
                     alert("error occurred, please try again!!")
+                }
+            }
+        }
+        })
+    loginBtn.addEventListener('click', () => {
+        window.location.href = "/users"
+    })
+}
+
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        try {
+            e.preventDefault();
+            const user = {
+                email: e.target.email.value,
+                password: e.target.password.value
+            }
+            const loginRes = await axios.post(`${api_url}/users`, user)
+            console.log("login response: ", loginRes);
+            localStorage.setItem("token", loginRes.data.token)
+            alert("Login successful")
+        } catch (err) { 
+            console.error("error logging in from frontend: ", err)
+            if (err.response && err.response.data.message) {
+                alert(err.response.data.message)
+                if (err.response.data.message === "User not found, please sign up") {
+                    window.location.href="/"
                 }
             }
         }
