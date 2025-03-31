@@ -1,7 +1,8 @@
 const User = require('../models/users')
 const bcrypt = require('bcrypt')
 const {generateToken}= require('../jwtmiddleware')
-
+const { Sequelize, Op } = require('sequelize');
+const sequelize=require('../util/database')
 exports.signupUser = async (req, res, next) => {
     try {
         console.log("request body: ",req);
@@ -35,6 +36,7 @@ exports.signupUser = async (req, res, next) => {
 exports.getUser = async (req, res, next) => {
     try {
         const { email, password } = req.body
+        
         const existingUser = await User.findOne({ where: { email: email } })
         if (!existingUser) { 
             return res.status(404).json({message:"User not found, please sign up"})
@@ -43,17 +45,57 @@ exports.getUser = async (req, res, next) => {
         if (!isValid) {
             return res.status(401).json({message:"Incorrect password"})
         }
-        const allLoggedInUsers = await User.findAll({
-            where: { isLoggedIn: true },
-            order:[["id","ASC"]]
-        })
+        
         existingUser.isLoggedIn = true;
         existingUser.save();
         const token = generateToken(existingUser)
-        return res.status(200).json({message:"Login successful",loggedInUsers:allLoggedInUsers})
+        return res.status(200).json({message:"Login successful",token})
         
     } catch (err) {
         console.log("error while getting user: ", err);
         res.status(500).json({ message: "Failed to log in", details: err })
+    }
+}
+
+exports.getLoggedInUsers = async (req, res, next) => {
+    try {
+        let currentUser = true
+        const existingUser = await User.findByPk(req.user.id)
+        console.log("req.user.id: ",req.user.id);
+        
+        if (!existingUser) {
+            currentUser=false
+            return res.status(404).json({ message: "User not found, please sign up" })
+        }
+        const allLoggedInUsers = await User.findAll({
+            where: {
+               isLoggedIn: true,
+               id: {[Op.not]: req.user.id },
+             },
+            attributes:["id","name"],
+            order: [["id", "ASC"]]
+        })
+        console.log("loggedIn users :",allLoggedInUsers);
+        
+        return res.status(200).json({ message: "Logged in users", currentUser, loggedInUsers: allLoggedInUsers })
+    } catch (err) {
+        console.log("error getting login Users from backend: ", err);
+        return res.status(500).json({message:"Error in getting loggedIn users ",details:err})
+        
+    }
+}
+
+exports.userLogout = async (req, res, next) => {
+    try { 
+        const existingUser = await User.findByPk(req.user.id)
+        if (!existingUser) {
+            return res.status(404).json({message:"user not found"})
+        }
+        existingUser.isLoggedIn = false;
+        existingUser.save();
+        return res.status(200).json({message:"Logout successful"})
+    } catch (err) { 
+        console.log("error while logging out: ", err);
+        return res.status(500).json({message:"Error in logging out",details:err})
     }
 }

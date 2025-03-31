@@ -6,12 +6,34 @@
     <title>Document</title>
     <link rel="stylesheet" href="output.css">
 </head>
-<body class="flex">
-        <div class="navbar fixed top-0 left-0 h-screen w-32 m-0 flex-1 flex-col bg-slate-500 text-white shadow-lg"></div>
-    <div class="max-w-md mx-auto">
+<body id="chatAppBody">
+        <div class="flexibleNavbar fixed top-0 left-0 h-screen w-40 flex-1 flex-col bg-slate-500 text-white shadow-lg">
+            <ul class="loggedInUsers">
+            </ul>
+      
+        <button
+            class="logoutBtn fixed bottom-4 bg-red-950 text-red-400 border border-red-400 border-b-4 font-medium overflow-hidden mx-4 px-5 py-2 rounded-md hover:brightness-150 hover:border-t-4 hover:border-b active:opacity-75 outline-none duration-300 group">
+            <span
+                class="bg-red-400 shadow-red-400 absolute -top-[150%] left-0 inline-flex w-80 h-[5px] rounded-md opacity-50 group-hover:top-[150%] duration-500 shadow-[0_0_10px_10px_rgba(0,0,0,0.3)]"></span>
+            LogOut
+        </button>
+
+        </div>
+    <div class="max-w-md mx-auto relative top-3 text-center">
     <h1>Chat App</h1>
-    <input type="text" name="message" id="message" placeholder="Type tour message here" />
-    <button id="send" type="submit">Send</button>
+    <div class="fixed bottom-0 left-32 w-full bg-blue-900 p-3 mx-8">
+    <input class="rounded-lg border-4 mr-2 border-blue-400 w-96 h-10" type="text" name="message" id="message" placeholder=" Type tour message here" /> 
+    <button
+        class="cursor-pointer transition-all 
+    bg-gray-700 text-white px-6 py-2 rounded-lg
+    border-green-400
+    border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px]
+    active:border-b-[2px] active:brightness-90 active:translate-y-[2px] hover:shadow-xl hover:shadow-green-300 shadow-green-300 active:shadow-none">
+        Send
+    </button>
+    </div>
     </div>
 </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script src="script.js"></script>
 </html>

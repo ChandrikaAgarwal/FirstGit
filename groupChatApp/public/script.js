@@ -3,6 +3,9 @@ const createProfBtn = document.querySelector(".createProfBtn")
 const loginBtn = document.querySelector('.loginBtn')
 const loginForm = document.querySelector('#login-form')
 const submitLogin = document.querySelector('.login-submit')
+const chatAppPage = document.querySelector('#chatAppBody')
+const logoutBtn=document.querySelector('.logoutBtn')
+
 // const api_url=process.env.API_URL
 const api_url ="http://localhost:3000"
 if (signupForm) {
@@ -28,7 +31,7 @@ if (signupForm) {
                 // console.log("token : ", newsignup.data.token);
                 localStorage.setItem("token", newsignup.data.token)
                 alert("Signup sucessful")
-          
+                window.location.href = "/users"
             } catch (err) {
             console.error("error signing up: ", err)
             if (err.response && err.response.data.message) {
@@ -58,7 +61,7 @@ if (loginForm) {
             console.log("login response: ", loginRes);
             localStorage.setItem("token", loginRes.data.token)
             alert("Login successful")
-            window.location.href="/chat"
+            window.location.href = "/chat"
         } catch (err) { 
             console.error("error logging in from frontend: ", err)
             if (err.response && err.response.data.message) {
@@ -67,6 +70,55 @@ if (loginForm) {
                     window.location.href="/"
                 }
             }
+        }
+    })
+}
+
+if (chatAppPage) {
+    const token = localStorage.getItem("token")
+    async function getLoggedInUsers() {
+        try {
+            
+            let loggedInul = document.querySelector('.loggedInUsers')
+            loggedInul.innerHTML += `<li class="navbar-item my-20 bg-slate-400 rounded-lg text-center">You joined</li>`
+            const navItem = document.querySelector('.navbar-item')
+            //getting all logged in Users
+            let getLoginUsers = await axios.get(`${api_url}/api/users`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            console.log("logged in users: ", getLoginUsers);
+            const loginUsers = getLoginUsers.data.loggedInUsers
+            loginUsers.forEach(user => { 
+                loggedInul.innerHTML += `<li id="${user.id}" class="navbar-item my-6 bg-slate-400 rounded-lg text-center">${user.name} joined</li>`
+            })
+        } catch (err) {
+            console.log("error getting loggedIn users ",err);
+            
+        }
+    }
+    window.addEventListener("DOMContentLoaded", async () => {
+       await getLoggedInUsers()
+    })
+    logoutBtn.addEventListener('click', async (e) => {
+        try {
+            e.preventDefault();
+            if (!token) {
+                alert("You are already logged out")
+                return
+            }
+            const loggingOut = await axios.post(`${api_url}/logout`,{} ,{
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            localStorage.removeItem("token")
+            window.location.href = "/users"
+            alert("logged out successfully")
+        } catch (err) { 
+           console.log("error logging out: ",err);
+           
         }
     })
 }
