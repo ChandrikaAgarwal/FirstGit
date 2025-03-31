@@ -24,6 +24,11 @@ const User = sequelize.define('user', {
         type: Sequelize.STRING(255),
         allowNull: false
     },
+    isLoggedIn: {
+        type:Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull:false
+    },
 },{
     timestamps: true 
 })

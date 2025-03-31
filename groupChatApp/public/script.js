@@ -58,6 +58,7 @@ if (loginForm) {
             console.log("login response: ", loginRes);
             localStorage.setItem("token", loginRes.data.token)
             alert("Login successful")
+            window.location.href="/chat"
         } catch (err) { 
             console.error("error logging in from frontend: ", err)
             if (err.response && err.response.data.message) {

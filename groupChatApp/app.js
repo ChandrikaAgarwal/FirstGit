@@ -12,6 +12,9 @@ app.use(express.static('public'))
 app.get('/users', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
+app.get('/chat', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', "chat.html"));
+})
 app.use('/',userRoute)
 // sequelize.sync({force:true})
 sequelize.sync()
