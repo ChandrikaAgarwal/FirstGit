@@ -2,9 +2,12 @@ const signupForm = document.querySelector("#signup-form")
 const createProfBtn = document.querySelector(".createProfBtn")
 const loginBtn = document.querySelector('.loginBtn')
 const loginForm = document.querySelector('#login-form')
+const sendMsgForm = document.querySelector('#send-msg-form')
 const submitLogin = document.querySelector('.login-submit')
 const chatAppPage = document.querySelector('#chatAppBody')
-const logoutBtn=document.querySelector('.logoutBtn')
+const logoutBtn = document.querySelector('.logoutBtn')
+const sendMsgBtn = document.querySelector('#sendMsg')
+const messagesUl=document.querySelector('.messages')
 
 // const api_url=process.env.API_URL
 const api_url ="http://localhost:3000"
@@ -31,6 +34,7 @@ if (signupForm) {
                 // console.log("token : ", newsignup.data.token);
                 localStorage.setItem("token", newsignup.data.token)
                 alert("Signup sucessful")
+                signupForm.reset()
                 window.location.href = "/users"
             } catch (err) {
             console.error("error signing up: ", err)
@@ -61,6 +65,7 @@ if (loginForm) {
             console.log("login response: ", loginRes);
             localStorage.setItem("token", loginRes.data.token)
             alert("Login successful")
+            loginForm.reset()
             window.location.href = "/chat"
         } catch (err) { 
             console.error("error logging in from frontend: ", err)
@@ -90,16 +95,17 @@ if (chatAppPage) {
             })
             console.log("logged in users: ", getLoginUsers);
             const loginUsers = getLoginUsers.data.loggedInUsers
-            loginUsers.forEach(user => { 
+            loginUsers.forEach(user => {
                 loggedInul.innerHTML += `<li id="${user.id}" class="navbar-item my-6 bg-slate-400 rounded-lg text-center">${user.name} joined</li>`
             })
         } catch (err) {
-            console.log("error getting loggedIn users ",err);
+            console.log("error getting loggedIn users ", err);
             
         }
     }
     window.addEventListener("DOMContentLoaded", async () => {
-       await getLoggedInUsers()
+        await getLoggedInUsers()
+        await getAllMessages()
     })
     logoutBtn.addEventListener('click', async (e) => {
         try {
@@ -108,7 +114,7 @@ if (chatAppPage) {
                 alert("You are already logged out")
                 return
             }
-            const loggingOut = await axios.post(`${api_url}/logout`,{} ,{
+            const loggingOut = await axios.post(`${api_url}/logout`, {}, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -116,9 +122,50 @@ if (chatAppPage) {
             localStorage.removeItem("token")
             window.location.href = "/users"
             alert("logged out successfully")
-        } catch (err) { 
-           console.log("error logging out: ",err);
+        } catch (err) {
+            console.log("error logging out: ", err);
            
         }
     })
+    
+        sendMsgForm.addEventListener('submit', async (e) => {
+            try {
+                e.preventDefault();
+                const userMsg = {
+                    message: e.target.message.value,
+                }
+                const sendMsg = await axios.post(`${api_url}/api/messages`, userMsg, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                console.log("message send response: ", sendMsg);
+                sendMsgForm.reset()
+                messagesUl.innerHTML += `<li id="${sendMsg.data.userId}" class="newMsg">You: ${sendMsg.data.newMsg.message}</li>`
+
+            } catch (err) {
+                console.log("error sending message: ", err);
+            }
+        })
+    async function getAllMessages() {
+        try {
+            const getAllMsgs = await axios.get(`${api_url}/api/messages`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            console.log("all messages retrieved: ", getAllMsgs);
+            let allmessages=getAllMsgs.data.allMsgs
+            allmessages.forEach(msg => {
+                if (msg.userId === getAllMsgs.data.currUser) {
+                    messagesUl.innerHTML += `<li id="${msg.userId}" class="newMsg">You: ${msg.message}</li>`
+                } else {
+                    messagesUl.innerHTML += `<li id="${msg.userId}" class="newMsg">${msg.name}: ${msg.message}</li>`
+                }
+            })
+        } catch (err) {
+            console.log("error getting all messages ", err);
+        
+        }
+    }
 }

@@ -3,7 +3,10 @@ const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const sequelize = require('./util/database')
-const userRoute=require('./routes/userRouter')
+const User = require('./models/users')
+const Message=require('./models/messages')
+const userRoute = require('./routes/userRouter')
+const messageRoute=require('./routes/messageRoute')
 const path=require('path')
 const app = express()
 app.use(cors())
@@ -15,8 +18,13 @@ app.get('/users', (req, res) => {
 app.get('/chat', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', "chat.html"));
 })
-app.use('/',userRoute)
-// sequelize.sync({force:true})
+app.use('/', userRoute)
+app.use('/api/messages', messageRoute)
+
+//associations
+Message.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
+User.hasMany(Message,{constraints:true,onDelete:'CASCADE'})
+// sequelize.sync({alter:true})
 sequelize.sync()
     .then(() => {
         app.listen(process.env.PORT || 3000, () => {

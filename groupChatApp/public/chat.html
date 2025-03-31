@@ -21,9 +21,14 @@
         </div>
     <div class="max-w-md mx-auto relative top-3 text-center">
     <h1>Chat App</h1>
+    <div class="">
+        <ul class="messages"></ul>
+    </div>
     <div class="fixed bottom-0 left-32 w-full bg-blue-900 p-3 mx-8">
+    <form action="/" method="post" id="send-msg-form">
     <input class="rounded-lg border-4 mr-2 border-blue-400 w-96 h-10" type="text" name="message" id="message" placeholder=" Type tour message here" /> 
     <button
+    type="submit" id="sendMsg"
         class="cursor-pointer transition-all 
     bg-gray-700 text-white px-6 py-2 rounded-lg
     border-green-400
@@ -31,6 +36,7 @@
     active:border-b-[2px] active:brightness-90 active:translate-y-[2px] hover:shadow-xl hover:shadow-green-300 shadow-green-300 active:shadow-none">
         Send
     </button>
+    </form>
     </div>
     </div>
 </body>
