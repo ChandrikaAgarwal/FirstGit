@@ -40,3 +40,24 @@ exports.getAllMsgs = async (req, res, next) => {
         
     }
 }
+
+exports.getNewMsg = async (req, res, next) => {
+    try { 
+        const user = await User.findByPk(req.user.id)
+        if (!user) { 
+            return res.status(404).json({message:"No user found"})
+        }
+        const newMsg = await Message.findOne({
+            where: {
+                userId:{[Op.not]:user.id}
+            },
+            order: [["id", "DESC"]],
+            limit:1
+        })
+        return res.status(200).json({message:"New message received",newMsg})
+    } catch (err) {
+        console.log("error in getting new message ", err);
+        return res.status(500).json({message:"Error occurred in getting new message",details:err})
+        
+    }
+}

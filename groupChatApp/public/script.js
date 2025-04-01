@@ -85,7 +85,7 @@ if (chatAppPage) {
         try {
             
             let loggedInul = document.querySelector('.loggedInUsers')
-            loggedInul.innerHTML += `<li class="navbar-item my-20 bg-slate-400 rounded-lg text-center">You joined</li>`
+            // loggedInul.innerHTML += `<li class="navbar-item my-20 bg-slate-400 rounded-lg text-center">You joined</li>`
             const navItem = document.querySelector('.navbar-item')
             //getting all logged in Users
             let getLoginUsers = await axios.get(`${api_url}/api/users`, {
@@ -95,18 +95,29 @@ if (chatAppPage) {
             })
             console.log("logged in users: ", getLoginUsers);
             const loginUsers = getLoginUsers.data.loggedInUsers
+            loggedInul.innerHTML = "";
             loginUsers.forEach(user => {
-                loggedInul.innerHTML += `<li id="${user.id}" class="navbar-item my-6 bg-slate-400 rounded-lg text-center">${user.name} joined</li>`
+                if (user.id === getLoginUsers.data.currentUser) {
+                    loggedInul.innerHTML += `<li id="${user.id}" class="navbar-item my-6 bg-slate-400 rounded-lg text-center">You joined</li>`
+                } else {
+                    loggedInul.innerHTML += `<li id="${user.id}" class="navbar-item my-6 bg-slate-400 rounded-lg text-center">${user.name} joined</li>`
+                }
             })
         } catch (err) {
             console.log("error getting loggedIn users ", err);
             
         }
     }
-    window.addEventListener("DOMContentLoaded", async () => {
-        await getLoggedInUsers()
-        await getAllMessages()
-    })
+    // window.addEventListener("DOMContentLoaded", async () => {
+    //     // await getLoggedInUsers()
+    //     // await getAllMessages()
+    // })
+    let loginterval = setInterval(async () => {
+      await getLoggedInUsers()
+    }, 1000)
+    let messageInterval = setInterval(async () => {
+     await getAllMessages()
+    }, 1000);
     logoutBtn.addEventListener('click', async (e) => {
         try {
             e.preventDefault();
@@ -122,6 +133,8 @@ if (chatAppPage) {
             localStorage.removeItem("token")
             window.location.href = "/users"
             alert("logged out successfully")
+            clearInterval(messageInterval)
+            clearInterval(loginterval)
         } catch (err) {
             console.log("error logging out: ", err);
            
@@ -142,7 +155,12 @@ if (chatAppPage) {
                 console.log("message send response: ", sendMsg);
                 sendMsgForm.reset()
                 messagesUl.innerHTML += `<li id="${sendMsg.data.userId}" class="newMsg">You: ${sendMsg.data.newMsg.message}</li>`
-
+                // const getNewMsg = await axios.get(`${api_url}/api/messages/newmsg`, {
+                //     headers: {
+                //         'Authorization': `Bearer ${token}`
+                //     }
+                // })
+                // console.log("new message response: ", getNewMsg);
             } catch (err) {
                 console.log("error sending message: ", err);
             }
@@ -155,7 +173,8 @@ if (chatAppPage) {
                 }
             })
             console.log("all messages retrieved: ", getAllMsgs);
-            let allmessages=getAllMsgs.data.allMsgs
+            let allmessages = getAllMsgs.data.allMsgs
+            messagesUl.innerHTML = "";
             allmessages.forEach(msg => {
                 if (msg.userId === getAllMsgs.data.currUser) {
                     messagesUl.innerHTML += `<li id="${msg.userId}" class="newMsg">You: ${msg.message}</li>`

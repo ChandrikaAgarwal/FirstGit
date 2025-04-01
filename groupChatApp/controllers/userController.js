@@ -59,25 +59,22 @@ exports.getUser = async (req, res, next) => {
 
 exports.getLoggedInUsers = async (req, res, next) => {
     try {
-        let currentUser = true
         const existingUser = await User.findByPk(req.user.id)
         console.log("req.user.id: ",req.user.id);
         
         if (!existingUser) {
-            currentUser=false
             return res.status(404).json({ message: "User not found, please sign up" })
         }
         const allLoggedInUsers = await User.findAll({
             where: {
                isLoggedIn: true,
-               id: {[Op.not]: req.user.id },
              },
             attributes:["id","name"],
             order: [["id", "ASC"]]
         })
         console.log("loggedIn users :",allLoggedInUsers);
         
-        return res.status(200).json({ message: "Logged in users", currentUser, loggedInUsers: allLoggedInUsers })
+        return res.status(200).json({ message: "Logged in users", currentUser:existingUser.id, loggedInUsers: allLoggedInUsers })
     } catch (err) {
         console.log("error getting login Users from backend: ", err);
         return res.status(500).json({message:"Error in getting loggedIn users ",details:err})
