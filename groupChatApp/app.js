@@ -1,5 +1,7 @@
 require('dotenv').config()
 const express = require('express')
+const http=require('http')
+const WebSocket=require('ws')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const sequelize = require('./util/database')
@@ -9,6 +11,23 @@ const userRoute = require('./routes/userRouter')
 const messageRoute=require('./routes/messageRoute')
 const path=require('path')
 const app = express()
+const server=http.createServer(app)
+const wss = new WebSocket.Server({ server })
+app.set('wss',wss)
+wss.on('connection', (ws) => {
+    console.log("new user connected");
+    ws.on('message', (message) => {
+        console.log(`message received:${message}`);
+        wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(message)
+            }
+        });
+    });
+    ws.on('close',()=>{console.log("user disconnected");
+    })
+    
+})
 app.use(cors())
 app.use(bodyParser.json())
 app.use(express.static('public'))
@@ -27,7 +46,7 @@ User.hasMany(Message,{constraints:true,onDelete:'CASCADE'})
 // sequelize.sync({alter:true})
 sequelize.sync()
     .then(() => {
-        app.listen(process.env.PORT || 3000, () => {
+        server.listen(process.env.PORT || 3000, () => {
         console.log("server running on", process.env.API_URL);
         
     })

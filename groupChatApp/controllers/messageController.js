@@ -23,12 +23,16 @@ exports.postAddMsg = async (req, res, next) => {
 
 exports.getAllMsgs = async (req, res, next) => {
     try {
+        const { lastMsgid }=req.query
         const user = await User.findByPk(req.user.id)
         if (!user) {
             return res.status(404).json({message:"User not found"})
         }
         const allMsgs = await Message.findAll({
-            attributes: ["userId","name","message"],
+            where: {
+                id:{[Op.not]:user.id}
+            },
+            attributes: ["id","userId","name","message"],
             order:[["id","ASC"]]
         })
         console.log("all messages: ", allMsgs);

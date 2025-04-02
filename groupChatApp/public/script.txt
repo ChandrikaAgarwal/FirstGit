@@ -8,9 +8,8 @@ const chatAppPage = document.querySelector('#chatAppBody')
 const logoutBtn = document.querySelector('.logoutBtn')
 const sendMsgBtn = document.querySelector('#sendMsg')
 const messagesUl=document.querySelector('.messages')
-const socket = new WebSocket('ws://localhost:3000')
-// const api_url=process.env.API_URL
 
+// const api_url=process.env.API_URL
 const api_url ="http://localhost:3000"
 if (signupForm) {
         signupForm.addEventListener("submit", async (e) => {
@@ -68,7 +67,6 @@ if (loginForm) {
             alert("Login successful")
             loginForm.reset()
             window.location.href = "/chat"
-            startWebSocket()
         } catch (err) { 
             console.error("error logging in from frontend: ", err)
             if (err.response && err.response.data.message) {
@@ -105,22 +103,21 @@ if (chatAppPage) {
                     loggedInul.innerHTML += `<li id="${user.id}" class="navbar-item my-6 bg-slate-400 rounded-lg text-center">${user.name} joined</li>`
                 }
             })
-            startWebSocket()
         } catch (err) {
             console.log("error getting loggedIn users ", err);
             
         }
     }
-    window.addEventListener("DOMContentLoaded", async () => {
-        await getLoggedInUsers()
-        // await getAllMessages()
-    })
-    // let loginterval = setInterval(async () => {
-    //     await getLoggedInUsers()
-    // }, 1000)
-    // let messageInterval = setInterval(async () => {
-    //     await getAllMessages()
-    // }, 1000);
+    // window.addEventListener("DOMContentLoaded", async () => {
+    //     // await getLoggedInUsers()
+    //     // await getAllMessages()
+    // })
+    let loginterval = setInterval(async () => {
+      await getLoggedInUsers()
+    }, 1000)
+    let messageInterval = setInterval(async () => {
+     await getAllMessages()
+    }, 1000);
     logoutBtn.addEventListener('click', async (e) => {
         try {
             e.preventDefault();
@@ -133,7 +130,7 @@ if (chatAppPage) {
                     'Authorization': `Bearer ${token}`
                 }
             })
-            // localStorage.removeItem("token")
+            localStorage.removeItem("token")
             window.location.href = "/users"
             alert("logged out successfully")
             clearInterval(messageInterval)
@@ -143,38 +140,27 @@ if (chatAppPage) {
            
         }
     })
-    //  let messages=new Array(10)
-    sendMsgForm.addEventListener('submit', async (e) => {
-        try {
-            e.preventDefault();
-            const userMsg = {
-                message: e.target.message.value,
-            }
-            const sendMsg = await axios.post(`${api_url}/api/messages`, userMsg, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+    
+        sendMsgForm.addEventListener('submit', async (e) => {
+            try {
+                e.preventDefault();
+                const userMsg = {
+                    message: e.target.message.value,
                 }
-            })
-            console.log("message send response: ", sendMsg);
-            sendMsgForm.reset()
-            // messages.push({ sendMsg })
-            // localStorage.setItem("oldMessages", messages)
-            messagesUl.innerHTML += `<li id="${sendMsg.data.userId}" class="newMsg">You: ${sendMsg.data.newMsg.message}</li>`
-        } catch (err) {
-            console.log("error sending message: ", err);
-        }
-    })
+                const sendMsg = await axios.post(`${api_url}/api/messages`, userMsg, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                console.log("message send response: ", sendMsg);
+                sendMsgForm.reset()
+                messagesUl.innerHTML += `<li id="${sendMsg.data.userId}" class="newMsg">You: ${sendMsg.data.newMsg.message}</li>`
+            } catch (err) {
+                console.log("error sending message: ", err);
+            }
+        })
     async function getAllMessages() {
         try {
-            // const alloldMsgs = localStorage.getItem("oldMessages")
-            // let lastMsgId;
-            // if (!allMsgs) {
-            //     lastMsgId = -1
-            // } else {
-            //     lastMsgId = alloldMsgs[-1].id
-            // }
-            // console.log("last message :",allMsgs[-1], "with id: ",lastMsgId);
-            
             const getAllMsgs = await axios.get(`${api_url}/api/messages`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -195,29 +181,4 @@ if (chatAppPage) {
         
         }
     }
-
-
-    function startWebSocket() {
-        socket.addEventListener('open', () => {
-            console.log("connected to websocket server");
-        })
-        socket.onerror = function (error) {
-            console.log('WebSocket Error: ' + error);
-        };
-        socket.addEventListener('message', async (event) => {
-            const data = JSON.parse(event.data);
-            console.log("message received: ", data);
-            if (data.type === "user-joined") {
-                console.log(`new user joined: ${data.name}`);
-              await addToUserList(data.userId, data.name)
-            
-            }
-        })
-    }
-    async function addToUserList(userId, userName) {
-        let loggedInul = document.querySelector('.loggedInUsers')
-        if (!document.getElementById(userId)) {
-            loggedInul.innerHTML += `<li id="${userId}" class="navbar-item my-6 bg-slate-400 rounded-lg text-center">${userName} joined</li>`;
-        }
-}
 }

@@ -49,15 +49,6 @@ exports.getUser = async (req, res, next) => {
         existingUser.isLoggedIn = true;
         existingUser.save();
         const token = generateToken(existingUser)
-        req.app.get('wss').clients.forEach(client => {
-            if (client.readyState === require('ws').OPEN) {
-                client.send(JSON.stringify({
-                    event: 'user-joined',
-                    userId: existingUser.id,
-                    name: existingUser.name
-                }));
-            }
-        });
         return res.status(200).json({message:"Login successful",token})
         
     } catch (err) {
@@ -82,14 +73,7 @@ exports.getLoggedInUsers = async (req, res, next) => {
             order: [["id", "ASC"]]
         })
         console.log("loggedIn users :",allLoggedInUsers);
-        req.app.get('wss').clients.forEach(client => {
-            if (client.readyState === require('ws').OPEN) {
-                client.send(JSON.stringify({
-                    event: 'all-users-joined',
-                    users: allLoggedInUsers,
-                }));
-            }
-        });
+        
         return res.status(200).json({ message: "Logged in users", currentUser:existingUser.id, loggedInUsers: allLoggedInUsers })
     } catch (err) {
         console.log("error getting login Users from backend: ", err);
