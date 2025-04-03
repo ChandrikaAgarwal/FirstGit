@@ -13,9 +13,9 @@ const path=require('path')
 const app = express()
 const server=http.createServer(app)
 const wss = new WebSocket.Server({ server })
-app.set('wss',wss)
+app.set('wss', wss) //WebSocket instance ko Express app me store kiya
 wss.on('connection', (ws) => {
-    console.log("new user connected");
+    console.log("New WebSocket connection established");
     ws.on('message', (message) => {
         console.log(`message received:${message}`);
         wss.clients.forEach(client => {
@@ -24,7 +24,8 @@ wss.on('connection', (ws) => {
             }
         });
     });
-    ws.on('close',()=>{console.log("user disconnected");
+    ws.on('close', () => {
+        console.log("WebSocket connection closed");
     })
     
 })
@@ -43,7 +44,7 @@ app.use('/api/messages', messageRoute)
 //associations
 Message.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
 User.hasMany(Message,{constraints:true,onDelete:'CASCADE'})
-// sequelize.sync({alter:true})
+// sequelize.sync({force:true})
 sequelize.sync()
     .then(() => {
         server.listen(process.env.PORT || 3000, () => {

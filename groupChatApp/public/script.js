@@ -7,8 +7,9 @@ const submitLogin = document.querySelector('.login-submit')
 const chatAppPage = document.querySelector('#chatAppBody')
 const logoutBtn = document.querySelector('.logoutBtn')
 const sendMsgBtn = document.querySelector('#sendMsg')
-const messagesUl=document.querySelector('.messages')
-const socket = new WebSocket('ws://localhost:3000')
+const messagesUl = document.querySelector('.messages')
+let loggedInul = document.querySelector('.loggedInUsers')
+let socket = new WebSocket('ws://localhost:3000')
 // const api_url=process.env.API_URL
 
 const api_url ="http://localhost:3000"
@@ -68,7 +69,7 @@ if (loginForm) {
             alert("Login successful")
             loginForm.reset()
             window.location.href = "/chat"
-            startWebSocket()
+          await startWebSocket()
         } catch (err) { 
             console.error("error logging in from frontend: ", err)
             if (err.response && err.response.data.message) {
@@ -84,9 +85,11 @@ if (loginForm) {
 if (chatAppPage) {
     const token = localStorage.getItem("token")
     async function getLoggedInUsers() {
+        console.log("entering getLoggedinUsers function");
+        
         try {
             
-            let loggedInul = document.querySelector('.loggedInUsers')
+            
             // loggedInul.innerHTML += `<li class="navbar-item my-20 bg-slate-400 rounded-lg text-center">You joined</li>`
             const navItem = document.querySelector('.navbar-item')
             //getting all logged in Users
@@ -105,7 +108,7 @@ if (chatAppPage) {
                     loggedInul.innerHTML += `<li id="${user.id}" class="navbar-item my-6 bg-slate-400 rounded-lg text-center">${user.name} joined</li>`
                 }
             })
-            startWebSocket()
+            // await startWebSocket()
         } catch (err) {
             console.log("error getting loggedIn users ", err);
             
@@ -113,14 +116,10 @@ if (chatAppPage) {
     }
     window.addEventListener("DOMContentLoaded", async () => {
         await getLoggedInUsers()
-        // await getAllMessages()
+        await startWebSocket()
+        await getAllMessages()
     })
-    // let loginterval = setInterval(async () => {
-    //     await getLoggedInUsers()
-    // }, 1000)
-    // let messageInterval = setInterval(async () => {
-    //     await getAllMessages()
-    // }, 1000);
+    
     logoutBtn.addEventListener('click', async (e) => {
         try {
             e.preventDefault();
@@ -136,14 +135,13 @@ if (chatAppPage) {
             // localStorage.removeItem("token")
             window.location.href = "/users"
             alert("logged out successfully")
-            clearInterval(messageInterval)
-            clearInterval(loginterval)
+            
+            await startWebSocket()
         } catch (err) {
             console.log("error logging out: ", err);
            
         }
     })
-    //  let messages=new Array(10)
     sendMsgForm.addEventListener('submit', async (e) => {
         try {
             e.preventDefault();
@@ -157,24 +155,19 @@ if (chatAppPage) {
             })
             console.log("message send response: ", sendMsg);
             sendMsgForm.reset()
-            // messages.push({ sendMsg })
-            // localStorage.setItem("oldMessages", messages)
-            messagesUl.innerHTML += `<li id="${sendMsg.data.userId}" class="newMsg">You: ${sendMsg.data.newMsg.message}</li>`
+            let newMsg = document.querySelector(`#m-${sendMsg.data.newMsg.id}`)
+            console.log("newMwsg ",newMsg);
+            
+            newMsg.textContent = `You:${sendMsg.data.newMsg.message}`
+            // messagesUl.innerHTML += `<li id="m-${sendMsg.data.newMsg.id}" class="newMsg">You: ${sendMsg.data.newMsg.message}</li>`
+            // await startWebSocket()
         } catch (err) {
             console.log("error sending message: ", err);
         }
     })
     async function getAllMessages() {
         try {
-            // const alloldMsgs = localStorage.getItem("oldMessages")
-            // let lastMsgId;
-            // if (!allMsgs) {
-            //     lastMsgId = -1
-            // } else {
-            //     lastMsgId = alloldMsgs[-1].id
-            // }
-            // console.log("last message :",allMsgs[-1], "with id: ",lastMsgId);
-            
+                      
             const getAllMsgs = await axios.get(`${api_url}/api/messages`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -185,11 +178,12 @@ if (chatAppPage) {
             messagesUl.innerHTML = "";
             allmessages.forEach(msg => {
                 if (msg.userId === getAllMsgs.data.currUser) {
-                    messagesUl.innerHTML += `<li id="${msg.userId}" class="newMsg">You: ${msg.message}</li>`
+                    messagesUl.innerHTML += `<li id="m-${msg.id}" class="newMsg">You: ${msg.message}</li>`
                 } else {
-                    messagesUl.innerHTML += `<li id="${msg.userId}" class="newMsg">${msg.name}: ${msg.message}</li>`
+                    messagesUl.innerHTML += `<li id="m-${msg.id}" class="newMsg">${msg.name}: ${msg.message}</li>`
                 }
             })
+            // await startWebSocket()
         } catch (err) {
             console.log("error getting all messages ", err);
         
@@ -197,27 +191,66 @@ if (chatAppPage) {
     }
 
 
-    function startWebSocket() {
+    async function startWebSocket() {
+        socket = new WebSocket("ws://localhost:3000");
         socket.addEventListener('open', () => {
             console.log("connected to websocket server");
         })
         socket.onerror = function (error) {
             console.log('WebSocket Error: ' + error);
         };
-        socket.addEventListener('message', async (event) => {
+    socket.addEventListener('message', async (event) => {
+            console.log("message received from server: ", event.data);
+            
             const data = JSON.parse(event.data);
             console.log("message received: ", data);
-            if (data.type === "user-joined") {
+            if (data.event === "user-joined") {
                 console.log(`new user joined: ${data.name}`);
               await addToUserList(data.userId, data.name)
             
             }
+        if (data.event === "user-left") { 
+            console.log(`user-loggedout: ,${data.name}`);
+            await removeFromUserList(data.userId, data.name)
+        }
+
+        if (data.event === "new-message") {
+            console.log("new message received: ", data);
+            await addMessage(data.message,data.msgId,data.name,data.userId)
+        }
         })
     }
     async function addToUserList(userId, userName) {
-        let loggedInul = document.querySelector('.loggedInUsers')
+        console.log("entering addtouserlist function");
+        console.log("loggedInul: ",loggedInul);
+        
+        // let loggedInul = document.querySelector('.loggedInUsers')
         if (!document.getElementById(userId)) {
+            console.log("entering if of loggedInul");
             loggedInul.innerHTML += `<li id="${userId}" class="navbar-item my-6 bg-slate-400 rounded-lg text-center">${userName} joined</li>`;
         }
-}
+    }
+    async function removeFromUserList(userId, userName) { 
+        console.log("entering to remove user form list");
+        console.log("loggedInul: ",loggedInul);
+        
+        console.log("loggedin user on logout: ",loggedInul);
+        
+        // let loggedInul = document.querySelector('.loggedInUsers')
+        if (document.getElementById(userId)) { 
+            console.log("entering if of removeuser from list");
+            
+            loggedInul.removeChild(document.getElementById(userId))
+        }
+    }
+    async function addMessage(message, msgId, userName,userId) { 
+        console.log("entering add message function");
+        console.log(`message received - msgId: ${msgId}, userId: ${userId}, userName: ${userName}`);
+
+        if (!document.getElementById(`m-${msgId}`)) {
+           console.log("checking if condition in addmessage");
+                messagesUl.innerHTML += `<li id="m-${msgId}" class="newMsg">${userName}: ${message}</li>`
+            
+        }
+    }
 }

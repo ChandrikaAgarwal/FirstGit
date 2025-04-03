@@ -2,7 +2,8 @@ const User = require('../models/users')
 const bcrypt = require('bcrypt')
 const {generateToken}= require('../jwtmiddleware')
 const { Sequelize, Op } = require('sequelize');
-const sequelize=require('../util/database')
+const sequelize = require('../util/database')
+
 exports.signupUser = async (req, res, next) => {
     try {
         console.log("request body: ",req);
@@ -82,14 +83,6 @@ exports.getLoggedInUsers = async (req, res, next) => {
             order: [["id", "ASC"]]
         })
         console.log("loggedIn users :",allLoggedInUsers);
-        req.app.get('wss').clients.forEach(client => {
-            if (client.readyState === require('ws').OPEN) {
-                client.send(JSON.stringify({
-                    event: 'all-users-joined',
-                    users: allLoggedInUsers,
-                }));
-            }
-        });
         return res.status(200).json({ message: "Logged in users", currentUser:existingUser.id, loggedInUsers: allLoggedInUsers })
     } catch (err) {
         console.log("error getting login Users from backend: ", err);
@@ -100,12 +93,22 @@ exports.getLoggedInUsers = async (req, res, next) => {
 
 exports.userLogout = async (req, res, next) => {
     try { 
+        const wss=req.app.get('wss')
         const existingUser = await User.findByPk(req.user.id)
         if (!existingUser) {
             return res.status(404).json({message:"user not found"})
         }
         existingUser.isLoggedIn = false;
         existingUser.save();
+        wss.clients.forEach((client) => { 
+            if (client.readyState === require('ws').OPEN) {
+                client.send(JSON.stringify({
+                    event: 'user-left',
+                    userId: existingUser.id,
+                    name: existingUser.name
+                }));
+            }
+        })
         return res.status(200).json({message:"Logout successful"})
     } catch (err) { 
         console.log("error while logging out: ", err);

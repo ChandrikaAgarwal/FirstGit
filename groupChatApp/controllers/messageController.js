@@ -6,6 +6,8 @@ const { Sequelize, Op } = require('sequelize')
 exports.postAddMsg = async (req, res, next) => {
     try {
         const user = await User.findByPk(req.user.id)
+        console.log("user: ",user);
+        
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
@@ -14,6 +16,19 @@ exports.postAddMsg = async (req, res, next) => {
             name:user.name,
             message,
         })
+        req.app.get('wss').clients.forEach(client => {
+            if (client.readyState === require('ws').OPEN) {
+                console.log("client: ",client);
+                
+                client.send(JSON.stringify({
+                    event: 'new-message',
+                    message: message,
+                    msgId:newMsg.id,
+                    name: user.name,
+                    userId: newMsg.userId,
+                }));
+            }
+        });
         return res.status(200).json({message:"Message send",username:user.name,newMsg})
     } catch (err) {
         console.log("error sending Message: ", err);
