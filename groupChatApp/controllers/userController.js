@@ -115,3 +115,18 @@ exports.userLogout = async (req, res, next) => {
         return res.status(500).json({message:"Error in logging out",details:err})
     }
 }
+
+exports.getAllUsers = async (req, res, next) => {
+    try { 
+        const user=await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({message:"user not found"})
+        }
+        const allUsers = await User.findAll()
+        res.status(200).json({message:"all users ",allUsers})
+    } catch (err) {
+        console.log("error in getting all users: ",err);
+        return res.status(500).json({message:"Error in getting all users ",details:err})
+        
+    }
+}

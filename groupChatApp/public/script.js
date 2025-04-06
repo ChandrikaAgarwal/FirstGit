@@ -9,6 +9,11 @@ const logoutBtn = document.querySelector('.logoutBtn')
 const sendMsgBtn = document.querySelector('#sendMsg')
 const messagesUl = document.querySelector('.messages')
 let loggedInul = document.querySelector('.loggedInUsers')
+let groups=document.querySelector('.groups')
+const groupPage = document.querySelector('#createGroup')
+const groupsUl = document.querySelector('.groupscreated')
+const specificGrpPage = document.querySelector('#groupBody')
+const usersloggedIngroup = document.querySelector('.usersloggedIngroup')
 let socket = new WebSocket('ws://localhost:3000')
 // const api_url=process.env.API_URL
 
@@ -82,15 +87,13 @@ if (loginForm) {
     })
 }
 
+const token = localStorage.getItem("token")
+let groupItems;
 if (chatAppPage) {
-    const token = localStorage.getItem("token")
     async function getLoggedInUsers() {
         console.log("entering getLoggedinUsers function");
         
         try {
-            
-            
-            // loggedInul.innerHTML += `<li class="navbar-item my-20 bg-slate-400 rounded-lg text-center">You joined</li>`
             const navItem = document.querySelector('.navbar-item')
             //getting all logged in Users
             let getLoginUsers = await axios.get(`${api_url}/api/users`, {
@@ -118,6 +121,8 @@ if (chatAppPage) {
         await getLoggedInUsers()
         await startWebSocket()
         await getAllMessages()
+        await getAllGroups()
+        await getGroupUsers()
     })
     
     logoutBtn.addEventListener('click', async (e) => {
@@ -156,7 +161,7 @@ if (chatAppPage) {
             console.log("message send response: ", sendMsg);
             sendMsgForm.reset()
             let newMsg = document.querySelector(`#m-${sendMsg.data.newMsg.id}`)
-            console.log("newMwsg ",newMsg);
+            console.log("newMwsg ", newMsg);
             
             newMsg.textContent = `You:${sendMsg.data.newMsg.message}`
             // messagesUl.innerHTML += `<li id="m-${sendMsg.data.newMsg.id}" class="newMsg">You: ${sendMsg.data.newMsg.message}</li>`
@@ -190,39 +195,102 @@ if (chatAppPage) {
         }
     }
 
+    async function getAllGroups() {
+        try {
+            const getAllGroups = await axios.get(`${api_url}/api/creategroup`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            console.log("all groups: ", getAllGroups);
+            let allgroups = getAllGroups.data.groups
+            allgroups.forEach((group) => {
+                // groupsUl.innerHTML +=`<li id=${group.id} class="navbar-item my-6 bg-slate-400 rounded-lg text-center">${group.groupname}</li>`
+                groupsUl.innerHTML += `<li id="g-${group.groupId}"><a href="/group/${group.groupId}" class=" new-group flex navbar-item my-6 px-10 bg-slate-400 rounded-lg text-center">${group.groupname}</a></li>`
+            })
+            console.log(groupsUl);
+            groupItems = document.querySelectorAll(".groupscreated li");
+            console.log("group items: ", groupItems);
+            await getGroupUsers()
+        } catch (err) {
+            console.log("Error fetching all groups");
+            
+        }
+    }
+}
+    let getusersofGroup;
+    async function getGroupUsers() {
+        try {
+            console.log(typeof (groupsUl));
+            console.log("group items: ", groupItems);
+            groupItems.forEach((group) => {
+                console.log("entering for each of groups");
+                let id = group.id.split('-')[1]
+                group.addEventListener("click", async (e) => {
+                    e.preventDefault()
+                    window.location.href = `/group/${id}`
+                    
+                })
+                
+            })
+        } catch (err) {
+            console.log("error fetching members of group: ", err);
+            
+        }
+    }
+
+
+
+
 
     async function startWebSocket() {
         socket = new WebSocket("ws://localhost:3000");
         socket.addEventListener('open', () => {
             console.log("connected to websocket server");
+            const token = localStorage.getItem('token');
+            socket.send(JSON.stringify({
+                type: 'auth',
+                token: token
+            }));
         })
         socket.onerror = function (error) {
             console.log('WebSocket Error: ' + error);
         };
-    socket.addEventListener('message', async (event) => {
+        socket.addEventListener('message', async (event) => {
             console.log("message received from server: ", event.data);
-            
-            const data = JSON.parse(event.data);
+            let data;
+            if (event.data instanceof Blob) {
+                const text = await event.data.text();
+                console.log("text: ",text);
+                data = JSON.parse(text);
+            } else {
+                data = JSON.parse(event.data);
+            }
             console.log("message received: ", data);
             if (data.event === "user-joined") {
                 console.log(`new user joined: ${data.name}`);
-              await addToUserList(data.userId, data.name)
+                await addToUserList(data.userId, data.name)
             
             }
-        if (data.event === "user-left") { 
-            console.log(`user-loggedout: ,${data.name}`);
-            await removeFromUserList(data.userId, data.name)
-        }
+            if (data.event === "user-left") {
+                console.log(`user-loggedout: ,${data.name}`);
+                await removeFromUserList(data.userId, data.name)
+            }
 
-        if (data.event === "new-message") {
-            console.log("new message received: ", data);
-            await addMessage(data.message,data.msgId,data.name,data.userId)
-        }
+            if (data.event === "new-message") {
+                console.log("new message received: ", data);
+                await addMessage(data.message, data.msgId, data.name, data.userId)
+            }
+
+            if (data.event === 'new-group') {
+                console.log("new group created:",data);
+                await addGroup(data.groupname, data.groupId)
+            }
         })
     }
     async function addToUserList(userId, userName) {
         console.log("entering addtouserlist function");
-        console.log("loggedInul: ",loggedInul);
+        console.log("loggedInul: ", loggedInul);
         
         // let loggedInul = document.querySelector('.loggedInUsers')
         if (!document.getElementById(userId)) {
@@ -230,27 +298,126 @@ if (chatAppPage) {
             loggedInul.innerHTML += `<li id="${userId}" class="navbar-item my-6 bg-slate-400 rounded-lg text-center">${userName} joined</li>`;
         }
     }
-    async function removeFromUserList(userId, userName) { 
+    async function removeFromUserList(userId, userName) {
         console.log("entering to remove user form list");
-        console.log("loggedInul: ",loggedInul);
+        console.log("loggedInul: ", loggedInul);
         
-        console.log("loggedin user on logout: ",loggedInul);
+        console.log("loggedin user on logout: ", loggedInul);
         
         // let loggedInul = document.querySelector('.loggedInUsers')
-        if (document.getElementById(userId)) { 
+        if (document.getElementById(userId)) {
             console.log("entering if of removeuser from list");
             
             loggedInul.removeChild(document.getElementById(userId))
         }
     }
-    async function addMessage(message, msgId, userName,userId) { 
+    async function addMessage(message, msgId, userName, userId) {
         console.log("entering add message function");
         console.log(`message received - msgId: ${msgId}, userId: ${userId}, userName: ${userName}`);
 
         if (!document.getElementById(`m-${msgId}`)) {
-           console.log("checking if condition in addmessage");
-                messagesUl.innerHTML += `<li id="m-${msgId}" class="newMsg">${userName}: ${message}</li>`
+            console.log("checking if condition in addmessage");
+            messagesUl.innerHTML += `<li id="m-${msgId}" class="newMsg">${userName}: ${message}</li>`
             
         }
     }
+
+async function addGroup(grpName, grpId) {
+    console.log("entering add group function");
+    if (!document.getElementById(`g-${grpId}`)) {
+        console.log("checking if condition in addgroup");
+        groupsUl.innerHTML += `<li id="g-${grpId}"><a href="/group/${grpId}" class="new-group flex navbar-item my-6 px-10 bg-slate-400 rounded-lg text-center">${grpName}</a></li>`
+    }
+}
+
+
+
+
+if (groupPage) {
+    const token = localStorage.getItem("token")
+    console.log("token: ",token);
+    
+    const dropDownMenu = document.querySelector('#dropdownMenu')
+    const toggle = document.getElementById("dropdownToggle");
+    const dropdown = document.getElementById("multiSelect");
+    const createGrpBtn = document.querySelector('#createGrpBtn')
+    const createBtn = document.querySelector('#createBtn')
+    const newGrpFrom = document.querySelector('#newgrp-form')
+    let selectedUsers;
+    async function getAllUsers() {
+        try {
+            let allUsers = await axios.get(`${api_url}/users/allusers`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            console.log("all users: ", allUsers);
+            allUsers=allUsers.data.allUsers
+            allUsers.forEach((user) => {
+                dropDownMenu.innerHTML +=`<label class="flex items-center px-4 py-2 hover:bg-gray-100">
+                <input type="checkbox" value="${user.name}" data-id="${user.id}" class="mr-2"> ${user.name}
+            </label>`
+            })
+            toggle.addEventListener("click", () => {
+                dropDownMenu.classList.toggle("hidden");
+            });
+            const checkboxes = dropDownMenu.querySelectorAll("input[type='checkbox']");
+            checkboxes.forEach(cb => {
+                cb.addEventListener("change", () => {
+                    const selected = Array.from(checkboxes)
+                        .filter(c => c.checked)
+                        .map(c => c.value)
+                        .join(", ");
+                    toggle.textContent = selected.length ? selected : "Select options";
+                });
+            });
+            // Click outside to close
+            document.addEventListener("click", (e) => {
+                if (!dropdown.contains(e.target)) {
+                    dropDownMenu.classList.add("hidden");
+                }
+            });
+            
+        } catch (err) {
+            console.log("error in getting all users: ", err);  
+        }
+
+    }
+    createGrpBtn.addEventListener('click', () => {
+        console.log("toggle textContent: ", toggle.textContent);
+        selectedUsers = Array.from(document.querySelectorAll("input[type='checkbox']:checked"))
+            .map(cb => ({
+                id: cb.dataset.id,
+                name: cb.value
+            }));
+        console.log("selectedUsers: ", selectedUsers);
+        document.querySelector('#group_nameForm').classList.remove('hidden')
+    })
+    newGrpFrom.addEventListener('submit', async (e) => {
+        try {
+            e.preventDefault();
+            const groupNm = document.querySelector('#groupName').value;
+            const grpDetails = {
+                grpName: e.target.groupName.value,
+                users:selectedUsers
+            }
+            console.log("grp details: ",grpDetails);
+            
+            const createGrpRes = await axios.post(`${api_url}/api/creategroup`, grpDetails, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            console.log("grpDetails are: ",createGrpRes);
+            newGrpFrom.reset();
+            
+        } catch (err) {
+            console.log("error creating a group: ",err);
+            
+        }
+    })
+    window.addEventListener("DOMContentLoaded", async () => { 
+        await getAllUsers();
+        await startWebSocket()
+    })
 }

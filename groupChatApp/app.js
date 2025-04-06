@@ -6,9 +6,14 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const sequelize = require('./util/database')
 const User = require('./models/users')
-const Message=require('./models/messages')
+const Message = require('./models/messages')
+const Group = require('./models/groups')
+const Usergroup = require('./models/userGroup')
+const Grpmsg=require('./models/groupmessages')
 const userRoute = require('./routes/userRouter')
-const messageRoute=require('./routes/messageRoute')
+const messageRoute = require('./routes/messageRoute')
+const groupRoute=require('./routes/groupRoute')
+const jwt = require('jsonwebtoken');
 const path=require('path')
 const app = express()
 const server=http.createServer(app)
@@ -18,6 +23,14 @@ wss.on('connection', (ws) => {
     console.log("New WebSocket connection established");
     ws.on('message', (message) => {
         console.log(`message received:${message}`);
+
+            const data = JSON.parse(message)
+            if (data.type === 'auth') {
+                const decoded = jwt.verify(data.token, process.env.SECRET_KEY);
+                ws.userId = decoded.id;
+                console.log("Authenticated user:", ws.userId);
+                ws.send(JSON.stringify({ event: 'auth-success' }));
+            }
         wss.clients.forEach(client => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(message)
@@ -38,13 +51,26 @@ app.get('/users', (req, res) => {
 app.get('/chat', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', "chat.html"));
 })
+
+app.get('/groups', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', "groups.html"));
+})
+
+app.get('/group/:groupId', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', "group.html"));
+})
 app.use('/', userRoute)
 app.use('/api/messages', messageRoute)
+app.use('/', groupRoute)
 
 //associations
 Message.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
-User.hasMany(Message,{constraints:true,onDelete:'CASCADE'})
-// sequelize.sync({force:true})
+User.hasMany(Message, { constraints: true, onDelete: 'CASCADE' })
+User.belongsToMany(Group, { through: Usergroup })
+Group.belongsToMany(User, { through: Usergroup })
+Grpmsg.belongsTo(Group, { constraints: true, onDelete: 'CASCADE' })
+Group.hasMany(Grpmsg, { constraints: true, onDelete: 'CASCADE' })
+// sequelize.sync({alter:true})
 sequelize.sync()
     .then(() => {
         server.listen(process.env.PORT || 3000, () => {

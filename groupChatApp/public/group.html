@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="output.css">
+    <link rel="stylesheet" href="/output.css">
 </head>
-<body id="chatAppBody">
-        <div class="flexibleNavbar fixed top-0 left-0 h-screen w-40 flex-1 flex-col bg-slate-500 text-white shadow-lg">
-            <ul class="loggedInUsers">
-            </ul>
-        <a href="/groups" class="groups my-6 bg-black rounded-lg flex px-10 font-bold">Groups</a>
-        <ul class="groupscreated"></ul>
+
+<body id="groupBody">
+    <div class="flexibleNavbar fixed top-0 left-0 h-screen w-40 flex-1 flex-col bg-slate-500 text-white shadow-lg">
+        <ul class="usersloggedIngroup">
+        </ul>
         <button
             class="logoutBtn fixed bottom-4 flex bg-red-950 text-red-400 border border-red-400 border-b-4 font-medium overflow-hidden mx-5 px-5 py-2 rounded-md hover:brightness-150 hover:border-t-4 hover:border-b active:opacity-75 outline-none duration-300 group">
             <span
@@ -19,28 +19,28 @@
             LogOut
         </button>
 
-        </div>
-    <div class="max-w-sm mx-auto relative top-3 text-center">
-    <h1>Chat App</h1>
-    <div class="overscroll-y-auto md:overscroll-contain">
-        <ul class="messages"></ul>
     </div>
-    <div class="fixed bottom-0 left-32 w-full bg-blue-900 p-3 mx-8">
-    <form action="/" method="post" id="send-msg-form">
-    <input class="rounded-lg border-4 mr-2 border-blue-400 w-96 h-10" type="text" name="message" id="message" placeholder=" Type tour message here" /> 
-    <button
-    type="submit" id="sendMsg"
-        class="cursor-pointer transition-all 
+    <div class="max-w-sm mx-auto relative top-3 text-center">
+        <h1>Chat App</h1>
+        <div class="overscroll-y-auto md:overscroll-contain">
+            <ul class="groupmessages"></ul>
+        </div>
+        <div class="fixed bottom-0 left-32 w-full bg-blue-900 p-3 mx-8">
+            <form action="/" method="post" id="group-msg-form">
+                <input class="rounded-lg border-4 mr-2 border-blue-400 w-96 h-10" type="text" name="message"
+                    id="message" placeholder=" Type tour message here" />
+                <button type="submit" id="sendMsg"
+                    class="cursor-pointer transition-all 
     bg-gray-700 text-white px-6 py-2 rounded-lg
     border-green-400
     border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px]
     active:border-b-[2px] active:brightness-90 active:translate-y-[2px] hover:shadow-xl hover:shadow-green-300 shadow-green-300 active:shadow-none">
-        Send
-    </button>
-    </form>
+                    Send
+                </button>
+            </form>
+        </div>
     </div>
-    </div>
-    <script src="script.js"></script>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script src="/groupScript.js"></script>
 </html>
