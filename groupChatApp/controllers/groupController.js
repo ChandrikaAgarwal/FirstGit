@@ -1,6 +1,7 @@
 const User = require('../models/users')
 const Usergroup = require('../models/userGroup')
 const Group = require('../models/groups')
+const { Op } = require('sequelize')
 
 exports.createGroup = async (req, res, next) => {
     try {
@@ -142,3 +143,136 @@ exports.getAllLoggedInusers = async (req, res, next) => {
     }
 }
 
+exports.searchUsers = async (req, res, next) => {
+    try {
+        const { searchQ } = req.query
+        const { groupId } = req.params
+        const user = await User.findByPk(req.user.id)
+        if (!user) { 
+            return res.status(404).json({ message: "User not found" })
+        }
+        const group = await Group.findByPk(groupId)
+        if (!group) { 
+            return res.status(404).json({ message: "Group not found" })
+        }
+        if (user.id !== group.createdby) {
+            return res.status(403).json({ message: "You are not the admin"})
+        }
+        const matchedUsers = await User.findAll({
+            where: {
+                [Op.or]: [
+                    { name: { [Op.like]: `%${searchQ}%` } },
+                    { email: { [Op.like]: `%${searchQ}%` } },
+                    {phone:{[Op.like]:`%${searchQ}%`}}
+                ]
+            },
+            attributes: ['id', 'name', 'email', 'phone'],
+        })
+        console.log("mathedUsers: ",matchedUsers);
+        
+        const groupMembers = await Usergroup.findAll({
+            where: { groupId },
+            attributes: ['userId']
+        });
+        const memberIds = groupMembers.map(member => member.userId);
+        console.log("memberIds: ",memberIds);
+        
+        const usersNotInGroup = matchedUsers.filter(user => !memberIds.includes(user.id));
+        console.log("usersNot in group: ",usersNotInGroup);
+        
+        // res.status(200).json({ users: usersNotInGroup });
+        res.status(200).json({ users: matchedUsers });
+    } catch (err) {
+        console.log("Error searching users: ", err);
+    }
+}
+
+exports.addNewMember = async (req, res, next) => {
+    try { 
+        const { groupId } = req.params
+        const user = await User.findByPk(req.user.id)
+        let addNewMember;
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        const group = await Group.findByPk(groupId)
+        if (!group) {
+            return res.status(404).json({ message: "Group not found" })
+        }
+        const { inputVal, inputId } = req.body
+        const existingMember = await Usergroup.findOne({
+            where: {
+                groupId: groupId,
+                userId:inputId
+            }
+        })
+        if (!existingMember) {
+            addNewMember = await Usergroup.create({
+                groupname: group.name,
+                username: inputVal,
+                userId: inputId,
+                groupId
+            })
+            req.app.get('wss').clients.forEach(client => {
+                if (client.readyState === require('ws').OPEN) {
+                    console.log("group client: ", client);
+                    console.log("client user id: ", client.userId);
+                    if (parseInt(inputId) === client.userId) {
+                        console.log("entering if of websocket");
+                        client.send(JSON.stringify({
+                            event: 'new-member',
+                            groupId: groupId,
+                            groupname: group.name,
+                            admin: user.name,
+                            memberId: inputId
+                        }));
+                    }
+                }
+            });
+            console.log("new member added: ", addNewMember);
+            return res.status(200).json({ message: "new member added to the group ", addNewMember })
+        } else {
+            console.log("user alredy exists");
+            return res.status(500).json({ message: "Member already exists" })
+        }
+       
+    } catch (err) {
+        console.log("error adding new member to the group: ", err);
+        return res.status(500).json({message:"error adding the new member to group",details:err})
+        
+    }
+}
+
+exports.deleteMember = async (req, res, next) => {
+    try {
+        const { groupId } = req.params
+        const {userId}=req.query
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        const group = await Group.findByPk(groupId)
+        if (!group) {
+            return res.status(404).json({ message: "Group not found" })
+        }
+        
+        const existingMember = await Usergroup.findOne({
+            where: {
+                groupId: groupId,
+                userId
+            }
+        })
+        if (existingMember) {
+            await existingMember.destroy()
+            console.log("member deleted");
+            return res.status(200).json({ message: "member removed from the group ", existingMember })
+        } else {
+            console.log("member not found");
+            return res.status(500).json({ message: "Member does not exist" })
+        }
+    } catch (err) {
+        console.log("error removing member from the group: ", err);
+        return res.status(500).json({ message: "error removing member from group", details: err })
+
+    }
+}

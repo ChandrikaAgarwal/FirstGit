@@ -2,6 +2,11 @@ const specificGrpPage = document.querySelector('#groupBody')
 const usersloggedIngroup = document.querySelector('.usersloggedIngroup')
 const sendMsgForm = document.querySelector('#group-msg-form')
 const messagesUl = document.querySelector('.groupmessages')
+const addParticipantForm = document.querySelector('#addParticipants-form')
+const searchInput = document.querySelector('#search')
+const searchRes = document.querySelector('#searchResults')
+const addMembersBtn = document.querySelector('#addMembers')
+const removeUserBtn = document.querySelector('#deleteMembers')
 let socket = new WebSocket('ws://localhost:3000')
 // const api_url=process.env.API_URL
 
@@ -16,7 +21,110 @@ if (specificGrpPage) {
         await getLoggedInUsers()
         await getAllMessages()
     })
+    let searchTimeout
+    let searchQuery = ""
+    let userId
+    function handleLiveSearch() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            searchUsers();  // Call the same search function after delay
+        }, 300); // Debounce: wait 300ms after user stops typing
+    }
+    async function searchUsers() {
+        try {
+            searchQuery = searchInput.value.trim()
+            if (searchQuery === "") {
+                searchRes.innerHTML = "";
+                return;
+            }
+                const response = await axios.get(`${api_url}/group/${groupId}/search?searchQ=${searchQuery}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                const searchResults = response.data.users
+                console.log("search Results: ", searchResults);
+        
+            searchRes.innerHTML = ""
+            if (searchResults.length === 0) {
+                searchRes.innerHTML = `<li class="mx-44">No matching users found</li>`
+                return
+            }
+            searchRes.innerHTML = searchResults.map(user => {
+            return `<li id="user-match-${user.id}" class="mx-44 cursor-pointer hover:bg-gray-100 p-1">${user.name}</li>`;
+            }).join(""); 
+            console.log("search Results",searchRes);
+            
+            searchResults.forEach(user => {
+                // searchRes.innerHTML += `<li id="user-match-${user.id}" class="mx-44 cursor-pointer hover:bg-gray-100 p-1">${user.name}</li>`
+                let name = user.name
+                console.log(typeof (name));
+            
+                let li = document.querySelector(`#user-match-${user.id}`)
+                console.log("li:",li);
+                
+                li.addEventListener('click', async () => {
+                    searchInput.value = li.textContent
+                    userId = li.id.split('-')[2]
+                    console.log("userid ", userId);
+                    
+                    searchRes.innerHTML = ""
+                });
+            })
+
+        } catch (err) {
+            console.error("Error searching for users", err)
+            if (err.response && err.response.data.message) {
+                alert(err.response.data.message)
+                if (err.response.data.message === "You are not the admin") {
+                    window.location.href=`/group/${groupId}`
+                }
+            }
+        }
+    }
+
+    addMembersBtn.addEventListener('click', async (e) => {
+        try {
+            let newMember = {
+                inputVal: searchInput.value,
+                inputId: userId
+            }
+            const addNewMember = await axios.post(`${api_url}/group/${groupId}/search`, newMember, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            console.log("new member to add: ", addNewMember);
+        } catch (err) { 
+            console.error("Error adding new member", err)
+            if (err.response && err.response.data.message) {
+                alert(err.response.data.message)
+                window.location.href = `/group/${groupId}`
+            }
+        }
+    })
     
+    removeUserBtn.addEventListener('click', async (e) => {
+        try {
+            let deleteMember = {
+                inputVal: searchInput.value,
+                inputId: userId
+            }
+            const deleteMemberRes = await axios.delete(`${api_url}/group/${groupId}/search?userId=${userId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            console.log("member deleted: ", deleteMemberRes);
+        } catch (err) {
+            console.error("Error deleting a member", err)
+            if (err.response && err.response.data.message) {
+                alert(err.response.data.message)
+                window.location.href = `/group/${groupId}`
+            }
+        }
+    })
+
     async function getuserofgrp() {
         
         try {
@@ -142,6 +250,10 @@ async function startWebSocket() {
         if (data.event === 'new-group-msg') {
             console.log("message received in group: ", data);
             await addMessage(data.message, data.msgId, data.name, data.userId)
+        }
+        if (data.event === 'new-member') {
+            console.log("new member joined the group");
+            
         }
     })
 }

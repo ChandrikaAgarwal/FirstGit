@@ -286,6 +286,10 @@ if (chatAppPage) {
                 console.log("new group created:",data);
                 await addGroup(data.groupname, data.groupId)
             }
+            if (data.event === 'new-member') {
+                console.log("new member joined the group");
+                await addGroup(data.groupname, data.groupId)
+            }
         })
     }
     async function addToUserList(userId, userName) {

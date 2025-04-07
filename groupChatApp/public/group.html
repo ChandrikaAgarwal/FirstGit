@@ -20,6 +20,12 @@
         </button>
 
     </div>
+    <form id="addParticipants-form" class="flex gap-2 mx-44 my-3">
+    <input type="text" id="search" placeholder=" add participants..." class="h-11 px-2 my-3 border border-gray-300 rounded-md" oninput="handleLiveSearch()">
+    <button type="button" id="addMembers" class="bg-slate-800 text-white p-2 my-3 rounded-md">Add</button>
+    <button type="button" id="deleteMembers" class="bg-slate-800 text-white p-2 my-3 rounded-md">Remove</button>
+    </form>
+    <ul id="searchResults"></ul>
     <div class="max-w-sm mx-auto relative top-3 text-center">
         <h1>Chat App</h1>
         <div class="overscroll-y-auto md:overscroll-contain">
