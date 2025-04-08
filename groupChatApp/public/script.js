@@ -40,7 +40,7 @@ if (signupForm) {
                 console.log("new Signup: ", newsignup);
                 // console.log("token : ", newsignup.data.token);
                 localStorage.setItem("token", newsignup.data.token)
-                alert("Signup sucessful")
+                alert("Signup sucessful!!!!")
                 signupForm.reset()
                 window.location.href = "/users"
             } catch (err) {
