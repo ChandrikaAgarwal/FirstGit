@@ -7,10 +7,10 @@ const searchInput = document.querySelector('#search')
 const searchRes = document.querySelector('#searchResults')
 const addMembersBtn = document.querySelector('#addMembers')
 const removeUserBtn = document.querySelector('#deleteMembers')
-let socket = new WebSocket('ws://localhost:3000')
+let socket = new WebSocket('ws://13.201.80.251')
 // const api_url=process.env.API_URL
 
-const api_url = "http://localhost:3000"
+const api_url = "http://13.201.80.251"
 const token = localStorage.getItem('token');
 if (specificGrpPage) {
     const pathParts = window.location.pathname.split('/')
@@ -220,7 +220,7 @@ if (specificGrpPage) {
 
 }
 async function startWebSocket() {
-    socket = new WebSocket("ws://localhost:3000");
+    socket = new WebSocket("ws://13.201.80.251");
     socket.addEventListener('open', () => {
         console.log("connected to websocket server");
         socket.send(JSON.stringify({

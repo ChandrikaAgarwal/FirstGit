@@ -14,10 +14,10 @@ const groupPage = document.querySelector('#createGroup')
 const groupsUl = document.querySelector('.groupscreated')
 const specificGrpPage = document.querySelector('#groupBody')
 const usersloggedIngroup = document.querySelector('.usersloggedIngroup')
-let socket = new WebSocket('ws://localhost:3000')
+let socket = new WebSocket('ws://13.201.80.251')
 // const api_url=process.env.API_URL
 
-const api_url ="http://localhost:3000"
+const api_url ="http://13.201.80.251"
 if (signupForm) {
         signupForm.addEventListener("submit", async (e) => {
             try {
@@ -244,7 +244,7 @@ if (chatAppPage) {
 
 
     async function startWebSocket() {
-        socket = new WebSocket("ws://localhost:3000");
+        socket = new WebSocket("ws://13.201.80.251");
         socket.addEventListener('open', () => {
             console.log("connected to websocket server");
             const token = localStorage.getItem('token');
