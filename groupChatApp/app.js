@@ -13,6 +13,7 @@ const Grpmsg=require('./models/groupmessages')
 const userRoute = require('./routes/userRouter')
 const messageRoute = require('./routes/messageRoute')
 const groupRoute = require('./routes/groupRoute')
+const fileRoute=require('./routes/fileRoute')
 const {searchUsers}=require('./controllers/groupController')
 const jwt = require('jsonwebtoken');
 const path=require('path')
@@ -63,6 +64,7 @@ app.get('/group/:groupId', (req, res) => {
 app.use('/', userRoute)
 app.use('/api/messages', messageRoute)
 app.use('/', groupRoute)
+app.use('/',fileRoute)
 
 //associations
 Message.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })

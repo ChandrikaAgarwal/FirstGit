@@ -31,10 +31,15 @@
         <div class="overscroll-y-auto md:overscroll-contain">
             <ul class="groupmessages"></ul>
         </div>
+        <form class="fixed bottom-20 left-44" id="fileUploadForm" enctype="multipart/form-data" method="post">
+        <input type="file" name="files" id="fileInput" multiple/>
+        <button id="sendFileBtn" type="submit" class="bg-black text-white border-4 rounded-lg p-1 mx-0">Send File</button>
+        </form>
         <div class="fixed bottom-0 left-32 w-full bg-blue-900 p-3 mx-8">
             <form action="/" method="post" id="group-msg-form">
                 <input class="rounded-lg border-4 mr-2 border-blue-400 w-96 h-10" type="text" name="message"
                     id="message" placeholder=" Type tour message here" />
+                
                 <button type="submit" id="sendMsg"
                     class="cursor-pointer transition-all 
     bg-gray-700 text-white px-6 py-2 rounded-lg

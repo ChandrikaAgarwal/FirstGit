@@ -7,10 +7,13 @@ const searchInput = document.querySelector('#search')
 const searchRes = document.querySelector('#searchResults')
 const addMembersBtn = document.querySelector('#addMembers')
 const removeUserBtn = document.querySelector('#deleteMembers')
-let socket = new WebSocket('ws://13.201.80.251')
+const fileForm = document.querySelector('#fileUploadForm')
+const fileInput = document.querySelector('#fileInput')
+const formData=new FormData()
+let socket = new WebSocket('ws://localhost:3000')
 // const api_url=process.env.API_URL
 
-const api_url = "http://13.201.80.251"
+const api_url = "http://localhost:3000"
 const token = localStorage.getItem('token');
 if (specificGrpPage) {
     const pathParts = window.location.pathname.split('/')
@@ -218,9 +221,31 @@ if (specificGrpPage) {
         }
     }
 
+    fileForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        console.log("files: ", fileInput.files);
+        
+        for (const file of fileInput.files) {
+            formData.append('files', file)       
+        }
+        try {
+            const fileResponse = await axios.post(`${api_url}/api/fileupload/group/${groupId}`, formData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            })
+            console.log("fileResponse: ",fileResponse);
+            let newMsg = document.querySelector(`#gm-${fileResponse.data.messages.id}`)
+            console.log("newMwsg ", newMsg);
+            newMsg.textContent = `You:${fileResponse.data.messages.message}`
+            fileForm.reset()
+        } catch (err) {
+            console.log("error uploading file: ", err);
+        }
+    })
 }
 async function startWebSocket() {
-    socket = new WebSocket("ws://13.201.80.251");
+    socket = new WebSocket("ws://localhost:3000");
     socket.addEventListener('open', () => {
         console.log("connected to websocket server");
         socket.send(JSON.stringify({
@@ -252,8 +277,11 @@ async function startWebSocket() {
             await addMessage(data.message, data.msgId, data.name, data.userId)
         }
         if (data.event === 'new-member') {
-            console.log("new member joined the group");
-            
+            console.log("new member joined the group"); 
+        }
+        if (data.event === 'new-filemsg') {
+            console.log("new file message received in group: ", data);
+            await addMessage(data.message, data.msgId, data.name, data.userId)
         }
     })
 }
@@ -275,7 +303,10 @@ async function addMessage(message, msgId, userName, userId) {
 
     if (!document.getElementById(`gm-${msgId}`)) {
         console.log("checking if condition in addmessage");
-        messagesUl.innerHTML += `<li id="gm-${msgId}" class="newMsg">${userName}: ${message}</li>`
-
+        if (message.indexOf('https://') !== -1) {
+            messagesUl.innerHTML += `<li id="gm-${msgId}" class=newMsg>${userName}:<a href="${message}" target="_blank">${message}</a></li>`
+        } else {
+            messagesUl.innerHTML += `<li id="gm-${msgId}" class="newMsg">${userName}: ${message}</li>`
+        }
     }
 }
