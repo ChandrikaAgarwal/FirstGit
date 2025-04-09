@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="output.css">
+</head>
+<body>
+    <div class="max-w-md mx-auto m-14 border-gray-600 rounded-md">
+    <form method="post" action="/" id="signup-form">
+        <div class="mb-4">
+            <label class="block text-sm text-black font-bold" for="name">Full Name</label>
+            <input class="mt-1 p-2 w-full bg-gradient-to-r from-purple-400 to-white border border-gray-600 rounded-md text-white" type="text" name="name"
+                id="name" />
+    
+        </div>
+    
+        <div class="mb-4">
+            <label class="block text-sm font-bold text-black" for="email">Email Address</label>
+            <input class="mt-1 p-2 w-full bg-gradient-to-r from-purple-400 to-white border border-gray-600 rounded-md text-white" name="email" id="email"
+                type="email" />
+        </div>
+    
+        <div class="mb-4">
+            <label class="block text-sm font-bold text-black" for="phone">Mobile No.</label>
+            <input class="mt-1 p-2 w-full bg-gradient-to-r from-purple-400 to-white border border-gray-600 rounded-md text-white" name="phone" id="phone"
+                type="tel" />
+        </div>
+    
+        <div class="mb-4">
+            <label class="block text-sm font-bold text-black" for="password">Password</label>
+            <input class="mt-1 p-2 w-full bg-gradient-to-r from-purple-400 to-white border border-gray-600 rounded-md text-white" name="password"
+                id="password" type="password" />
+        </div>
+    
+        <div>
+            <button
+                class="create-profBtn bg-gradient-to-r from-purple-600 via-purple-400 to-blue-500 text-white px-4 py-2 font-bold rounded-md hover:opacity-80"
+                type="submit">
+                Create Profile
+            </button>
+        </div>
+        <div class="flex justify-end">
+            <p class="text-white m-3 text-lg">Already a user?</p>
+            <button
+                class="loginBtn bg-gradient-to-r from-purple-600 via-purple-400 to-blue-500 text-white px-4 py-1 font-bold rounded-md hover:opacity-80"
+                type="button">Login</button>
+        </div>
+    </form>
+    </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script src="script.js"></script>
+</html>
