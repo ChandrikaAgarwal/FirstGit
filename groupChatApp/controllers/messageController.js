@@ -5,6 +5,9 @@ const sequelize = require('../util/database')
 const { Sequelize, Op } = require('sequelize')
 const Group = require('../models/groups')
 const Usergroup = require('../models/userGroup')
+const archivedChats = require('../models/archivedmessages')
+const cron=require('node-cron')
+
 
 exports.postAddMsg = async (req, res, next) => {
     try {
@@ -55,6 +58,7 @@ exports.getAllMsgs = async (req, res, next) => {
             order:[["id","ASC"]]
         })
         console.log("all messages: ", allMsgs);
+        
         return res.status(200).json({message:"getting all messages ",allMsgs, currUser:user.id})
         
     } catch (err) {
@@ -151,6 +155,7 @@ exports.getAllGroupMsgs = async (req, res, next) => {
             // order: [["id", "ASC"]]
         })
         console.log("all groupmessages: ", allMsgs);
+        
         return res.status(200).json({ message: "getting all groupmessages ", allMsgs, currUser: user.id })
 
     } catch (err) {
@@ -159,3 +164,40 @@ exports.getAllGroupMsgs = async (req, res, next) => {
 
     }
 }
+
+cron.schedule("0 0 * * *", async () => {
+
+    const yesterDay = new Date();
+    yesterDay.setDate(yesterDay.getDate() - 1);
+    const oldMessages = await Groupmessage.findAll({
+        where: {
+            createdAt: {
+                [Op.gt]: new Date(yesterDay.setHours(0, 0, 0, 0)),
+                [Op.lt]: new Date(yesterDay.setHours(23, 59, 0, 0)),
+            }
+        }
+    })
+    console.log("old messages: ", oldMessages);
+
+    oldMessages.forEach(async (oldmsg) => {
+        console.log("oldmsg: ", oldmsg);
+        const exists = await archivedChats.findOne({
+            where: { message: oldmsg.message, userId: oldmsg.userId, groupId: oldmsg.groupId }
+        });
+        if (!exists) {
+            const newarchivemsg = await archivedChats.create({
+                name: oldmsg.name,
+                message: oldmsg.message,
+                userId: oldmsg.userId,
+                groupId: oldmsg.groupId,
+            })
+
+            if (newarchivemsg) {
+                console.log("destroying old message");
+                
+                await oldmsg.destroy()
+            }
+        }    
+    })
+    console.log("Archiving done for yesterday's messages");
+})

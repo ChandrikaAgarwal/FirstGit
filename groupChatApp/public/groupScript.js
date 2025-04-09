@@ -10,10 +10,10 @@ const removeUserBtn = document.querySelector('#deleteMembers')
 const fileForm = document.querySelector('#fileUploadForm')
 const fileInput = document.querySelector('#fileInput')
 const formData=new FormData()
-let socket = new WebSocket('ws://13.201.80.251')
+let socket = new WebSocket('ws://localhost:3000')
 // const api_url=process.env.API_URL
 
-const api_url = "http://13.201.80.251"
+const api_url = "http://localhost:3000"
 const token = localStorage.getItem('token');
 if (specificGrpPage) {
     const pathParts = window.location.pathname.split('/')
@@ -209,9 +209,9 @@ if (specificGrpPage) {
             messagesUl.innerHTML = "";
             allmessages.forEach(msg => {
                 if (msg.userId === getAllMsgs.data.currUser) {
-                    messagesUl.innerHTML += `<li id="m-${msg.id}" class="newMsg">You: ${msg.message}</li>`
+                    messagesUl.innerHTML += `<li id="gm-${msg.id}" class="newMsg">You: ${msg.message}</li>`
                 } else {
-                    messagesUl.innerHTML += `<li id="m-${msg.id}" class="newMsg">${msg.name}: ${msg.message}</li>`
+                    messagesUl.innerHTML += `<li id="gm-${msg.id}" class="newMsg">${msg.name}: ${msg.message}</li>`
                 }
             })
             // await startWebSocket()
@@ -245,7 +245,7 @@ if (specificGrpPage) {
     })
 }
 async function startWebSocket() {
-    socket = new WebSocket("ws://13.201.80.251");
+    socket = new WebSocket("ws://localhost:3000");
     socket.addEventListener('open', () => {
         console.log("connected to websocket server");
         socket.send(JSON.stringify({
