@@ -2,6 +2,8 @@ const signupForm = document.querySelector('#signup-form')
 const loginForm = document.querySelector('#login-form')
 const createProfBtn = document.querySelector('.create-profBtn')
 const loginBtn = document.querySelector('.loginBtn')
+const editProfilePage = document.querySelector('#edit-profilePage')
+const editprofForm = document.querySelector('#editProfile-form')
 let api_url ="http://localhost:5000"
 if (signupForm) {
     signupForm.addEventListener("submit", async (e) => {
@@ -58,7 +60,7 @@ if (loginForm) {
             localStorage.setItem("token", loginRes.data.token)
             alert("Login successful!!!")
             loginForm.reset()
-            // window.location.href = "/chat"
+            window.location.href = "/home"
         } catch (err) {
             console.error("error logging in from frontend: ", err)
             if (err.response && err.response.data.message) {
@@ -67,6 +69,38 @@ if (loginForm) {
                     window.location.href = "/"
                 }
             }
+        }
+    })
+}
+
+if (editProfilePage) {
+    const token=localStorage.getItem("token")
+    editprofForm.addEventListener('submit', async (e) => {
+        try {
+            e.preventDefault();
+            const editUser = {
+                name: e.target.editname.value,
+                email: e.target.editemail.value,
+                phone: e.target.editphone.value.trim(),
+                password: e.target.confirmpass.value,
+            }
+            console.log("edit User: ", editUser);
+            let hasSpace = editUser.phone.indexOf(" ")
+            let phoneLength = editUser.phone.length
+            if (phoneLength !== 10 || hasSpace >= 0) {
+                alert("Invalid phone number")
+                return
+            }
+            const editProfile = await axios.post(`${api_url}/edit-profile`, editUser, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            console.log("profile edited: ", editProfile);
+            window.location.href='/home'
+        } catch (err) {
+            console.log("error editing profile: ",err);
+            
         }
     })
 }

@@ -57,3 +57,25 @@ exports.getUser = async (req, res, next) => {
         res.status(500).json({ message: "Failed to log in", details: err })
     }
 }
+
+exports.editUser = async (req, res, next) => {
+    try {
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        const { name, email, phone, password } = req.body
+        const saltRounds = 10
+        const hashedPassword = await bcrypt.hash(password, saltRounds)
+        user.name = name
+        user.email = email
+        user.phone = phone
+        user.password = hashedPassword
+        user.save()
+        return res.status(200).json({message:"profile edited successfully"})
+    } catch (err) {
+        console.log("error editing profile: ", err);
+        res.status(500).json({ message: "Failed to edit profile", details: err })
+        
+    }
+}

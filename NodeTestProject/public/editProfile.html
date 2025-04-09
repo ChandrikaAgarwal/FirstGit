@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="output.css">
+</head>
+<body id="edit-profilePage">
+    <nav class="bg-slate-400 border-gray-900 h-16">
+        <a href="/home" class="text-white underline p-3" id="home">Home</a>
+        <a href="/profile" class="text-white underline p-3">My Account</a>
+    </nav>
+    <div class="title">
+        <h2 class="max-w-md mx-auto my-12">Edit Profile Page</h2>
+    </div>
+    <form method="post" class="mx-28" id="editProfile-form">
+        <div class="mb-8">
+        <label for="editname" class="p-3">Name</label>
+        <input type="text" id="editname" name="editname" class="outline outline-slate-950 px-4 py-2"/>
+        </div>
+
+        <div class="mb-8">
+        <label for="editemail" class="p-3">Email</label>
+        <input type="text" id="editemail" name="editemail" class="outline outline-slate-950 px-4 py-2"/>
+        </div>
+
+        <div class="mb-8">
+            <label for="editphone" class="p-3">Phone</label>
+            <input type="tel" id="editphone" name="editphone" class="outline outline-slate-950 px-4 py-2" />
+        </div>
+  
+        <div class="mb-8">
+            <label for="editpass" class="p-3">Password</label>
+            <input type="password" id="editpass" name="editpass" class="outline outline-slate-950 px-4 py-2"/>
+        </div>
+
+        <div class="mb-8">
+            <label for="confirmpass" class="p-3">Confirm Password</label>
+            <input type="password" id="confirmpass" name="confirmpass" class="outline outline-slate-950 px-4 py-2"/>
+        </div>
+        <button type="submit" id="editProfile" class="border-4 rounded-lg p-2 bg-black text-white font-bold mx-7 my-5">Edit Profile</button>
+    </form>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script src="script.js"></script>
+</html>

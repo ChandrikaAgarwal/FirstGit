@@ -16,6 +16,18 @@ app.get('/users', (req, res) => {
     res.sendFile(path.join(__dirname,'public','login.html'))
 })
 
+app.get('/home', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'home.html'))
+})
+app.get('/profile', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'profilepage.html'))
+})
+app.get('/edit-profile', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'editProfile.html'))
+})
+app.get('/share-recipe', (req, res) => {
+    res.sendFile(path.join(__dirname,'public','shareRecipe.html'))
+})
 app.use('/',userRoute)
 // sequelize.sync({force:true})
 sequelize.sync()
