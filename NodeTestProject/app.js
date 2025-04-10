@@ -3,8 +3,10 @@ const bodyParser = require('body-parser')
 const express = require('express')
 const cors = require('cors')
 const sequelize = require('./util/database')
-const User=require('./models/users')
-const userRoute=require('./routes/userRouter')
+const User = require('./models/users')
+const Recipe=require('./models/recipes')
+const userRoute = require('./routes/userRouter')
+const recipeRoute=require('./routes/recipeRoute')
 const path = require('path')
 const app = express()
 
@@ -28,8 +30,15 @@ app.get('/edit-profile', (req, res) => {
 app.get('/share-recipe', (req, res) => {
     res.sendFile(path.join(__dirname,'public','shareRecipe.html'))
 })
-app.use('/',userRoute)
-// sequelize.sync({force:true})
+app.get('/myrecipes', (req, res) => { 
+    res.sendFile(path.join(__dirname,'public','myrecipes.html'))
+})
+app.use('/', userRoute)
+app.use('/',recipeRoute)
+
+Recipe.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
+User.hasMany(Recipe, { constraints: true, onDelete: 'CASCADE' })
+// sequelize.sync({alter:true})
 sequelize.sync()
     .then(() => {
         app.listen(process.env.PORT || 5000, () => {
