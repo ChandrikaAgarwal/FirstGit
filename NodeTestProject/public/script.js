@@ -7,6 +7,7 @@ const editprofForm = document.querySelector('#editProfile-form')
 const homePage = document.querySelector("#homePage")
 const myRecipes = document.querySelector("#myRecipes")
 const selectedRecipePage = document.querySelector("#selected-recipe")
+const authorsPage = document.querySelector('#authorsPage')
 let api_url ="http://localhost:5000"
 if (signupForm) {
     signupForm.addEventListener("submit", async (e) => {
@@ -292,6 +293,8 @@ if (selectedRecipePage) {
         recipeDetailsDiv.appendChild(methodTitle);
         recipeDetailsDiv.appendChild(methodList);
     }
+}
 
-
+if (authorsPage) {
+    
 }
