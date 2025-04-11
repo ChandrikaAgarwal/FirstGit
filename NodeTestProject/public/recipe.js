@@ -7,15 +7,15 @@ if (shareRecipePage) {
         try {
             e.preventDefault()
             const formData=new FormData()
-            formData.append("name", e.target.recipeName.value);
-            formData.append("description", e.target.recipeDescription.value);
-            formData.append("ingredients", e.target.recipeIngredients.value);
-            formData.append("method", e.target.recipeMethod.value);
-            formData.append("cuisine", e.target.cuisine.value);
-            formData.append("category", e.target["cuisine-category"].value);
-            formData.append("cookingTime", e.target["cooking-time"].value);
-            formData.append("marinationTime", e.target["marination-time"].value);
-            formData.append("serves", e.target.serves.value);
+            formData.append("name", e.target.recipeName.value.trim());
+            formData.append("description", e.target.recipeDescription.value.trim());
+            formData.append("ingredients", e.target.recipeIngredients.value.trim());
+            formData.append("method", e.target.recipeMethod.value.trim());
+            formData.append("cuisine", e.target.cuisine.value.trim());
+            formData.append("category", e.target["cuisine-category"].value.trim());
+            formData.append("cookingTime", e.target["cooking-time"].value.trim());
+            formData.append("marinationTime", e.target["marination-time"].value.trim());
+            formData.append("serves", e.target.serves.value.trim());
             const mainIngredients = Array.from(document.querySelector("#main-ingredients").selectedOptions).map(opt => opt.value);
             formData.append("mainingrediant", JSON.stringify(mainIngredients));
             console.log("mainIngredients: ",formData.get("mainingrediant"));
@@ -33,7 +33,7 @@ if (shareRecipePage) {
                 }
             })
             console.log("recipe submitted: ", newRecipe);
-            
+            recipeForm.reset()
             
         } catch (error) { 
             console.log("Error posting a recipe: ", error);

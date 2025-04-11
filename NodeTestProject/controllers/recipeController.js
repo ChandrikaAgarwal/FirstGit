@@ -2,9 +2,12 @@ const User = require('../models/users')
 const multer = require('multer')
 const Recipe = require('../models/recipes')
 const {v4:uuidv4}=require('uuid')
-const AWS=require('aws-sdk')
+const AWS = require('aws-sdk')
+const { Sequelize, Op } = require('sequelize')
+
 exports.newRecipe = async (req, res, next) => {
     try {
+        
         const user = await User.findByPk(req.user.id)
         if (!user) {
             return res.status(404).json({ message: "No user found" })
@@ -74,5 +77,93 @@ function uploadToS3(file) {
     } catch (err) {
         console.log("error uploading to s3: ",err);
         throw new Error("s3 upload failed: "+err.message)
+    }
+}
+
+exports.getAllRecipes = async (req, res, next) => {
+    try {
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        const recipes = await Recipe.findAll({
+            where: {
+                userId: { [Op.not]: user.id }
+            },
+        })
+        return res.status(200).json({message:"All recipes: ",recipes})
+    } catch (err) { 
+        console.log("error fetching all recipes: ", err);
+        return res.status(500).json({ message: "Error fetching all recipes" })
+     }
+}
+
+exports.getMyRecipes = async (req, res, next) => {
+    try {
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "No user found" })
+        }
+        const myrecipes = await Recipe.findAll({
+            where: {
+                userId:user.id
+            },
+        })
+        console.log("my recipes: ",myrecipes);
+        
+        return res.status(200).json({ message: "All recipes: ", myrecipes })
+    } catch (err) {
+        console.log("error fetching all recipes: ", err);
+        return res.status(500).json({ message: "Error fetching your recipes" })
+    }
+}
+
+exports.getSearchResults = async (req, res, next) => {
+    try {
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "No user found" })
+        }
+        const { name, cuisine, category, ingredients, type } = req.query
+        console.log("name: ",name);
+        console.log("category: ", category);
+        console.log("cuisine: ",cuisine);
+        console.log("ingredients: ",ingredients);
+        console.log("type: ", type);
+
+        const searchConditions = [];
+        if (name) searchConditions.push({ name: { [Op.like]: `%${name}%` } });
+        if (cuisine) searchConditions.push({ cuisine: { [Op.like]: `%${cuisine}%` } });
+        if (category) searchConditions.push({ category: { [Op.like]: `%${category}%` } });
+        if (ingredients) searchConditions.push({ mainingrediant: { [Op.like]: `%${ingredients}%` } });
+        if (type) searchConditions.push({ recipetype: { [Op.like]: `%${type}%` } });
+        console.log("search Conditions: ",searchConditions);
+        
+        const matchedRecipe = await Recipe.findAll({
+            where: {
+                [Op.or]: searchConditions
+            }
+        })
+        console.log("matched recipes: ",matchedRecipe);
+        return res.status(200).json({message:"Matched Recipes: ",matchedRecipe})
+    } catch (err) {
+        console.log("error fetching matching recipes: ", err);
+        return res.status(500).json({ message: "Error fetching matching recipes" })
+    }
+}
+
+exports.getThisRecipe = async (req, res, next) => {
+    try {
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        const { recipeId } = req.params
+        const recipe = await Recipe.findByPk(recipeId)
+        console.log("recipe: ", recipe);
+        return res.status(200).json({message:"Recipe found",recipe})
+    } catch (err) {
+        console.log("error fetching requested recipe: ",err);
+        return res.status(500).json({message:"Recipe not found ",details:err})
     }
 }

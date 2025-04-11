@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="output.css">
+</head>
+<body id="searchPage">
+    <nav class="bg-slate-400 border-gray-900 h-16 p-3">
+        <a href="/home" class="text-white underline p-3" id="home">Home</a>
+        <a href="/profile" class="text-white underline p-3" id="profile">My account</a>
+        <a href="/authors" class="text-white underline p-3" id="authors">Authors</a>
+    </nav>
+    <div class="title">
+        <h2 class="max-w-md mx-auto my-12 mb-4">Search</h2>
+    </div>
+    <div id="search" class="max-w-md mx-auto border-4 border-slate-800 p-10 ">
+        <form action="" id="search-form">
+            <label for="searchname">Search for</label>
+            <input type="text" id="searchname" name="searchname" class="outline outline-slate-950 m-3"/>
+            <h4 class="font-bold text-red-500">Advanced Recipe search<h4>
+            <div class="flex items-center">
+                <div class="flex flex-col">
+                    <label for="cuisine">Cuisine(*)</label>
+                    <select name="cuisine" id="cuisine" class="outline outline-slate-950 m-3">
+                        <option value="Please Select">Please Select</option>
+                        <option value="General">General</option>
+                        <option value="African">African</option>
+                        <option value="American">American</option>
+                        <option value="Australian">Australian</option>
+                        <option value="British">British</option>
+                        <option value="Bengali">Bengali</option>
+                        <option value="Chinese">Chinese</option>
+                        <option value="European">European</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Indian">Indian</option>
+                        <option value="Uncategorized">Uncategorized</option>
+                    </select>
+                </div>
+                <div class="flex flex-col">
+                    <label for="cuisine-category">Category(*)</label>
+                    <select name="cuisine-category" id="cuisine-category" class="outline outline-slate-950 m-4">
+                        <optgroup label="General">
+                            <option value="Please Select">Please Select</option>
+                            <option value="CakesBiscuits">Cakes/Biscuits</option>
+                            <option value="Desserts">Desserts</option>
+                            <option value="HotCold Drinks">Hot/Cold Drinks</option>
+                            <option value="Icecream">Icecream</option>
+                            <option value="Juice">Juice</option>
+                            <option value="Salads">Salads</option>
+                        </optgroup>
+                        <optgroup label="Other Cuisines">
+                            <option value="starters">Starters</option>
+                            <option value="Main Course">Main Course</option>
+                            <option value="Sides">Sides</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+            <!-- Main ingredients -->
+            <div class="flex flex-col">
+                <label for="main-ingredients">Main Ingredients(**)</label><br />
+                <select name="main-ingredients" id="main-ingredients" class="outline outline-slate-950 px-4 py-2 mb-4" multiple>
+                    <option value="Please Select">Please Select</option>
+                    <option value="Wheat">Wheat</option>
+                    <option value="Rice">Rice</option>
+                    <option value="Beans/Pulses">Beans/Pulses</option>
+                    <option value="Cheese/Paneer/Tofu">Cheese/Paneer/Tofu</option>
+                    <option value="Egg">Egg</option>
+                    <option value="Dairy">Dairy</option>
+                    <option value="Flour">Flour</option>
+                    <option value="Fruits">Fruits</option>
+                    <option value="Grains">Grains</option>
+                    <option value="Pasta">Pasta</option>
+                    <option value="Vegetables">Vegetables</option>
+                </select>
+            </div>
+            <!-- Recipe types -->
+            <div class="flex flex-col">
+                <label for="recipe-type">Recipe Type(**)</label><br />
+                <select name="recipe-type" id="recipe-type" class="outline outline-slate-950 px-4 py-2 mb-4" multiple>
+                    <option value="Please Select">Please Select</option>
+                    <option value="Baking">Baking</option>
+                    <option value="Beverages">Beverages</option>
+                    <option value="Breakfast">Breakfast</option>
+                    <option value="Bread">Bread</option>
+                    <option value="Desserts">Desserts</option>
+                    <option value="Dinner">Dinner</option>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Quick Meal">Quick Meal</option>
+                    <option value="Snacks">Snacks</option>
+                    <option value="Special Occassion">Special Occassion</option>
+                </select>
+            </div>
+            <button type="submit" id="searchBtn" class="bg-black text-white border-4 p-2 rounded-lg mb-5">Search</button>
+        </form>
+    </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script src="search.js"></script>
+</html>

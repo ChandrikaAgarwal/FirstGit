@@ -6,11 +6,15 @@
     <title>Document</title>
     <link rel="stylesheet" href="output.css">
 </head>
-<body>
+<body id="homePage">
     <nav class="bg-slate-400 border-gray-900 h-16" id="navbar-home">
-    <a href="/profile" class="text-white underline" id="profile">My account</a>
+    <a href="/profile" class="text-white underline p-3" id="profile">My account</a>
+    <a href="/search" class="text-white underline p-3" id="search">Search</a>
+    <a href="/authors" class="text-white underline p-3" id="authors">Authors</a>
     </nav>
-    <div></div>
+    <div id="recipes" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 mx-auto max-w-7xl">
+        
+    </div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
 <script src="script.js"></script>

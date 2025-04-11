@@ -33,6 +33,18 @@ app.get('/share-recipe', (req, res) => {
 app.get('/myrecipes', (req, res) => { 
     res.sendFile(path.join(__dirname,'public','myrecipes.html'))
 })
+app.get('/search', (req, res) => { 
+    res.sendFile(path.join(__dirname,'public','search.html'))
+})
+app.get('/search-results', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'searchResults.html'))
+})
+app.get('/recipes/:recipeId', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'recipe.html'))
+})
+app.get('/authors', (req, res) => {
+    res.sendFile(path.join(__dirname,'public',"authors.html"))
+})
 app.use('/', userRoute)
 app.use('/',recipeRoute)
 
