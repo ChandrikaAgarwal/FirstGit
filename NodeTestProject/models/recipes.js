@@ -54,6 +54,16 @@ const Recipe = sequelize.define('recipe', {
     recipeImg: {
         type: Sequelize.JSON,
         allowNull: true
+    },
+    avgRating: {
+        type: Sequelize.DECIMAL(3, 2),
+        allowNull: true,
+        defaultValue:0
+    },
+    totalRatings: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        defaultValue: 0
     }
 
 }, { timestamps: true })

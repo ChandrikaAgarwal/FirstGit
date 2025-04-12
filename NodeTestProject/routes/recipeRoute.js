@@ -8,5 +8,6 @@ router.post('/share-recipe',jwtAuthMiddleware,upload.array('files'),recipeContro
 router.get('/api/allrecipes', jwtAuthMiddleware, recipeControl.getAllRecipes)
 router.get('/api/myrecipes', jwtAuthMiddleware, recipeControl.getMyRecipes)
 router.get('/api/search-results', jwtAuthMiddleware, recipeControl.getSearchResults)
-router.get('/api/recipes/:recipeId',jwtAuthMiddleware,recipeControl.getThisRecipe)
+router.get('/api/recipes/:recipeId', jwtAuthMiddleware, recipeControl.getThisRecipe)
+router.post('/api/ratings',jwtAuthMiddleware,recipeControl.recipeRatings)
 module.exports = router;

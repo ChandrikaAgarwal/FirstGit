@@ -219,7 +219,8 @@ if (selectedRecipePage) {
         const mainIngred = mainIngredArray.join(", ")
         const recipeType = JSON.parse(recipe.recipetype)
         const type = recipeType.join(", ")
-
+        const totalRatings = document.getElementById("totalRatings")
+        totalRatings.textContent = `Total Ratings: ${recipe.totalRatings}`
         const namep = document.createElement('p')
         namep.textContent = recipe.name
         namep.className = "text-red-600 font-bold"
@@ -232,7 +233,7 @@ if (selectedRecipePage) {
         recipeDetailsDiv.appendChild(postedby)
 
         const imgContainer = document.createElement("div");
-        imgContainer.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4";
+        imgContainer.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 flex";
         if (recipe.recipeImg.length > 0) {
             recipe.recipeImg.forEach((imgurl) => {
                 const imgElement = document.createElement("img")
@@ -240,7 +241,6 @@ if (selectedRecipePage) {
                 imgElement.alt = recipe.name
                 imgElement.className = "w-full h-48 object-cover rounded-lg";
                 imgContainer.appendChild(imgElement);
-                
             })
         } else {
             imgElement.src = "default-image.jpg"; // Put a default image in your public folder
@@ -249,6 +249,41 @@ if (selectedRecipePage) {
             imgContainer.appendChild(imgElement);
         }
         recipeDetailsDiv.appendChild(imgContainer)
+
+        const starContainer = document.getElementById('star-container');
+        const ratingText = document.getElementById('rating-value');
+        
+        let selectedRating = 0;
+        let totalRating = 0;
+        for (let i = 1; i <= 5; i++) {
+            const star = document.createElement('span');
+            star.innerHTML = '★';
+            star.classList.add('text-gray-400', 'text-3xl', 'cursor-pointer', 'transition-colors', 'duration-200');
+            star.dataset.rating = i;
+            star.addEventListener('mouseenter', () => highlightStars(i));
+            star.addEventListener('mouseleave', () => highlightStars(selectedRating));
+            star.addEventListener('click', async() => {
+                selectedRating = i;
+                totalRating+=1
+                ratingText.textContent = `Rating: ${selectedRating}`;
+                totalRatings.textContent=`Total Ratings: ${totalRating}`
+                await highlightStars(selectedRating);
+                const ratingDetail = {
+                    selectedRating,
+                    totalRating,
+                    recipeId: recipe.id
+                }
+                const giveRating = await axios.post(`${api_url}/api/ratings`, ratingDetail, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                console.log("rating: ",giveRating);
+                
+            });
+            starContainer.appendChild(star);
+        }
 
         const detailDiv = document.createElement('div')
         detailDiv.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 my-4";
@@ -268,7 +303,7 @@ if (selectedRecipePage) {
         recipeDetailsDiv.appendChild(detailDiv)
 
         const ingredientsList = document.createElement('ul')
-        ingredientsList.className = "list-disc pl-5 text-gray-700 pb-10"; 
+        ingredientsList.className = "list-disc pl-5 text-gray-700 pb-10";
         const ingredientsArray = recipe.ingredients.split(/\r?\n/); // split on both \r\n and \n
         ingredientsArray.forEach(item => {
             const li = document.createElement('li');
@@ -282,19 +317,71 @@ if (selectedRecipePage) {
 
         const methodList = document.createElement('ul')
         methodList.className = "list-disc pl-5 text-gray-700";
-        const methodArray = recipe.method.split(/\r?\n/).filter(item=>item.trim() !=="");
+        const methodArray = recipe.method.split(/\r?\n/).filter(item => item.trim() !== "");
         methodArray.forEach((item) => {
             const li = document.createElement('li');
             li.textContent = item.trim();
             methodList.appendChild(li);
         })
-        const methodTitle=document.createElement('p')
+        const methodTitle = document.createElement('p')
         methodTitle.innerHTML = `<span class="font-bold text-red-900 my-24">Method :</span>`;
         recipeDetailsDiv.appendChild(methodTitle);
         recipeDetailsDiv.appendChild(methodList);
+    
+       async function highlightStars(rating) {
+            const stars = starContainer.children;
+            for (let i = 0; i < stars.length; i++) {
+                if (i < rating) {
+                    stars[i].classList.remove('text-gray-400');
+                    stars[i].classList.add('text-yellow-400');
+                } else {
+                    stars[i].classList.add('text-gray-400');
+                    stars[i].classList.remove('text-yellow-400');
+                }
+            }
+        }
     }
 }
 
 if (authorsPage) {
-    
+    const token = localStorage.getItem("token")
+    window.addEventListener("DOMContentLoaded", async () => {
+        await getAuthors()
+    })
+
+    async function getAuthors() {
+        try {
+            const getAuthors = await axios.get(`${api_url}/api/authors`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            console.log("all Authors: ", getAuthors);
+            await displayAuthors(getAuthors.data.allAuthors)
+        } catch (err) {
+            console.log("error getting all authors ", err);
+            
+        }
+    }
+
+
+    async function displayAuthors(allauthors) {
+        const authorList = document.querySelector('#authorsList')
+        authorList.innerHTML = ""
+        allauthors.forEach(author => {
+            const authorDiv = document.createElement('div')
+            authorDiv.className = "border border-gray-300 rounded-lg shadow-md p-4 m-4 max-w-sm";
+            const authorImg = document.createElement('img')
+            authorImg.src = "userdefaultProfile.jpg"
+            authorImg.alt = author.name
+            authorImg.className = "w-full h-45 object-cover rounded-md mb-3";
+            authorDiv.appendChild(authorImg)
+            const authorRef = document.createElement('a')
+            authorRef.href = `/author/${author.id}`
+            authorRef.textContent = `${author.name}`
+            authorRef.className = "text-red-600 font-semibold hover:underline";
+            authorDiv.appendChild(authorRef)
+            authorList.appendChild(authorDiv)
+        })
+    }
 }

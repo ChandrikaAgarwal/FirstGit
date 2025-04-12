@@ -5,5 +5,6 @@ const router = express.Router()
 
 router.post('/', userControl.signupUser)
 router.post('/users', userControl.getUser)
-router.post('/edit-profile',jwtAuthMiddleware,userControl.editUser)
+router.post('/edit-profile', jwtAuthMiddleware, userControl.editUser)
+router.get('/api/authors',jwtAuthMiddleware,userControl.getAuthors)
 module.exports = router;

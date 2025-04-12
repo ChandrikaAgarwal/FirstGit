@@ -4,6 +4,7 @@ const Recipe = require('../models/recipes')
 const {v4:uuidv4}=require('uuid')
 const AWS = require('aws-sdk')
 const { Sequelize, Op } = require('sequelize')
+const Rating = require('../models/ratings')
 
 exports.newRecipe = async (req, res, next) => {
     try {
@@ -165,5 +166,58 @@ exports.getThisRecipe = async (req, res, next) => {
     } catch (err) {
         console.log("error fetching requested recipe: ",err);
         return res.status(500).json({message:"Recipe not found ",details:err})
+    }
+}
+
+exports.recipeRatings = async (req, res, next) => {
+    try {
+        const { selectedRating,totalRating,recipeId }=req.body
+        const user = await User.findByPk(req.user.id)
+        if (!user||!selectedRating||!recipeId) {
+            return res.status(404).json({ message: "Missing Data" })
+        }
+        const existingRating = await Rating.findOne({
+            where: {
+                userId: req.user.id,
+                recipeId
+            }
+        })
+        if (existingRating) {
+            return res.status(400).json({ message: "You have already rated this recipe once" })
+        }
+        const newRating = await Rating.create({
+            userId: req.user.id,
+            recipeId: recipeId,
+            rating: selectedRating
+        })
+
+        const allRecipes = await Rating.findAll({
+            where: {
+                recipeId,
+            },
+            attributes:[
+            [Sequelize.fn('AVG', Sequelize.col('rating')), 'avgRating'],
+            [Sequelize.fn('COUNT', Sequelize.col('rating')), 'totalRating'],
+            ],
+            raw:true
+        })
+        await newRating.update(
+        
+            {
+                totalRatings: allRecipes[0].totalRating,
+                avgRating: allRecipes[0].avgRating
+             },
+        )
+        await newRating.save()
+        const recipe = await Recipe.findByPk(recipeId)
+        recipe.avgRating = allRecipes[0].avgRating
+        recipe.totalRatings = allRecipes[0].totalRating
+        recipe.save()
+        console.log("allRecipes: ", recipe);
+        console.log("newrating: ",newRating);
+        
+        return res.status(200).json({message:"Recipe rated",recipe})
+    } catch (err) {
+        console.log("error fetching recipe ratings: ",err);
     }
 }

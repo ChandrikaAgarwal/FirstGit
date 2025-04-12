@@ -79,3 +79,18 @@ exports.editUser = async (req, res, next) => {
         
     }
 }
+
+exports.getAuthors = async (req, res, next) => {
+    try {
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        const allAuthors = await User.findAll()
+        return res.status(200).json({message:"All authors: ",allAuthors})
+    } catch (err) {
+        console.log("error getting all authors: ",err);
+        return res.status(500).json({message:"Error getting all authors: ",details:err})
+        
+    }
+}
