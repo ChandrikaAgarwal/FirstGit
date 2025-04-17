@@ -72,7 +72,7 @@ if (searchResultsPage) {
                 recipeImg.src = recipe.recipeImg[0];
                 recipeImg.alt = recipe.name;
             } else {
-                recipeImg.src = "/default-image.jpg"; // Put a default image in your public folder
+                recipeImg.src = "default-image.jpg"; // Put a default image in your public folder
                 recipeImg.alt = "No image available";
             }
             recipeImg.className = "w-full h-45 object-cover rounded-md mb-3";
@@ -81,6 +81,25 @@ if (searchResultsPage) {
             recipeName.textContent = recipe.name;
             recipeName.className = "text-xl font-bold text-red-700 mb-1";
 
+            const avgRating = recipe.avgRating
+            const recipeRating = document.createElement('div')
+            recipeRating.innerHTML = ""
+            recipeRating.className = "flex space-x-1 mb-2"
+            if (avgRating === "0.00") {
+                recipeRating.innerHTML = `<p class="font-thin">No ratings available</p>`
+            } else {
+                for (let i = 1; i <= 5; i++) {
+                    const star = document.createElement('i');
+                    if (avgRating >= i) {
+                        star.classList.add('fa', 'fa-star', 'text-yellow-400'); // full star
+                    } else if (avgRating >= i - 0.5) {
+                        star.classList.add('fa', 'fa-star-half-alt', 'text-yellow-400'); // half star
+                    } else {
+                        star.classList.add('fa', 'fa-star-o', 'text-gray-400'); // empty star
+                    }
+                    recipeRating.appendChild(star)
+                }
+            }
             const recipeDesc = document.createElement('p');
             recipeDesc.textContent = recipe.description || "No description provided.";
             recipeDesc.className = "text-gray-700 mb-2";
@@ -92,12 +111,13 @@ if (searchResultsPage) {
 
             recipeCard.appendChild(recipeImg);
             recipeCard.appendChild(recipeName);
+            recipeCard.appendChild(recipeRating)
             recipeCard.appendChild(recipeDesc);
             recipeCard.appendChild(readMore);
 
             recipesDiv.appendChild(recipeCard);
         });
-    }  
+    } 
     
     
 }

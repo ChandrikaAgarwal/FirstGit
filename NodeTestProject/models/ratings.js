@@ -28,6 +28,10 @@ const Rating = sequelize.define('rating', {
         type: Sequelize.DOUBLE(3,2),
         allowNull: true,
         defaultValue:0
+    },
+    comment: {
+        type: Sequelize.TEXT,
+        allowNull:true
     }
 }, { timestamps: true })
 

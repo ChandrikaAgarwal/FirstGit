@@ -112,12 +112,12 @@ if (editProfilePage) {
 if (homePage) {
     const token = localStorage.getItem("token")
     
-    window.addEventListener("DOMContentLoaded", async() => {
+    window.addEventListener("DOMContentLoaded", async () => {
         await getAllRecipes()
     })
     async function getAllRecipes() {
         try {
-           const allRecipes = await axios.get(`${api_url}/api/allrecipes`, {
+            const allRecipes = await axios.get(`${api_url}/api/allrecipes`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -125,50 +125,71 @@ if (homePage) {
             console.log("all recipes: ", allRecipes);
             displayRecipes(allRecipes.data.recipes)
         } catch (err) {
-            console.log("error getting all recipes: ",err);
+            console.log("error getting all recipes: ", err);
             
         }
     }
-    async function displayRecipes(allrecipes) {
-        const recipesDiv = document.querySelector('#recipes');
-        recipesDiv.innerHTML = ""; // Clear any existing content
-
-        allrecipes.forEach(recipe => {
-            const recipeCard = document.createElement('div');
-            recipeCard.className = "border border-gray-300 rounded-lg shadow-md p-4 m-4 max-w-sm";
-
-            const recipeImg = document.createElement('img');
-            if (recipe.recipeImg) {
-                recipeImg.src = recipe.recipeImg[0]; 
-                recipeImg.alt = recipe.name;
-            } else {
-                recipeImg.src = "default-image.jpg"; // Put a default image in your public folder
-                recipeImg.alt = "No image available";
-            }
-            recipeImg.className = "w-full h-45 object-cover rounded-md mb-3";
-
-            const recipeName = document.createElement('h2');
-            recipeName.textContent = recipe.name;
-            recipeName.className = "text-xl font-bold text-red-700 mb-1";
-
-            const recipeDesc = document.createElement('p');
-            recipeDesc.textContent = recipe.description || "No description provided.";
-            recipeDesc.className = "text-gray-700 mb-2";
-
-            const readMore = document.createElement('a');
-            readMore.href = `/recipes/${recipe.id}`; // You can link this to a detailed page if needed
-            readMore.textContent = "Read more";
-            readMore.className = "text-red-600 font-semibold hover:underline";
-
-            recipeCard.appendChild(recipeImg);
-            recipeCard.appendChild(recipeName);
-            recipeCard.appendChild(recipeDesc);
-            recipeCard.appendChild(readMore);
-
-            recipesDiv.appendChild(recipeCard);
-        });
-    }
 }
+async function displayRecipes(allrecipes) {
+    const recipesDiv = document.querySelector('#recipes');
+    recipesDiv.innerHTML = ""; // Clear any existing content
+
+    allrecipes.forEach(recipe => {
+        const recipeCard = document.createElement('div');
+        recipeCard.className = "border border-gray-300 rounded-lg shadow-md p-4 m-4 max-w-sm";
+
+        const recipeImg = document.createElement('img');
+        if (recipe.recipeImg) {
+            recipeImg.src = recipe.recipeImg[0];
+            recipeImg.alt = recipe.name;
+        } else {
+            recipeImg.src = "default-image.jpg"; // Put a default image in your public folder
+            recipeImg.alt = "No image available";
+        }
+        recipeImg.className = "w-full h-45 object-cover rounded-md mb-3";
+
+        const recipeName = document.createElement('h2');
+        recipeName.textContent = recipe.name;
+        recipeName.className = "text-xl font-bold text-red-700 mb-1";
+
+        const avgRating = recipe.avgRating
+        const recipeRating = document.createElement('div')
+        recipeRating.innerHTML = ""
+        recipeRating.className = "flex space-x-1 mb-2"
+        if (avgRating === "0.00") {
+            recipeRating.innerHTML = `<p class="font-thin">No ratings available</p>`
+        } else {
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('i');
+                if (avgRating >= i) {
+                    star.classList.add('fa', 'fa-star', 'text-yellow-400'); // full star
+                } else if (avgRating >= i - 0.5) {
+                    star.classList.add('fa', 'fa-star-half-alt', 'text-yellow-400'); // half star
+                } else {
+                    star.classList.add('fa', 'fa-star-o', 'text-gray-400'); // empty star
+                }
+                recipeRating.appendChild(star)
+            }
+        }
+        const recipeDesc = document.createElement('p');
+        recipeDesc.textContent = recipe.description || "No description provided.";
+        recipeDesc.className = "text-gray-700 mb-2";
+
+        const readMore = document.createElement('a');
+        readMore.href = `/recipes/${recipe.id}`; // You can link this to a detailed page if needed
+        readMore.textContent = "Read more";
+        readMore.className = "text-red-600 font-semibold hover:underline";
+
+        recipeCard.appendChild(recipeImg);
+        recipeCard.appendChild(recipeName);
+        recipeCard.appendChild(recipeRating)
+        recipeCard.appendChild(recipeDesc);
+        recipeCard.appendChild(readMore);
+
+        recipesDiv.appendChild(recipeCard);
+    });
+}
+
 
 if (myRecipes) {
     console.log("entering my recipes page");
@@ -184,15 +205,19 @@ if (myRecipes) {
                 }
             })
             console.log("all recipes: ", myRecipes);
+            displayRecipes(myRecipes.data.myrecipes)
         } catch (err) {
             console.log("error getting all recipes: ", err);
 
         }
+        
     }
 }
 
 if (selectedRecipePage) {
     const token = localStorage.getItem("token")
+    const reviewForm=document.querySelector('#review-form')
+    const comment=document.querySelector('#comment')
     window.addEventListener("DOMContentLoaded", async () => {
         await getSelectedRecipe()
     })
@@ -220,7 +245,7 @@ if (selectedRecipePage) {
         const recipeType = JSON.parse(recipe.recipetype)
         const type = recipeType.join(", ")
         const totalRatings = document.getElementById("totalRatings")
-        totalRatings.textContent = `Total Ratings: ${recipe.totalRatings}`
+        totalRatings.textContent = `Total Ratings: ${recipe.totalRatings} (${recipe.avgRating})`
         const namep = document.createElement('p')
         namep.textContent = recipe.name
         namep.className = "text-red-600 font-bold"
@@ -304,21 +329,28 @@ if (selectedRecipePage) {
         let totalRating = 0;
         for (let i = 1; i <= 5; i++) {
             const star = document.createElement('span');
-            star.innerHTML = '★';
+            star.innerHTML ="&#9734"
             star.classList.add('text-gray-400', 'text-3xl', 'cursor-pointer', 'transition-colors', 'duration-200');
             star.dataset.rating = i;
             star.addEventListener('mouseenter', () => highlightStars(i));
             star.addEventListener('mouseleave', () => highlightStars(selectedRating));
-            star.addEventListener('click', async() => {
+            star.addEventListener('click', async () => {
                 selectedRating = i;
-                totalRating+=1
+                totalRating += 1
                 ratingText.textContent = `Rating: ${selectedRating}`;
-                totalRatings.textContent=`Total Ratings: ${totalRating}`
+                totalRatings.textContent = `Total Ratings: ${totalRating}`
                 await highlightStars(selectedRating);
+            })
+            starContainer.appendChild(star);
+        }
+        reviewForm.addEventListener('submit', async (e) => {
+            try {
+                e.preventDefault()
                 const ratingDetail = {
                     selectedRating,
                     totalRating,
-                    recipeId: recipe.id
+                    recipeId: recipe.id,
+                    comment: e.target.comment.value
                 }
                 const giveRating = await axios.post(`${api_url}/api/ratings`, ratingDetail, {
                     headers: {
@@ -326,11 +358,16 @@ if (selectedRecipePage) {
                         'Authorization': `Bearer ${token}`
                     }
                 })
-                console.log("rating: ",giveRating);
+                console.log("rating: ", giveRating);
+            } catch (err) {
+                console.log("error posting a review: ",err);
                 
+                if (err.response && err.response.data.message) {
+                    alert(err.response.data.message)
+                }
+            }   
             });
-            starContainer.appendChild(star);
-        }
+            
 
         const detailDiv = document.createElement('div')
         detailDiv.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 my-4";

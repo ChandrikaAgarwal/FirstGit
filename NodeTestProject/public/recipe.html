@@ -15,14 +15,23 @@
         <a href="/mycollections" class="text-white underline p-3" id="mycollections">My collections</a>
     </nav>
      <div id="recipeDetails" class="max-w-7xl my-10 mx-60"></div>
-    <div class="flex flex-col items-center space-y-2">
-        <div id="star-container" class="flex space-x-1">
+     <div id="userReviews" class="max-w-md mx-auto">
+     <label for="review-form" class="mb-4">Leave a Reply</label>
+     <form method="post" id="review-form" class="mb-7">
+         <textarea name="comment" id="comment" class="outline outline-slate-950 px-4 py-2 mb-2 rounded-sm" rows="4" cols="50"></textarea>
+         
+        <div id="star-container" class="flex space-x-1 mb-2">
             <!-- Stars will be generated here -->
         </div>
+    <button type="submit" id="submit-review" class="border-2 border-slate-950 rounded-md p-1">Submit Review</button>
+    </form>
         <p id="rating-value" class="text-lg font-medium text-gray-700">Rating: 0</p>
         <p id="totalRatings" class="text-lg font-medium text-gray-700">Total Ratings</p>
     </div>
-
+    <div>
+        <h4>Reviews</h4>
+        <ul id="user-reviews"></ul>
+    </div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
 <script src="/script.js"></script>

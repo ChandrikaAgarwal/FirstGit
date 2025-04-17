@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body id="myRecipes">
     <nav class="bg-slate-400 border-gray-900 h-16 p-3">
@@ -15,9 +18,10 @@
         <a href="/mycollections" class="text-white underline p-3" id="mycollections">My collections</a>
     </nav>
     <div class="title">
-        <h2 class="max-w-md mx-auto my-12 mb-4">Your recipes</h2>
+        <h2 class="my-12 mb-4 text-center font-bold">Your recipes</h2>
     </div>
+    <div id="recipes" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 mx-auto max-w-7xl"></div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
-<script src="script.js"></script>
+<script src="/script.js"></script>
 </html>

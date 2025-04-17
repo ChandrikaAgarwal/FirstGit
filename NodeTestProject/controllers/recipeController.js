@@ -179,7 +179,7 @@ exports.getThisRecipe = async (req, res, next) => {
 
 exports.recipeRatings = async (req, res, next) => {
     try {
-        const { selectedRating,totalRating,recipeId }=req.body
+        const { selectedRating,totalRating,recipeId,comment }=req.body
         const user = await User.findByPk(req.user.id)
         if (!user||!selectedRating||!recipeId) {
             return res.status(404).json({ message: "Missing Data" })
@@ -196,7 +196,8 @@ exports.recipeRatings = async (req, res, next) => {
         const newRating = await Rating.create({
             userId: req.user.id,
             recipeId: recipeId,
-            rating: selectedRating
+            rating: selectedRating,
+            comment:comment
         })
 
         const allRecipes = await Rating.findAll({

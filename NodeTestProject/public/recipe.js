@@ -138,6 +138,7 @@ if (newColletionPage) {
 if (mycollections) {
     const chooseCollection = document.querySelector('#choose-collection')
     const filterCollections = document.querySelector("#filter-collections")
+    const recipes = document.querySelector("#recipes")
     window.addEventListener("DOMContentLoaded", async () => {
         await getMyCollections();
     })
@@ -183,11 +184,71 @@ if (mycollections) {
                 })
                 console.log("all recipes in collection: ",recipesInCollection);
                 console.log(recipesInCollection.data.recipesinCollection[0].recipes);
-                
+                await displayRecipes(recipesInCollection.data.recipesinCollection[0].recipes)
             } catch (err) {
                 console.log("error getting all recipes in colletion ",err);
                 
             }
         })
+    }
+
+    async function displayRecipes(allrecipes) {
+        const recipesDiv = document.querySelector('#recipes');
+        recipesDiv.innerHTML = ""; // Clear any existing content
+
+        allrecipes.forEach(recipe => {
+            const recipeCard = document.createElement('div');
+            recipeCard.className = "border border-gray-300 rounded-lg shadow-md p-4 m-4 max-w-sm";
+
+            const recipeImg = document.createElement('img');
+            if (recipe.recipeImg) {
+                recipeImg.src = recipe.recipeImg[0];
+                recipeImg.alt = recipe.name;
+            } else {
+                recipeImg.src = "default-image.jpg"; // Put a default image in your public folder
+                recipeImg.alt = "No image available";
+            }
+            recipeImg.className = "w-full h-45 object-cover rounded-md mb-3";
+
+            const recipeName = document.createElement('h2');
+            recipeName.textContent = recipe.name;
+            recipeName.className = "text-xl font-bold text-red-700 mb-1";
+
+            const avgRating = recipe.avgRating
+            const recipeRating = document.createElement('div')
+            recipeRating.innerHTML = ""
+            recipeRating.className = "flex space-x-1 mb-2"
+            if (avgRating === "0.00") {
+                recipeRating.innerHTML = `<p class="font-thin">No ratings available</p>`
+            } else {
+                for (let i = 1; i <= 5; i++) {
+                    const star = document.createElement('i');
+                    if (avgRating >= i) {
+                        star.classList.add('fa', 'fa-star', 'text-yellow-400'); // full star
+                    } else if (avgRating >= i - 0.5) {
+                        star.classList.add('fa', 'fa-star-half-alt', 'text-yellow-400'); // half star
+                    } else {
+                        star.classList.add('fa', 'fa-star-o', 'text-gray-400'); // empty star
+                    }
+                    recipeRating.appendChild(star)
+                }
+            }
+            const recipeDesc = document.createElement('p');
+            recipeDesc.textContent = recipe.description || "No description provided.";
+            recipeDesc.className = "text-gray-700 mb-2";
+
+            const readMore = document.createElement('a');
+            readMore.href = `/recipes/${recipe.id}`; // You can link this to a detailed page if needed
+            readMore.textContent = "Read more";
+            readMore.className = "text-red-600 font-semibold hover:underline";
+
+            recipeCard.appendChild(recipeImg);
+            recipeCard.appendChild(recipeName);
+            recipeCard.appendChild(recipeRating)
+            recipeCard.appendChild(recipeDesc);
+            recipeCard.appendChild(readMore);
+
+            recipesDiv.appendChild(recipeCard);
+        });
     }
 }

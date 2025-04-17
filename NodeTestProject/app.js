@@ -63,7 +63,7 @@ User.hasMany(Recipe, { constraints: true, onDelete: 'CASCADE' })
 User.belongsToMany(Collection, { through: Usercollection })
 Collection.belongsToMany(User, { through: Usercollection })
 Recipe.belongsToMany(Collection, { through: RecipeCollection })
-Collection.belongsToMany(Recipe,{through:RecipeCollection})
+Collection.belongsToMany(Recipe, { through: RecipeCollection })
 // sequelize.sync({alter:true})
 sequelize.sync()
     .then(() => {
