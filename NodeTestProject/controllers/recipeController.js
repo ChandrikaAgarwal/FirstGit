@@ -5,6 +5,9 @@ const {v4:uuidv4}=require('uuid')
 const AWS = require('aws-sdk')
 const { Sequelize, Op } = require('sequelize')
 const Rating = require('../models/ratings')
+const Usercollection = require('../models/userCollection');
+const Collection = require('../models/collections');
+const RecipeCollection = require('../models/recipeCollection');
 
 exports.newRecipe = async (req, res, next) => {
     try {
@@ -161,8 +164,13 @@ exports.getThisRecipe = async (req, res, next) => {
         }
         const { recipeId } = req.params
         const recipe = await Recipe.findByPk(recipeId)
+        const collections = await Usercollection.findAll({
+            where: {
+                userId:user.id
+            }
+        })
         console.log("recipe: ", recipe);
-        return res.status(200).json({message:"Recipe found",recipe})
+        return res.status(200).json({message:"Recipe found",recipe,collections})
     } catch (err) {
         console.log("error fetching requested recipe: ",err);
         return res.status(500).json({message:"Recipe not found ",details:err})
@@ -219,5 +227,35 @@ exports.recipeRatings = async (req, res, next) => {
         return res.status(200).json({message:"Recipe rated",recipe})
     } catch (err) {
         console.log("error fetching recipe ratings: ",err);
+    }
+}
+
+exports.storeRecipe = async (req, res) => {
+    try {
+        const { collectionId } = req.params
+        const { recipeId } = req.query
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        const recipe = await Recipe.findByPk(recipeId)
+        const collection = await Collection.findByPk(collectionId)
+        const existingEntry = await RecipeCollection.findOne({
+            where: {
+                recipeId: recipe.id,
+                collectionId: collection.id
+            }
+        });
+        if (existingEntry) {
+            return res.status(400).json({ message: "Recipe already exists in this collection" });
+        }
+        if (!recipe || !collection) {
+            return res.status(500).json({ message: "Recipe or collection not found" })
+        }
+        await collection.addRecipe(recipe, { through: { collectionName: collection.collectionName } })
+        return res.status(200).json({message:"recipe added to following collection: "})
+    } catch (err) {
+        console.log("error adding recipe to collection ", err);
+        return res.status(500).json({message:"Error in adding recipe to collection ",details:err})      
     }
 }

@@ -5,7 +5,10 @@ const cors = require('cors')
 const sequelize = require('./util/database')
 const User = require('./models/users')
 const Recipe = require('./models/recipes')
-const Rating=require('./models/ratings')
+const Rating = require('./models/ratings')
+const Collection = require('./models/collections')
+const Usercollection = require('./models/userCollection')
+const RecipeCollection=require('./models/recipeCollection')
 const userRoute = require('./routes/userRouter')
 const recipeRoute=require('./routes/recipeRoute')
 const path = require('path')
@@ -46,11 +49,21 @@ app.get('/recipes/:recipeId', (req, res) => {
 app.get('/authors', (req, res) => {
     res.sendFile(path.join(__dirname,'public',"authors.html"))
 })
+app.get('/create-collection', (req, res) => {
+    res.sendFile(path.join(__dirname,'public','createCollection.html'))
+})
+app.get('/mycollections', (req, res) => {
+    res.sendFile(path.join(__dirname,"public",'mycollections.html'))
+})
 app.use('/', userRoute)
 app.use('/',recipeRoute)
 
 Recipe.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
 User.hasMany(Recipe, { constraints: true, onDelete: 'CASCADE' })
+User.belongsToMany(Collection, { through: Usercollection })
+Collection.belongsToMany(User, { through: Usercollection })
+Recipe.belongsToMany(Collection, { through: RecipeCollection })
+Collection.belongsToMany(Recipe,{through:RecipeCollection})
 // sequelize.sync({alter:true})
 sequelize.sync()
     .then(() => {

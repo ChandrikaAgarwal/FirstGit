@@ -73,8 +73,8 @@ User.belongsToMany(Group, { through: Usergroup })
 Group.belongsToMany(User, { through: Usergroup })
 Grpmsg.belongsTo(Group, { constraints: true, onDelete: 'CASCADE' })
 Group.hasMany(Grpmsg, { constraints: true, onDelete: 'CASCADE' })
-// sequelize.sync({alter:true})
-sequelize.sync()
+sequelize.sync({alter:true})
+// sequelize.sync()
     .then(() => {
         server.listen(process.env.PORT || 3000, () => {
         console.log("server running on", process.env.API_URL);

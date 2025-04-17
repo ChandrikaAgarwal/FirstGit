@@ -9,5 +9,6 @@ router.get('/api/allrecipes', jwtAuthMiddleware, recipeControl.getAllRecipes)
 router.get('/api/myrecipes', jwtAuthMiddleware, recipeControl.getMyRecipes)
 router.get('/api/search-results', jwtAuthMiddleware, recipeControl.getSearchResults)
 router.get('/api/recipes/:recipeId', jwtAuthMiddleware, recipeControl.getThisRecipe)
-router.post('/api/ratings',jwtAuthMiddleware,recipeControl.recipeRatings)
+router.post('/api/ratings', jwtAuthMiddleware, recipeControl.recipeRatings)
+router.post('/api/collect-recipe/:collectionId',jwtAuthMiddleware,recipeControl.storeRecipe)
 module.exports = router;
