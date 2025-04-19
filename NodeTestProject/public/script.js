@@ -9,7 +9,7 @@ const myRecipes = document.querySelector("#myRecipes")
 const selectedRecipePage = document.querySelector("#selected-recipe")
 const authorsPage = document.querySelector('#authorsPage')
 const author = document.querySelector('#author')
-let api_url ="http://localhost:5000"
+let api_url ="http://13.201.228.202"
 if (signupForm) {
     signupForm.addEventListener("submit", async (e) => {
         try {
