@@ -260,3 +260,75 @@ exports.storeRecipe = async (req, res) => {
         return res.status(500).json({message:"Error in adding recipe to collection ",details:err})      
     }
 }
+
+exports.deleteRecipe = async (req, res) => {
+    try {
+        const { recipeId } = req.params
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            res.status(404).json({ message: "User not found" })
+        }
+        const recipe = await Recipe.findByPk(recipeId)
+        await recipe.destroy()
+        return res.status(200).json({ message: "recipe deleted successfully" })
+    } catch (err) {
+        console.log("error deleting the recipe: ", err);
+        return res.status(500).json({message:"error deleting the recipe:",details:err})
+        
+    }
+}
+
+exports.updateRecipe = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        const { recipeId } = req.params
+        const recipe = await Recipe.findByPk(recipeId)
+        const files = req.files;
+        const { name, description, ingredients, method, cuisine, category, cookingTime, marinationTime, serves, mainingrediant, recipetype } = req.body;
+        if (files && files.length > 0) {
+            const fileUrls = await Promise.all(files.map(file => uploadToS3(file)))
+            recipe.recipeImg = fileUrls
+            await recipe.save()
+        }
+        await recipe.update({
+            name,
+            description,
+            ingredients,
+            method,
+            cuisine,
+            category,
+            cookingTime,
+            marinationTime,
+            serves,
+            mainingrediant,
+            recipetype,
+        });
+        return res.status(200).json({ message: "recipe", recipe })
+        
+    } catch (err) {
+        console.log("error editing the recipe: ", err);
+        return res.status(500).json({ message: "error editing the recipe:", details: err })
+    }
+}
+
+exports.getAuthorRecipes = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        const { authorId } = req.params
+        const recipes = await Recipe.findAll({
+            where: {
+                userId:authorId
+            }
+        })
+        return res.status(200).json({ message: "Author recipe", recipes })
+    } catch (err) {
+        console.log("error getting the recipes: ", err);
+        return res.status(500).json({ message: "error getting the recipe:", details: err })
+    }
+}

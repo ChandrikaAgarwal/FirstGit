@@ -55,6 +55,9 @@ app.get('/create-collection', (req, res) => {
 app.get('/mycollections', (req, res) => {
     res.sendFile(path.join(__dirname,"public",'mycollections.html'))
 })
+app.get('/author/:authorId', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'author.html'))
+})
 app.use('/', userRoute)
 app.use('/',recipeRoute)
 

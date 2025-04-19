@@ -5,6 +5,31 @@ const mycollections=document.querySelector("#mycollections")
 const api_url ="http://localhost:5000"
 const token=localStorage.getItem("token")
 if (shareRecipePage) {
+    let recipeId
+    window.addEventListener('DOMContentLoaded', async () => {
+        const urlParams = new URLSearchParams(window.location.search)
+        recipeId = urlParams.get('id')
+        console.log("recipe ID: ",recipeId);
+        if (recipeId) {
+            const response = await axios.get(`${api_url}/api/getedit-recipe/${recipeId}`, {
+                headers: {
+                    'Authorization': `Bearer: ${token}`
+                }
+            })
+            const recipe = response.data.recipe;
+            console.log("Fetched recipe: ", recipe);
+            document.querySelector("#recipeName").value = recipe.name || "";
+            document.querySelector("#recipeDescription").value = recipe.description || "";
+            document.querySelector("#recipeIngredients").value = recipe.ingredients || "";
+            document.querySelector("#recipeMethod").value = recipe.method || "";
+            document.querySelector("#cuisine").value = recipe.cuisine || "";
+            document.querySelector("#cuisine-category").value = recipe.category || "";
+            document.querySelector("#cooking-time").value = recipe.cookingTime || "";
+            document.querySelector("#marination-time").value = recipe.marinationTime || "";
+            document.querySelector("#serves").value = recipe.serves || "";
+        }
+    })
+    
     recipeForm.addEventListener("submit", async (e) => {
         try {
             e.preventDefault()
@@ -28,13 +53,30 @@ if (shareRecipePage) {
             for (let i = 0; i < files.length; i++) {
                 formData.append("files", files[i]); // append each file
             }
-            const newRecipe = await axios.post(`${api_url}/share-recipe`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization':`Bearer: ${token}`
-                }
-            })
-            console.log("recipe submitted: ", newRecipe);
+
+            //edit recipe
+            if (recipeId) {
+                console.log("sending put request",recipeId);
+                
+                const getRec = await axios.put(`${api_url}/api/edit-recipe/${recipeId}`,formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer: ${token}`
+                    }
+                })
+               console.log("getting recipe: ",getRec);
+               
+            } else {
+                console.log("new recipe");
+                
+                const newRecipe = await axios.post(`${api_url}/share-recipe`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer: ${token}`
+                    }
+                })
+                console.log("recipe submitted: ", newRecipe);
+            }
             recipeForm.reset()
             
         } catch (error) { 
@@ -42,6 +84,8 @@ if (shareRecipePage) {
             
         }
     })
+   
+    
 }
 
 if (newColletionPage) {

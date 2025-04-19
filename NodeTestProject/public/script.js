@@ -8,6 +8,7 @@ const homePage = document.querySelector("#homePage")
 const myRecipes = document.querySelector("#myRecipes")
 const selectedRecipePage = document.querySelector("#selected-recipe")
 const authorsPage = document.querySelector('#authorsPage')
+const author = document.querySelector('#author')
 let api_url ="http://localhost:5000"
 if (signupForm) {
     signupForm.addEventListener("submit", async (e) => {
@@ -123,20 +124,21 @@ if (homePage) {
                 }
             })
             console.log("all recipes: ", allRecipes);
-            displayRecipes(allRecipes.data.recipes)
+            displayRecipes(allRecipes.data.recipes,false)
         } catch (err) {
             console.log("error getting all recipes: ", err);
             
         }
     }
 }
-async function displayRecipes(allrecipes) {
+async function displayRecipes(allrecipes, showEditDelete) {
     const recipesDiv = document.querySelector('#recipes');
     recipesDiv.innerHTML = ""; // Clear any existing content
 
     allrecipes.forEach(recipe => {
         const recipeCard = document.createElement('div');
         recipeCard.className = "border border-gray-300 rounded-lg shadow-md p-4 m-4 max-w-sm";
+        recipeCard.id=recipe.id
 
         const recipeImg = document.createElement('img');
         if (recipe.recipeImg) {
@@ -178,14 +180,24 @@ async function displayRecipes(allrecipes) {
         const readMore = document.createElement('a');
         readMore.href = `/recipes/${recipe.id}`; // You can link this to a detailed page if needed
         readMore.textContent = "Read more";
-        readMore.className = "text-red-600 font-semibold hover:underline";
-
+        readMore.className = "text-red-600 font-semibold hover:underline flex";
+        const editDelete = document.createElement('div')
+        if (showEditDelete) {
+            const delBtn = document.createElement('button')
+            delBtn.id = "del-btn"
+            delBtn.classList.add('fa-solid', 'fa-trash')
+            const editBtn = document.createElement('button')
+            editBtn.id = 'edit-btn'
+            editBtn.classList.add('fa-solid', 'fa-pen', 'p-3', 'm-3')
+            editDelete.appendChild(delBtn)
+            editDelete.appendChild(editBtn)
+        }
         recipeCard.appendChild(recipeImg);
         recipeCard.appendChild(recipeName);
         recipeCard.appendChild(recipeRating)
         recipeCard.appendChild(recipeDesc);
         recipeCard.appendChild(readMore);
-
+        recipeCard.appendChild(editDelete)
         recipesDiv.appendChild(recipeCard);
     });
 }
@@ -194,6 +206,8 @@ async function displayRecipes(allrecipes) {
 if (myRecipes) {
     console.log("entering my recipes page");
     const token = localStorage.getItem("token")
+    const recipesDiv = document.querySelector('#recipes');
+    
     window.addEventListener("DOMContentLoaded", async () => {
         await getMyRecipes()
     })
@@ -205,13 +219,36 @@ if (myRecipes) {
                 }
             })
             console.log("all recipes: ", myRecipes);
-            displayRecipes(myRecipes.data.myrecipes)
+            displayRecipes(myRecipes.data.myrecipes,true)
         } catch (err) {
             console.log("error getting all recipes: ", err);
 
+        }      
+    }
+    recipesDiv.addEventListener('click', async (e) => {
+        if (e.target && e.target.id === 'del-btn') {
+            console.log("Delete button clicked");
+            const recipeCard = e.target.closest('div[id]')
+            console.log("recipe: ", recipeCard);
+            recipeId=parseInt(recipeCard.id)
+            const confirmDelete = confirm("Are you sure you want to delete this recipe?");
+            if (!confirmDelete) return
+            const deleteRecipe = await axios.delete(`${api_url}/api/delete-recipe/${recipeId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            recipesDiv.removeChild(recipeCard)
+            console.log("deleteRecipe: ",deleteRecipe);
+            
+        }
+        if (e.target && e.target.id === 'edit-btn') {
+            const recipeCard = e.target.closest('div[id]')
+            recipeId = parseInt(recipeCard.id)
+            window.location.href =`/share-recipe?id=${recipeId}`
         }
         
-    }
+    })
 }
 
 if (selectedRecipePage) {
@@ -467,5 +504,30 @@ if (authorsPage) {
             authorDiv.appendChild(authorRef)
             authorList.appendChild(authorDiv)
         })
+    }
+}
+
+if (author) {
+    const token = localStorage.getItem("token")
+    const authorRecipes = document.querySelector('#recipes')
+    window.addEventListener('DOMContentLoaded', async () => {
+        await getAuthorRecipes()
+    })
+
+    async function getAuthorRecipes() {
+        try {
+            const pathParts = window.location.pathname.split('/')
+            const authorId = pathParts[pathParts.length - 1]
+            const getrecipes = await axios.get(`${api_url}/api/author-recipes/${authorId}`,{
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            console.log("author recipes: ",getrecipes);
+            await displayRecipes(getrecipes.data.recipes, false)
+         } catch (err) {
+            console.log("Error fetching author recipes: ",err);
+            
+        }
     }
 }
