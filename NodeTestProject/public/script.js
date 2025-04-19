@@ -63,7 +63,7 @@ if (loginForm) {
             const loginRes = await axios.post(`${api_url}/users`, user)
             console.log("login response: ", loginRes);
             localStorage.setItem("token", loginRes.data.token)
-            alert("Login successful!!!")
+            alert("Login successful!")
             loginForm.reset()
             window.location.href = "/home"
         } catch (err) {
