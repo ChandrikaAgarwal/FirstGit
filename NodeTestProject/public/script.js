@@ -1,6 +1,8 @@
 const signupForm = document.querySelector('#signup-form')
 const loginForm = document.querySelector('#login-form')
 const createProfBtn = document.querySelector('.create-profBtn')
+const adminLogin = document.querySelector('.admin-login')
+const userLogin = document.querySelector('.user-login')
 const loginBtn = document.querySelector('.loginBtn')
 const editProfilePage = document.querySelector('#edit-profilePage')
 const editprofForm = document.querySelector('#editProfile-form')
@@ -9,7 +11,7 @@ const myRecipes = document.querySelector("#myRecipes")
 const selectedRecipePage = document.querySelector("#selected-recipe")
 const authorsPage = document.querySelector('#authorsPage')
 const author = document.querySelector('#author')
-let api_url ="http://13.201.228.202"
+let api_url ="http://localhost:5000"
 if (signupForm) {
     signupForm.addEventListener("submit", async (e) => {
         try {
@@ -53,19 +55,35 @@ if (signupForm) {
 }
 
 if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
+    adminLogin.addEventListener('click', async() => {
+        let role = 'admin'
+        let email = document.querySelector('#email').value
+        let password = document.querySelector('#password').value
+        await submitLoginForm(role, email, password)
+    })
+    userLogin.addEventListener('click', async() => {
+        let role = 'user'
+        let email = document.querySelector('#email').value
+        let password = document.querySelector('#password').value
+        await submitLoginForm(role, email, password)
+    })
+    async function submitLoginForm(role, email, password) {
         try {
-            e.preventDefault();
             const user = {
-                email: e.target.email.value,
-                password: e.target.password.value
+                role: role,
+                email: email,
+                password: password
             }
             const loginRes = await axios.post(`${api_url}/users`, user)
             console.log("login response: ", loginRes);
             localStorage.setItem("token", loginRes.data.token)
             alert("Login successful!")
             loginForm.reset()
-            window.location.href = "/home"
+            if (role === 'admin') {
+                window.location.href = "/admin"
+            } else {
+                window.location.href = "/home"
+            }
         } catch (err) {
             console.error("error logging in from frontend: ", err)
             if (err.response && err.response.data.message) {
@@ -75,9 +93,8 @@ if (loginForm) {
                 }
             }
         }
-    })
+    }
 }
-
 if (editProfilePage) {
     const token=localStorage.getItem("token")
     editprofForm.addEventListener('submit', async (e) => {
@@ -139,7 +156,15 @@ async function displayRecipes(allrecipes, showEditDelete) {
         const recipeCard = document.createElement('div');
         recipeCard.className = "border border-gray-300 rounded-lg shadow-md p-4 m-4 max-w-sm";
         recipeCard.id=recipe.id
-
+        
+        if (recipe.isDeleted) {
+            const message = document.createElement('p')
+            message.textContent = "This recipe was removed by admin for safety reasons.";
+            message.className = "text-red-600 text-center font-semibold"
+            recipeCard.appendChild(message)
+            recipesDiv.appendChild(recipeCard)
+            return
+        }
         const recipeImg = document.createElement('img');
         if (recipe.recipeImg) {
             recipeImg.src = recipe.recipeImg[0];
@@ -230,7 +255,7 @@ if (myRecipes) {
             console.log("Delete button clicked");
             const recipeCard = e.target.closest('div[id]')
             console.log("recipe: ", recipeCard);
-            recipeId=parseInt(recipeCard.id)
+           let recipeId=parseInt(recipeCard.id)
             const confirmDelete = confirm("Are you sure you want to delete this recipe?");
             if (!confirmDelete) return
             const deleteRecipe = await axios.delete(`${api_url}/api/delete-recipe/${recipeId}`, {
@@ -269,13 +294,13 @@ if (selectedRecipePage) {
                 }
             })
             console.log("get recipe: ", getRecipe);
-            await displayRecipe(getRecipe.data.recipe, getRecipe.data.collections)
+            await displayRecipe(getRecipe.data.recipe, getRecipe.data.collections,pathParts)
         } catch (err) {
             console.log("Error fetching recipe: ", err);
             
         }
     }
-    async function displayRecipe(recipe,usercollections) {
+    async function displayRecipe(recipe,usercollections,path) {
         const recipeDetailsDiv = document.querySelector("#recipeDetails")
         const mainIngredArray = JSON.parse(recipe.mainingrediant);
         const mainIngred = mainIngredArray.join(", ")
@@ -336,6 +361,7 @@ if (selectedRecipePage) {
                         }
                     })
                     console.log("recipeCollection: ", recipeincollection);
+                    
                 } catch (err) {
                     console.log("error posting recipe in collection: ",err);
                     
@@ -344,6 +370,7 @@ if (selectedRecipePage) {
             }
             
         })
+            
         if (recipe.recipeImg && recipe.recipeImg.length > 0) {
             recipe.recipeImg.forEach((imgurl) => {
                 imgElement.src = imgurl
@@ -507,27 +534,27 @@ if (authorsPage) {
     }
 }
 
-if (author) {
-    const token = localStorage.getItem("token")
-    const authorRecipes = document.querySelector('#recipes')
-    window.addEventListener('DOMContentLoaded', async () => {
-        await getAuthorRecipes()
-    })
+    if (author) {
+        const token = localStorage.getItem("token")
+        const authorRecipes = document.querySelector('#recipes')
+        window.addEventListener('DOMContentLoaded', async () => {
+            await getAuthorRecipes()
+        })
 
-    async function getAuthorRecipes() {
-        try {
-            const pathParts = window.location.pathname.split('/')
-            const authorId = pathParts[pathParts.length - 1]
-            const getrecipes = await axios.get(`${api_url}/api/author-recipes/${authorId}`,{
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            console.log("author recipes: ",getrecipes);
-            await displayRecipes(getrecipes.data.recipes, false)
-         } catch (err) {
-            console.log("Error fetching author recipes: ",err);
+        async function getAuthorRecipes() {
+            try {
+                const pathParts = window.location.pathname.split('/')
+                const authorId = pathParts[pathParts.length - 1]
+                const getrecipes = await axios.get(`${api_url}/api/author-recipes/${authorId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                console.log("author recipes: ", getrecipes);
+                await displayRecipes(getrecipes.data.recipes, false)
+            } catch (err) {
+                console.log("Error fetching author recipes: ", err);
             
+            }
         }
     }
-}

@@ -32,9 +32,14 @@
                 <a class="text-sm text-[#7747ff]" href="#">Forgot your password?
                 </a>
             </div>
-            <button type="submit"
-                class="login-submit bg-[#7747ff] w-max m-auto px-6 py-2 rounded text-white text-sm font-normal">Login</button>
+            <div class="flex flex-row">
+            <label for="button" class="text-[#7747ff]">Login As:</label>
+            <button type="button" name="role" value="admin"
+                class="admin-login bg-[#7747ff] w-max m-auto px-6 py-2 rounded text-white text-sm font-normal ">Admin</button>
+            <button type="button" name="role" value="user"
+                    class="user-login bg-[#7747ff] w-max m-auto px-6 py-2 rounded text-white text-sm font-normal">User</button>
 
+        </div>
         </form>
         <div class="text-sm text-center mt-[1.6rem]">Don’t have an account yet? <a class="text-sm text-[#7747ff]"
                 href="/">Sign up for free!</a></div>

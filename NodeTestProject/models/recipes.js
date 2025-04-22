@@ -64,6 +64,11 @@ const Recipe = sequelize.define('recipe', {
         type: Sequelize.INTEGER,
         allowNull: true,
         defaultValue: 0
+    },
+    isDeleted: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull:false
     }
 
 }, { timestamps: true })

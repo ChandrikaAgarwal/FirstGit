@@ -3,9 +3,7 @@ const bcrypt = require('bcrypt')
 const {generateToken}= require('../jwtmiddleware')
 const { Sequelize, Op } = require('sequelize');
 const sequelize = require('../util/database');
-const Collection = require('../models/collections');
-const Usercollection = require('../models/userCollection');
-const Recipe=require('../models/recipes')
+
 
 exports.signupUser = async (req, res, next) => {
     try {
@@ -18,16 +16,21 @@ exports.signupUser = async (req, res, next) => {
             return res.status(400).json({ message: 'User already exists, please log in' })
         }
         const hashedPassword = await bcrypt.hash(password, saltRounds)
-
+        
         const newUser = await User.create({
             name,
             email,
             phone,
             password: hashedPassword,
-            isLoggedIn:false,
+            isLoggedIn: false,
+            isAdmin:false
         })
+        if (newUser.email === 'chandrikaagarwal2@gmail.com') {
+            newUser.isAdmin = true
+            await newUser.save()
+        }
         const token = generateToken(newUser)
-        console.log("token recieved: ",token);
+        // console.log("token recieved: ",token);
         
         return res.status(200).json({message:"Signup successful. Please log in",token,newUser})
     } catch (err) {
@@ -39,7 +42,7 @@ exports.signupUser = async (req, res, next) => {
 
 exports.getUser = async (req, res, next) => {
     try {
-        const { email, password } = req.body
+        const { email, password,role } = req.body
         
         const existingUser = await User.findOne({ where: { email: email } })
         if (!existingUser) { 
@@ -49,7 +52,11 @@ exports.getUser = async (req, res, next) => {
         if (!isValid) {
             return res.status(401).json({message:"Incorrect password"})
         }
-        
+        if (role === 'admin') {
+            if (existingUser.isAdmin === false) {
+                return res.status(400).json({message:"Access denied!, you are not an admin"})
+            }
+        }
         existingUser.isLoggedIn = true;
         existingUser.save();
         const token = generateToken(existingUser)
@@ -98,82 +105,3 @@ exports.getAuthors = async (req, res, next) => {
     }
 }
 
-exports.newCollection = async (req, res) => {
-    try {
-        const user = await User.findByPk(req.user.id)
-        if (!user) {
-            return res.status(404).json({ message: "User not found" })
-        }
-        const { cName, share, members } = req.body
-        const newCollection = await Collection.create({
-            collectionName: cName,
-            createdby: user.id,
-            creatorname: user.name,
-            shared:share
-        })
-        await user.addCollection(newCollection, {
-            through: {
-                collectionName: cName,
-                username:user.name
-            }
-        })
-        await Promise.all(members.map(async (m) => {
-            const member = await User.findByPk(m.id)
-            if (member) {
-                await member.addCollection(newCollection, {
-                    through: {
-                        collectionName: cName,
-                        username: member.name
-                }})
-            }
-        }))
-        return res.status(200).json({message:"new collection",newCollection})
-        
-    } catch (err) {
-        console.log("error creating a new collection: ", err);
-        return res.status(500).json({message:"error in creating a new collection:", details:err})
-        
-    }
-}
-
-exports.getMyCollections = async (req, res) => {
-    try {
-        const user = await User.findByPk(req.user.id)
-        if (!user) {
-            return res.status(404).json({ message: "User not found" })
-        }
-        let mycollections = await Usercollection.findAll({
-            where: {
-                userId:user.id
-            },
-        })
-        console.log("my collections: ",mycollections);
-        return res.status(200).json({ message: "my collection", mycollections })
-    } catch (err) {
-        console.log("error getting your collections: ", err);
-        return res.status(500).json({ message: "error in getting your collections:", details: err })
-        
-    }
-}
-
-exports.getRecipesInCollection = async (req, res) => {
-    try {
-        const user = await User.findByPk(req.user.id)
-        if (!user) {
-            return res.status(404).json({ message: "User not found" })
-        }
-        const { collectionId } = req.params
-        const recipesinCollection = await Collection.findAll({
-            where: {
-                id:collectionId
-            },
-            include:Recipe
-        })
-        console.log("recipes in collection: ",recipesinCollection);
-        res.status(200).json({message:"All recipes in the collection: ",recipesinCollection})
-     } catch (err) {
-        console.log("error getting your recipes in collections:", err);
-        
-        return res.status(500).json({ message: "error in getting your recipes in collections:", details: err })
-    }
-}
