@@ -5,44 +5,51 @@ const totalUsers = document.querySelector('#usersCount')
 const totalRecipes = document.querySelector('#recipesCount')
 const allrecipes = document.querySelector('#recipes')
 const selectedRecipe = document.querySelector('#selected-recipe')
+const authorspage = document.querySelector('#authorsPage')
+const authorpage = document.querySelector('#author')
+const pathParts = window.location.pathname.split('/')
+if (pathParts.includes('admin')) {
 
-if (adminPage) {
-    window.addEventListener('DOMContentLoaded', async () => {
-        await countUsersAndRecipes()
-        await getAllRecipes()
-    })
-    async function countUsersAndRecipes() {
-        try {
-            let users_recipes = await axios.get(`${apiUrl}/api/users-recipes`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            console.log("users_recipes: ", users_recipes);
-            totalUsers.textContent = `${users_recipes.data.totalUsers}`
-            totalRecipes.textContent = `${users_recipes.data.totalRecipes}`
+    if (adminPage) {
+        window.addEventListener('DOMContentLoaded', async () => {
+            await countUsersAndRecipes()
+            await getAllRecipes()
+        })
+        async function countUsersAndRecipes() {
+            try {
+                let users_recipes = await axios.get(`${apiUrl}/api/users-recipes`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                console.log("users_recipes: ", users_recipes);
+                totalUsers.textContent = `${users_recipes.data.totalUsers}`
+                totalRecipes.textContent = `${users_recipes.data.totalRecipes}`
             
-        } catch (err) {
-            console.log("error getting all users and recipes: ", err);
+            } catch (err) {
+                console.log("error getting all users and recipes: ", err);
             
+            }
+        }
+
+        async function getAllRecipes() {
+            try {
+                const allRecipes = await axios.get(`${apiUrl}/api/allrecipes`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                console.log("all recipes: ", allRecipes);
+                displayRecipes(allRecipes.data.recipes)
+            } catch (err) {
+                console.log("error getting all recipes: ", err);
+            }
         }
     }
-
-    async function getAllRecipes() {
-        try {
-            const allRecipes = await axios.get(`${apiUrl}/api/allrecipes`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            console.log("all recipes: ", allRecipes);
-            displayRecipes(allRecipes.data.recipes)
-        } catch (err) {
-            console.log("error getting all recipes: ", err);
-        }
-    }
-
     async function displayRecipes(allrecipes) {
+        console.log("entering display recipes for admin page");
+        const pathParts = window.location.pathname.split('/')
+       
         const recipesDiv = document.querySelector('#recipes');
         recipesDiv.innerHTML = ""; // Clear any existing content
 
@@ -63,7 +70,7 @@ if (adminPage) {
                 recipeImg.src = recipe.recipeImg[0];
                 recipeImg.alt = recipe.name;
             } else {
-                recipeImg.src = "default-image.jpg"; // Put a default image in your public folder
+                recipeImg.src = "/default-image.jpg"; // Put a default image in your public folder
                 recipeImg.alt = "No image available";
             }
             recipeImg.className = "w-full h-45 object-cover rounded-md mb-3";
@@ -96,15 +103,18 @@ if (adminPage) {
             recipeDesc.className = "text-gray-700 mb-2";
 
             const readMore = document.createElement('a');
-            readMore.href = `admin/recipes/${recipe.id}`;
+            
+            readMore.href = `/admin/recipes/${recipe.id}`;
             readMore.textContent = "Read more";
             readMore.className = "text-red-600 font-semibold hover:underline flex";
             const editDelete = document.createElement('div')
             // editDelete.id = "delete-recipe"
-            const delBtn = document.createElement('button')
-            delBtn.id = "del-btn"
-            delBtn.classList.add('fa-solid', 'fa-trash')
-            editDelete.appendChild(delBtn)
+            if (pathParts.includes('admin')) {
+                const delBtn = document.createElement('button')
+                delBtn.id = "del-btn"
+                delBtn.classList.add('fa-solid', 'fa-trash')
+                editDelete.appendChild(delBtn)
+            }
             recipeCard.appendChild(recipeImg);
             recipeCard.appendChild(recipeName);
             recipeCard.appendChild(recipeRating)
@@ -113,9 +123,9 @@ if (adminPage) {
             recipeCard.appendChild(editDelete)
             recipesDiv.appendChild(recipeCard);
         });
-    }   
-        let recipeId=null
-        const recipesDiv = document.querySelector('#recipes');
+    
+        let recipeId = null
+        // const recipesDiv = document.querySelector('#recipes');
         recipesDiv.addEventListener('click', async (e) => {
             if (e.target && e.target.id === 'del-btn') {
                 console.log("Delete button clicked");
@@ -127,70 +137,175 @@ if (adminPage) {
                 reasonDiv.classList.remove('hidden')
                 reasonDiv.classList.add('flex')
             }
-            })
-                let reasonForm = document.querySelector('#reason-form')
-                reasonForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const deleteRecipe = {
-                        reason: e.target.reason.value.trim(),
-                        recipeId:recipeId
-                    }
-                const confirmDelete = confirm("Are you sure you want to delete this recipe?");
-                    if (!confirmDelete) {
-                        reasonDiv.classList.add('hidden') 
-                        return
-                    } else {
-                        
-                        reasonDiv.classList.add('hidden')
-                    }
-                reasonForm.reset()    
-                console.log("delete recipe: ", deleteRecipe);
-                    let deletedRecipe = await axios.delete(`${apiUrl}/admin/delete-recipe`, {
-                        headers: {
-                        'Authorization':`Bearer ${token}`
-                        },
-                        data: {
-                            recipe:deleteRecipe
-                        }
-                })
-                })
+        
+        let reasonForm = document.querySelector('#reason-form')
+        reasonForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const deleteRecipe = {
+                reason: e.target.reason.value.trim(),
+                recipeId: recipeId
             }
-        // })
-    
+            const confirmDelete = confirm("Are you sure you want to delete this recipe?");
+            if (!confirmDelete) {
+                reasonDiv.classList.add('hidden')
+                return
+            } else {
+                        
+                reasonDiv.classList.add('hidden')
+            }
+            reasonForm.reset()
+            console.log("delete recipe: ", deleteRecipe);
+            let deletedRecipe = await axios.delete(`${apiUrl}/admin/delete-recipe`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                data: {
+                    recipe: deleteRecipe
+                }
+            })
+        })
+        })
+    }   
 
 
-if (selectedRecipe) {
-    window.addEventListener('DOMContentLoaded', async () => {
-        await recipe()
-    })
+    if (selectedRecipe) {
+        window.addEventListener('DOMContentLoaded', async () => {
+            await recipe()
+        })
     
-    async function recipe() {
-        try {
+        async function recipe() {
+            try {
+                const pathParts = window.location.pathname.split('/')
+                const ifAdmin = pathParts[pathParts.length - 3]
+                console.log(ifAdmin);
+                if (ifAdmin === 'admin') {
+                    let userReviews = document.querySelector('#userReviews')
+                    console.log("userReviews: ", userReviews);
+                    userReviews.style.display = 'none'
+                    let collections = document.querySelector('.selectCollection')
+                    console.log(collections);
+                    let rating = document.querySelector('#rating-value')
+                    rating.style.display = 'none'
+                    let navbar = document.getElementsByTagName('nav')[0]
+                    let navlinks = document.querySelectorAll('nav a')
+                    navlinks.forEach((link) => {
+                        link.remove()
+                    })
+                    let navlink = document.createElement('a')
+                    navlink.href = '/admin'
+                    navlink.textContent = "Home"
+                    navlink.className = "text-white underline p-3"
+                    navbar.appendChild(navlink)
+                    let manageusers = document.createElement('a')
+                    manageusers.href = '/admin/allusers'
+                    manageusers.textContent = "Manage users"
+                    manageusers.className = "text-white underline p-3"
+                    navbar.appendChild(manageusers)
+                }
+            } catch (err) {
+                console.log("error rendering recipe: ", err);
+            
+            }
+        }
+    }
+
+    if (authorspage) {
+        const token = localStorage.getItem("token")
+        window.addEventListener("DOMContentLoaded", async () => {
             const pathParts = window.location.pathname.split('/')
-            const ifAdmin = pathParts[pathParts.length - 3]
+            const ifAdmin = pathParts[pathParts.length - 2]
             console.log(ifAdmin);
             if (ifAdmin === 'admin') {
-               let userReviews = document.querySelector('#userReviews')
-                console.log("userReviews: ", userReviews);
-                userReviews.style.display = 'none'
-                let collections = document.querySelector('.selectCollection')
-                console.log(collections);
-                let rating = document.querySelector('#rating-value')
-                rating.style.display = 'none'
-                let navbar=document.getElementsByTagName('nav')[0]
-                let navlinks = document.querySelectorAll('nav a')
-                navlinks.forEach((link) => {
-                    link.remove()
-                })
+                let navbar = document.querySelector('.navbar')
+                navbar.innerHTML = ""
                 let navlink = document.createElement('a')
                 navlink.href = '/admin'
                 navlink.textContent = "Home"
                 navlink.className = "text-white underline p-3"
                 navbar.appendChild(navlink)
             }
-        } catch (err) {
-            console.log("error rendering recipe: ",err);
-            
+            await getAuthors()
+        })
+
+        async function getAuthors() {
+            try {
+                const getAuthors = await axios.get(`${api_url}/api/authors`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                console.log("all Authors: ", getAuthors);
+                await displayAuthors(getAuthors.data.allAuthors)
+            } catch (err) {
+                console.log("error getting all authors ", err);
+
+            }
+        }
+
+
+        async function displayAuthors(allauthors) {
+            const authorList = document.querySelector('#authorsList')
+            authorList.innerHTML = ""
+            allauthors.forEach(author => {
+                const authorDiv = document.createElement('div')
+                authorDiv.className = "border border-gray-300 rounded-lg shadow-md p-4 m-4 max-w-sm";
+                const authorImg = document.createElement('img')
+                authorImg.id = "authorImg"
+                authorImg.src = "/userdefaultProfile.jpg"
+                authorImg.alt = author.name
+                authorImg.className = "w-full h-45 object-cover rounded-md mb-3";
+                authorDiv.appendChild(authorImg)
+                const authorRef = document.createElement('a')
+                authorRef.href = `author/${author.id}`
+                authorRef.textContent = `${author.name}`
+                authorRef.className = "text-red-600 font-semibold hover:underline";
+                authorDiv.appendChild(authorRef)
+                authorList.appendChild(authorDiv)
+            })
         }
     }
-}
+
+    if (authorpage) {
+        const token = localStorage.getItem("token")
+        console.log("author page");
+        let ifAdmin;
+        window.addEventListener("DOMContentLoaded", async () => {
+            const pathParts = window.location.pathname.split('/')
+            ifAdmin = pathParts[pathParts.length - 3]
+            console.log(ifAdmin);
+        
+            await getAuthorRecipes()
+        })
+        async function getAuthorRecipes() {
+            if (ifAdmin === 'admin') {
+                let navbar = document.querySelector('.navbar')
+                navbar.innerHTML = ""
+                let navlink = document.createElement('a')
+                navlink.href = '/admin'
+                navlink.textContent = "Home"
+                navlink.className = "text-white underline p-3"
+                navbar.appendChild(navlink)
+                let manageusers = document.createElement('a')
+                manageusers.href = '/admin/allusers'
+                manageusers.textContent = "Manage Users"
+                manageusers.className = "text-white underline p-3"
+                navbar.appendChild(manageusers)
+        
+                try {
+                    const pathParts = window.location.pathname.split('/')
+                    const authorId = pathParts[pathParts.length - 1]
+                    const getrecipes = await axios.get(`${api_url}/api/author-recipes/${authorId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    })
+                    console.log("author recipes: ", getrecipes);
+                    await displayRecipes(getrecipes.data.recipes)
+                } catch (err) {
+                    console.log("Error fetching author recipes: ", err);
+
+                }
+            }
+        }
+    }
+} 

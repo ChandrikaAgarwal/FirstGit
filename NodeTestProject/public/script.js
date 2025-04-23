@@ -322,55 +322,56 @@ if (selectedRecipePage) {
         const imgContainer = document.createElement("div");
         imgContainer.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 flex";
         const imgElement = document.createElement("img")
-        const collections = document.createElement("div")
-        const selectCollection = document.createElement('select')
-        selectCollection.className = "selectCollection outline outline-slate-950 m-3"
-        const defaultoption = document.createElement('option')
-        defaultoption.value = ""
-        defaultoption.textContent = "please select"
-        defaultoption.disabled = true
-        defaultoption.selected=true
-        const newCollectionOpt = document.createElement('option')
-        newCollectionOpt.value= "newCollection"
-        newCollectionOpt.textContent = "+ Create New Collection"   
-        newCollectionOpt.className="createNewCollection text-blue-600 underline"
-        selectCollection.appendChild(defaultoption)
-        selectCollection.appendChild(newCollectionOpt)
-        usercollections.forEach((uc) => {
-            const newUC = document.createElement('option')
-            newUC.value = `${uc.collectionId}`
-            newUC.textContent = `${uc.collectionName}`
-            selectCollection.appendChild(newUC)
-        })
-        collections.className = "collections flex flex-col w-44"
-        collections.appendChild(selectCollection)
-        collections.addEventListener('change', async (e) => {
-            if (e.target.value === 'newCollection') {
-                console.log("redirecting");
-                window.location.href='/create-collection'
-            } else {
-                let collectionId = e.target.value
-                console.log("value: ", collectionId);
-                try {
-                    let recipeincollection = await axios.post(`${api_url}/api/collect-recipe/${collectionId}`, {},{
-                        params: {
-                            recipeId: recipe.id
-                        },
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    })
-                    console.log("recipeCollection: ", recipeincollection);
-                    
-                } catch (err) {
-                    console.log("error posting recipe in collection: ",err);
-                    
-                }
+       
+            const collections = document.createElement("div")
+            const selectCollection = document.createElement('select')
+            selectCollection.className = "selectCollection outline outline-slate-950 m-3"
+            const defaultoption = document.createElement('option')
+            defaultoption.value = ""
+            defaultoption.textContent = "please select"
+            defaultoption.disabled = true
+            defaultoption.selected = true
+            const newCollectionOpt = document.createElement('option')
+            newCollectionOpt.value = "newCollection"
+            newCollectionOpt.textContent = "+ Create New Collection"
+            newCollectionOpt.className = "createNewCollection text-blue-600 underline"
+            selectCollection.appendChild(defaultoption)
+            selectCollection.appendChild(newCollectionOpt)
+            usercollections.forEach((uc) => {
+                const newUC = document.createElement('option')
+                newUC.value = `${uc.collectionId}`
+                newUC.textContent = `${uc.collectionName}`
+                selectCollection.appendChild(newUC)
+            })
+            collections.className = "collections flex flex-col w-44"
+            collections.appendChild(selectCollection)
+            collections.addEventListener('change', async (e) => {
+                if (e.target.value === 'newCollection') {
+                    console.log("redirecting");
+                    window.location.href = '/create-collection'
+                } else {
+                    let collectionId = e.target.value
+                    console.log("value: ", collectionId);
+                    try {
+                        let recipeincollection = await axios.post(`${api_url}/api/collect-recipe/${collectionId}`, {}, {
+                            params: {
+                                recipeId: recipe.id
+                            },
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        })
+                        console.log("recipeCollection: ", recipeincollection);
                 
-            }
+                    } catch (err) {
+                        console.log("error posting recipe in collection: ", err);
+                    
+                    }
+                
+                }
             
-        })
-            
+            })
+          
         if (recipe.recipeImg && recipe.recipeImg.length > 0) {
             recipe.recipeImg.forEach((imgurl) => {
                 imgElement.src = imgurl
@@ -379,13 +380,15 @@ if (selectedRecipePage) {
                 imgContainer.appendChild(imgElement);
             })
         } else {
-            imgElement.src = "default-image.jpg"; // Put a default image in your public folder
+            imgElement.src = "/default-image.jpg"; // Put a default image in your public folder
             imgElement.alt = "No image available";
             imgElement.className = "w-full h-48 object-cover rounded-lg";
             imgContainer.appendChild(imgElement);
         }
         recipeDetailsDiv.appendChild(imgContainer)
-        imgContainer.appendChild(collections)
+        if (!path.includes('admin')) {
+            imgContainer.appendChild(collections)
+        }
         const starContainer = document.getElementById('star-container');
         const ratingText = document.getElementById('rating-value');
         
@@ -520,7 +523,8 @@ if (authorsPage) {
             const authorDiv = document.createElement('div')
             authorDiv.className = "border border-gray-300 rounded-lg shadow-md p-4 m-4 max-w-sm";
             const authorImg = document.createElement('img')
-            authorImg.src = "userdefaultProfile.jpg"
+            authorImg.id="authorImg"
+            authorImg.src = "/userdefaultProfile.jpg"
             authorImg.alt = author.name
             authorImg.className = "w-full h-45 object-cover rounded-md mb-3";
             authorDiv.appendChild(authorImg)

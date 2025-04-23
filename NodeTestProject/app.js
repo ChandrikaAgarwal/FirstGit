@@ -71,6 +71,12 @@ app.get('/admin', (req, res) => {
 app.get('/admin/recipes/:recipeId', (req, res) => {
     res.sendFile(path.join(__dirname,'views','recipe.html'))
 })
+app.get('/admin/allusers', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'authors.html'))
+})
+app.get('/admin/author/:authorId', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'author.html'))
+})
 app.use('/', userRoute)
 app.use('/', recipeRoute)
 app.use('/', collectionRoute)
