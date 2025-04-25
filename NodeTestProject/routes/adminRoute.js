@@ -3,5 +3,6 @@ const router= express.Router()
 const{jwtAuthMiddleware}=require('../jwtmiddleware')
 const adminControl = require('../controllers/adminController')
 router.get('/api/users-recipes', jwtAuthMiddleware, adminControl.countUsersRecipes)
-router.delete('/admin/delete-recipe',jwtAuthMiddleware,adminControl.deleteRecipe)
+router.delete('/admin/delete-recipe', jwtAuthMiddleware, adminControl.deleteRecipe)
+router.post('/api/action', jwtAuthMiddleware, adminControl.actionOnUser)
 module.exports = router;

@@ -248,7 +248,24 @@ if (pathParts.includes('admin')) {
             authorList.innerHTML = ""
             allauthors.forEach(author => {
                 const authorDiv = document.createElement('div')
-                authorDiv.className = "border border-gray-300 rounded-lg shadow-md p-4 m-4 max-w-sm";
+                authorDiv.className = "border border-gray-300 rounded-lg shadow-md p-4 m-4 max-w-md relative";
+                authorDiv.id = `${author.id}`
+                const buttonWrapper = document.createElement('div')
+                buttonWrapper.className ="absolute top-2 right-2 z-10"
+                const actionbtn = document.createElement('button')
+                actionbtn.className = "absolute top-2 right-2 text-gray-600 hover:text-black p-2 z-10"
+                actionbtn.innerHTML = `<i class="fa-solid fa-ellipsis-vertical"></i>`
+                buttonWrapper.appendChild(actionbtn)
+                const dropdown = document.createElement('div')
+                dropdown.className ="admin-controls hidden flex flex-col bg-white border border-gray-300 rounded shadow-md mt-2"
+                dropdown.innerHTML =`<button class="make-admin px-4 py-2 hover:bg-gray-100 text-left">Make Admin</button>
+    <button class="ban-author px-4 py-2 hover:bg-gray-100 text-left">Ban Author</button>
+    <button class="remove-author px-4 py-2 hover:bg-gray-100 text-left text-red-600">Remove Author</button>`
+                buttonWrapper.appendChild(dropdown)
+                authorDiv.appendChild(buttonWrapper)
+                document.addEventListener('click', () => {
+                    dropdown.classList.add('hidden');
+                });
                 const authorImg = document.createElement('img')
                 authorImg.id = "authorImg"
                 authorImg.src = "/userdefaultProfile.jpg"
@@ -258,11 +275,77 @@ if (pathParts.includes('admin')) {
                 const authorRef = document.createElement('a')
                 authorRef.href = `author/${author.id}`
                 authorRef.textContent = `${author.name}`
-                authorRef.className = "text-red-600 font-semibold hover:underline";
+                authorRef.className = "text-red-600 font-semibold hover:underline";              
                 authorDiv.appendChild(authorRef)
                 authorList.appendChild(authorDiv)
+                actionbtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // prevent bubbling
+                    dropdown.classList.toggle('hidden');
+                });
             })
+            //event-delegation
+            authorList.addEventListener('click', async (e) => {
+                if (e.target.tagName==='BUTTON') {
+                    let control = e.target.className.split(' ')[0]
+                    console.log("control: ",control.trim());
+                    let userid = e.target.closest("div[id]").id
+                    // console.log("userId: ", userid);
+                    let reasonDiv = document.querySelector('#reasonDiv')
+                    let oldReasonForm = document.querySelector('#reason-form')
+                    let actionDetails
+                    if (control === 'ban-author' || control === 'remove-author') {
+                        reasonDiv.classList.remove('hidden')
+                        reasonDiv.classList.add('flex')
+                        
+                        // Clone and replace the form to remove old event listeners
+                        const newReasonForm = oldReasonForm.cloneNode(true);
+                        oldReasonForm.parentNode.replaceChild(newReasonForm, oldReasonForm);
+
+                        newReasonForm.addEventListener('submit', async (e) => {
+                            e.preventDefault();
+                            let reason = e.target.reason.value.trim()
+                            const confirmAction = confirm("Are you sure you want to take this action?");
+                            if (!confirmAction) {
+                                reasonDiv.classList.add('hidden')
+                                return
+                            }
+
+                            actionDetails = {
+                                reason,
+                                control,
+                                userid
+                            }
+                            reasonDiv.classList.add('hidden');
+                            e.target.reset();
+                            const actionTaken = await axios.post(`${apiUrl}/api/action`, actionDetails, {
+                                headers: {
+                                    'Authorization': `Bearer ${token}`
+                                }
+                            })
+                            console.log("action taken: ",actionTaken);
+                            
+                        })
+                    } else {
+                        const confirmAction = confirm("Are you sure you want to take this action?");
+                        if (!confirmAction) {
+                            reasonDiv.classList.add('hidden')
+                            return
+                        }
+                        actionDetails = {
+                            control,
+                            userid
+                        }
+                        await axios.post(`${apiUrl}/api/action`, actionDetails, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        }); 
+                    }             
+                }
+            })          
         }
+
+            
     }
 
     if (authorpage) {

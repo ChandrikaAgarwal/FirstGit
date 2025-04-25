@@ -29,6 +29,11 @@ const User = sequelize.define('user', {
         defaultValue: false,
         allowNull:false
     },
+    isBanned: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+    },
     isAdmin: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
