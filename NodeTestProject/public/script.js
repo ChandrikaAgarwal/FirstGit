@@ -11,6 +11,7 @@ const myRecipes = document.querySelector("#myRecipes")
 const selectedRecipePage = document.querySelector("#selected-recipe")
 const authorsPage = document.querySelector('#authorsPage')
 const author = document.querySelector('#author')
+const adminCredsPage = document.querySelector('#adminCredsPage')
 let api_url = "http://localhost:5000"
 const url = window.location.pathname.split('/')
 if (!url.includes('admin')) {
@@ -97,6 +98,29 @@ if (!url.includes('admin')) {
             }
         }
     }
+    if (adminCredsPage) {
+        const token = localStorage.getItem("token")
+        let adminCredsForm = document.querySelector('#adminCreds-form')
+        try {
+            adminCredsForm.addEventListener('submit', async (e) => {
+                e.preventDefault()
+                const newAdmin = {
+                    email: e.target.email.value,
+                    password: e.target.password.value
+                }
+                let setAdminCreds = await axios.post(`${api_url}/api/setadmin-creds`, newAdmin, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                console.log("admin credentials: ",setAdminCreds);
+                
+            })
+        } catch (err) {
+            console.log("error creating admin credentials: ",err);
+            
+        }
+    }
     if (editProfilePage) {
         const token = localStorage.getItem("token")
         editprofForm.addEventListener('submit', async (e) => {
@@ -133,7 +157,16 @@ if (!url.includes('admin')) {
         const token = localStorage.getItem("token")
     
         window.addEventListener("DOMContentLoaded", async () => {
+            const mainIngredientSelect = document.getElementById('main-ingredients');
+            const recipeTypeSelect = document.getElementById('recipe-type');
+            const cuisineSelect = document.getElementById('cuisine');
+            mainIngredientSelect.addEventListener('change', fetchAndDisplayRecipes);
+            recipeTypeSelect.addEventListener('change', fetchAndDisplayRecipes);
+            cuisineSelect.addEventListener('change', fetchAndDisplayRecipes);
+            
             await getAllRecipes()
+            // await fetchAndDisplayRecipes();
+
         })
         async function getAllRecipes() {
             try {
@@ -143,11 +176,42 @@ if (!url.includes('admin')) {
                     }
                 })
                 console.log("all recipes: ", allRecipes);
+                const username = document.querySelector('#username')
+                username.textContent = `Hello ${allRecipes.data.user.name}`
+                const admin = document.querySelector('#admin')
+                if (allRecipes.data.user.isAdmin === true) {
+                    admin.classList.remove("hidden")
+                }
                 displayRecipes(allRecipes.data.recipes, false)
             } catch (err) {
                 console.log("error getting all recipes: ", err);
             
             }
+        }
+
+        async function fetchAndDisplayRecipes() {
+            const mainIngredient = document.getElementById('main-ingredients').value;
+            const recipeType = document.getElementById('recipe-type').value;
+            const cuisine = document.getElementById('cuisine').value;
+            try {
+                let query = "";
+                if (mainIngredient !== "Please Select") {
+                    query += `ingredients=${mainIngredient}&`;
+                }
+                if (recipeType !== "Please Select") {
+                    query += `type=${recipeType}&`;
+                }
+                if (cuisine !== "pleaseSelect") {
+                    query += `cuisine=${cuisine}&`;
+                }
+                const response = await axios.get(`${api_url}/recipes?${query}`, {
+                    headers: {
+                        'Authorization':`Bearer ${token}`
+                    }
+                });
+                const recipes = response.data.matchedRecipe;
+                displayRecipes(recipes,false)
+            }catch(err){}
         }
     }
     async function displayRecipes(allrecipes, showEditDelete) {
@@ -172,7 +236,7 @@ if (!url.includes('admin')) {
                 recipeImg.src = recipe.recipeImg[0];
                 recipeImg.alt = recipe.name;
             } else {
-                recipeImg.src = "default-image.jpg"; // Put a default image in your public folder
+                recipeImg.src = "/default-image.jpg"; // Put a default image in your public folder
                 recipeImg.alt = "No image available";
             }
             recipeImg.className = "w-full h-45 object-cover rounded-md mb-3";
@@ -296,13 +360,13 @@ if (!url.includes('admin')) {
                     }
                 })
                 console.log("get recipe: ", getRecipe);
-                await displayRecipe(getRecipe.data.recipe, getRecipe.data.collections, pathParts)
+                await displayRecipe(getRecipe.data.recipe, getRecipe.data.collections, pathParts, getRecipe.data.isCreator)
             } catch (err) {
                 console.log("Error fetching recipe: ", err);
             
             }
         }
-        async function displayRecipe(recipe, usercollections, path) {
+        async function displayRecipe(recipe, usercollections, path,isCreator) {
             const recipeDetailsDiv = document.querySelector("#recipeDetails")
             const mainIngredArray = JSON.parse(recipe.mainingrediant);
             const mainIngred = mainIngredArray.join(", ")
@@ -314,10 +378,13 @@ if (!url.includes('admin')) {
             namep.textContent = recipe.name
             namep.className = "text-red-600 font-bold"
             recipeDetailsDiv.appendChild(namep)
-
+            if (isCreator) {
+                reviewForm.classList.add('hidden')
+                document.querySelector('.review-label').classList.add('hidden')
+            }
             const postedby = document.createElement('p')
             const postDate = new Date(recipe.createdAt).toLocaleDateString()
-            postedby.innerHTML = `Posted by&nbsp;&nbsp;&nbsp;&nbsp;${recipe.userId}&nbsp;&nbsp;&nbsp;&nbsp;${postDate}`
+            postedby.innerHTML = `Posted by&nbsp;&nbsp;&nbsp;&nbsp;${recipe.username}&nbsp;&nbsp;&nbsp;&nbsp;${postDate}`
             postedby.className = "my-12"
             recipeDetailsDiv.appendChild(postedby)
 
@@ -510,7 +577,7 @@ if (!url.includes('admin')) {
                     }
                 })
                 console.log("all Authors: ", getAuthors);
-                await displayAuthors(getAuthors.data.allAuthors)
+                await displayAuthors(getAuthors.data.allAuthors,getAuthors.data.following)
             } catch (err) {
                 console.log("error getting all authors ", err);
             
@@ -518,12 +585,23 @@ if (!url.includes('admin')) {
         }
 
 
-        async function displayAuthors(allauthors) {
+        async function displayAuthors(allauthors,following) {
             const authorList = document.querySelector('#authorsList')
             authorList.innerHTML = ""
+            const followingIds = following.map(f => f.followingId);
             allauthors.forEach(author => {
+               
                 const authorDiv = document.createElement('div')
-                authorDiv.className = "border border-gray-300 rounded-lg shadow-md p-4 m-4 max-w-sm";
+                authorDiv.className = "border border-gray-300 rounded-lg shadow-md p-4 m-4 max-w-sm relative";
+                authorDiv.id = `${author.id}`
+                if (author.isBanned) {
+                    const message = document.createElement('p')
+                    message.textContent = "This user has been banned by admin for safety reasons.";
+                    message.className = "text-red-600 text-center font-semibold"
+                    authorDiv.appendChild(message)
+                    authorList.appendChild(authorDiv)
+                    return
+                }
                 const authorImg = document.createElement('img')
                 authorImg.id = "authorImg"
                 authorImg.src = "/userdefaultProfile.jpg"
@@ -534,8 +612,43 @@ if (!url.includes('admin')) {
                 authorRef.href = `/author/${author.id}`
                 authorRef.textContent = `${author.name}`
                 authorRef.className = "text-red-600 font-semibold hover:underline";
+                const followbutton=document.createElement('button')
+                followbutton.type="button"
+                followbutton.className = "follow absolute bottom-2 right-3 bg-black text-white rounded-md p-1 font-bold"
+                    if (followingIds.includes(author.id)) {
+                        followbutton.textContent = "Following"
+                        followbutton.disabled = true;
+                    } else {
+                        followbutton.textContent="Follow"    
+                }
                 authorDiv.appendChild(authorRef)
+                authorDiv.appendChild(followbutton)
                 authorList.appendChild(authorDiv)
+                
+            })
+            authorList.addEventListener('click', async (e) => {
+                try {
+                    if (e.target.tagName === "BUTTON") {
+                        e.target.textContent = "Following"
+                        let closestDiv = e.target.closest("div[id]")
+                        let followingId = closestDiv.id
+                        let followingName=closestDiv.querySelector('a').textContent.trim()
+                        console.log("id:",followingId);
+                        const userfollowed = {
+                            followingId,
+                            followingName
+                        }
+                        const followUser = await axios.post(`${api_url}/api/follow-user`, userfollowed, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        })
+                        console.log("followUser: ", followUser);
+                    }
+                } catch (err) {
+                    console.log("error following user: ",err);
+                    
+                }
             })
         }
     }
@@ -564,4 +677,7 @@ if (!url.includes('admin')) {
             }
         }
     }
+
+
 }
+

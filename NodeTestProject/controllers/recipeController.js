@@ -25,6 +25,7 @@ exports.newRecipe = async (req, res, next) => {
        
     
         const newRecipe = await user.createRecipe({
+            username:user.name,
             name,
             description,
             ingredients,
@@ -91,11 +92,11 @@ exports.getAllRecipes = async (req, res, next) => {
             return res.status(404).json({ message: "User not found" })
         }
         const recipes = await Recipe.findAll({
-            where: {
-                userId: { [Op.not]: user.id }
-            },
+            // where: {
+            //     userId: { [Op.not]: user.id }
+            // },
         })
-        return res.status(200).json({message:"All recipes: ",recipes})
+        return res.status(200).json({message:"All recipes: ",recipes,user})
     } catch (err) { 
         console.log("error fetching all recipes: ", err);
         return res.status(500).json({ message: "Error fetching all recipes" })
@@ -163,14 +164,18 @@ exports.getThisRecipe = async (req, res, next) => {
             return res.status(404).json({ message: "User not found" })
         }
         const { recipeId } = req.params
+        let isCreator=false
         const recipe = await Recipe.findByPk(recipeId)
+        if (user.id === recipe.userId) {
+            isCreator=true
+        }
         const collections = await Usercollection.findAll({
             where: {
                 userId:user.id
             }
         })
         console.log("recipe: ", recipe);
-        return res.status(200).json({message:"Recipe found",recipe,collections})
+        return res.status(200).json({message:"Recipe found",recipe,collections,isCreator})
     } catch (err) {
         console.log("error fetching requested recipe: ",err);
         return res.status(500).json({message:"Recipe not found ",details:err})

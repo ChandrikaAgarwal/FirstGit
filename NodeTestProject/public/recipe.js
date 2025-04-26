@@ -1,10 +1,11 @@
 const shareRecipePage=document.querySelector('#share-recipe')
-const recipeForm = document.querySelector('#shareRecipe-form')
+
 const newColletionPage = document.querySelector('#createCollection')
 const mycollections=document.querySelector("#mycollections")
 const api_url ="http://localhost:5000"
 const token=localStorage.getItem("token")
 if (shareRecipePage) {
+    const recipeForm = document.querySelector('#shareRecipe-form')
     let recipeId
     window.addEventListener('DOMContentLoaded', async () => {
         const urlParams = new URLSearchParams(window.location.search)
@@ -97,12 +98,12 @@ if (newColletionPage) {
     const dropdown = document.querySelector('.multiselect')
     async function getAllUsers() {
         try {
-            const allUsers = await axios.get(`${api_url}/api/authors`, {
+            const allFollowers = await axios.get(`${api_url}/api/followers`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             })
-            console.log("all users: ", allUsers);
+            console.log("all users: ", allFollowers);
             shareCollection.addEventListener('change', () => {
                 const shareVal = shareCollection.value
                 if (shareVal === "No") {
@@ -114,9 +115,9 @@ if (newColletionPage) {
                 }
             })
             
-            let users = allUsers.data.allAuthors
+            let users = allFollowers.data.followers
             users.forEach((user) => {
-                dropDownMenu.innerHTML += `<label class="flex items-center px-4 py-2 hover:bg-gray-100"><input type="checkbox" value="${user.name}" data-id="${user.id}" class="mr-2">${user.name}</label>`
+                dropDownMenu.innerHTML += `<label class="flex items-center px-4 py-2 hover:bg-gray-100"><input type="checkbox" value="${user.followingName}" data-id="${user.followingId}" class="mr-2">${user.followingName}</label>`
             })
 
             toggle.addEventListener("click", () => {

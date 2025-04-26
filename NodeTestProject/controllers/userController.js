@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt')
 const {generateToken}= require('../jwtmiddleware')
 const { Sequelize, Op } = require('sequelize');
 const sequelize = require('../util/database');
+const FollowUsers = require('../models/followUsers');
+const Admin = require('../models/admin');
 
 
 exports.signupUser = async (req, res, next) => {
@@ -43,7 +45,6 @@ exports.signupUser = async (req, res, next) => {
 exports.getUser = async (req, res, next) => {
     try {
         const { email, password,role } = req.body
-        
         const existingUser = await User.findOne({ where: { email: email } })
         if (!existingUser) { 
             return res.status(404).json({message:"User not found, please sign up"})
@@ -52,6 +53,7 @@ exports.getUser = async (req, res, next) => {
         if (!isValid) {
             return res.status(401).json({message:"Incorrect password"})
         }
+        
         if (role === 'admin') {
             if (existingUser.isAdmin === false) {
                 return res.status(400).json({message:"Access denied!, you are not an admin"})
@@ -68,6 +70,31 @@ exports.getUser = async (req, res, next) => {
     }
 }
 
+exports.makeAdmin = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        if (!user.isAdmin === false) {
+            return res.status(500).json({ message: "you are not authorized to be an admin" })
+        }
+        const { email, password } = req.body
+        const saltRounds = 10
+        const hashedPassword = await bcrypt.hash(password, saltRounds)
+
+        const newAdmin = await Admin.create({
+            name: user.name,
+            email,
+            password:hashedPassword
+        })
+        return res.status(200).json({message:"Admin credentials are set",newAdmin})
+    } catch (err) {
+        console.log("error setting admin credentials ", err);
+        return res.status(500).json({ message:"error setting admin credentials", details:err})
+        
+    }
+}
 exports.editUser = async (req, res, next) => {
     try {
         const user = await User.findByPk(req.user.id)
@@ -96,8 +123,17 @@ exports.getAuthors = async (req, res, next) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
-        const allAuthors = await User.findAll()
-        return res.status(200).json({message:"All authors: ",allAuthors})
+        const allAuthors = await User.findAll({
+            where: {
+                id: { [Op.not]:user.id}
+            }
+        })
+        const following = await FollowUsers.findAll({
+            where: {
+                followerId:user.id
+            }
+        })
+        return res.status(200).json({message:"All authors: ",allAuthors,following})
     } catch (err) {
         console.log("error getting all authors: ",err);
         return res.status(500).json({message:"Error getting all authors: ",details:err})
@@ -105,3 +141,42 @@ exports.getAuthors = async (req, res, next) => {
     }
 }
 
+exports.followUser = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        const { followingId,followingName } = req.body
+        console.log("followingId: ",followingId);
+        const createFollower = await FollowUsers.create({
+            followingId,
+            followerId: user.id,
+            followingName
+        })
+        return res.status(200).json({message:"You follow this user now",createFollower})
+    } catch (err) {
+        console.log("error creating follower: ", err);
+        return res.status(500).json({ message: "Error creating follower: ", details: err })
+        
+    }
+}
+
+exports.getFollowers = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        const followers = await FollowUsers.findAll({
+            where: {
+                followerId:user.id
+            }
+        })
+        return res.status(200).json({message:"Follower list",followers})
+    } catch (err) {
+        console.log("error fetching the followers list: ", err);
+        return res.status(500).json({message:"Error fetching followers list: ",details:err})
+        
+    }
+}

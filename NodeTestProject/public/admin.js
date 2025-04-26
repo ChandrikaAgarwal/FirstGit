@@ -343,9 +343,7 @@ if (pathParts.includes('admin')) {
                     }             
                 }
             })          
-        }
-
-            
+        }           
     }
 
     if (authorpage) {

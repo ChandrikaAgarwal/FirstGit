@@ -7,6 +7,10 @@ const Recipe = sequelize.define('recipe', {
         allowNull: false,
         primaryKey: true
     },
+    username: {
+        type: Sequelize.STRING,
+        allowNull:false
+    },
     name: {
         type: Sequelize.STRING,
         allowNull: false

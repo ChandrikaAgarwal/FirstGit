@@ -14,5 +14,6 @@ router.post('/api/collect-recipe/:collectionId', jwtAuthMiddleware, recipeContro
 router.delete('/api/delete-recipe/:recipeId', jwtAuthMiddleware, recipeControl.deleteRecipe)
 router.get('/api/getedit-recipe/:recipeId', jwtAuthMiddleware, recipeControl.getThisRecipe)
 router.put('/api/edit-recipe/:recipeId', jwtAuthMiddleware, upload.array('files'), recipeControl.updateRecipe)
-router.get('/api/author-recipes/:authorId',jwtAuthMiddleware,recipeControl.getAuthorRecipes)
+router.get('/api/author-recipes/:authorId', jwtAuthMiddleware, recipeControl.getAuthorRecipes)
+router.get('/recipes', jwtAuthMiddleware, recipeControl.getSearchResults)
 module.exports = router;
