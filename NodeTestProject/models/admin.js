@@ -20,6 +20,10 @@ const Admin = sequelize.define('admin', {
         type: Sequelize.STRING(255),
         allowNull: false
     },
+    userId: {
+        type: Sequelize.INTEGER,
+        allowNull:false
+    }
 }, {
     timestamps: true
 })

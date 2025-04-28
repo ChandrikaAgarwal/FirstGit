@@ -7,6 +7,7 @@ const allrecipes = document.querySelector('#recipes')
 const selectedRecipe = document.querySelector('#selected-recipe')
 const authorspage = document.querySelector('#authorsPage')
 const authorpage = document.querySelector('#author')
+const editAdminCredsPage = document.querySelector('#adminCredsPage')
 const pathParts = window.location.pathname.split('/')
 if (pathParts.includes('admin')) {
 
@@ -32,6 +33,29 @@ if (pathParts.includes('admin')) {
             }
         }
 
+        if (editAdminCredsPage) {
+            let adminCredsForm = document.querySelector('#adminCreds-form')
+            try {
+                adminCredsForm.addEventListener('submit', async (e) => {
+                    e.preventDefault()
+                    const newAdmin = {
+                        email: e.target.email.value,
+                        password: e.target.password.value
+                    }
+                    let setAdminCreds = await axios.post(`${api_url}/api/setadmin-creds`, newAdmin, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    })
+                    console.log("admin credentials: ", setAdminCreds);
+                    // alert(setAdminCreds.data.message)
+                    window.location.href='/users'
+                })
+            } catch (err) {
+                console.log("error creating admin credentials: ", err);
+
+            }
+        }
         async function getAllRecipes() {
             try {
                 const allRecipes = await axios.get(`${apiUrl}/admin/allrecipes`, {
@@ -40,6 +64,8 @@ if (pathParts.includes('admin')) {
                     }
                 })
                 console.log("all recipes: ", allRecipes);
+                const username = document.querySelector('.hello-admin')
+                username.textContent = `Hello ${allRecipes.data.user.name}`
                 displayRecipes(allRecipes.data.recipes)
             } catch (err) {
                 console.log("error getting all recipes: ", err);

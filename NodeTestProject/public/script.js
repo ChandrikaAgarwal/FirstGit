@@ -1,5 +1,3 @@
-// const { default: axios } = require("axios")
-
 const signupForm = document.querySelector('#signup-form')
 const loginForm = document.querySelector('#login-form')
 const createProfBtn = document.querySelector('.create-profBtn')
@@ -121,7 +119,7 @@ if (!url.includes('admin')) {
                     }
                 })
                 console.log("admin credentials: ",setAdminCreds);
-                
+                alert(setAdminCreds.data.message)
             })
         } catch (err) {
             console.log("error creating admin credentials: ",err);

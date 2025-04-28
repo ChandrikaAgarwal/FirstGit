@@ -15,16 +15,29 @@ exports.makeAdmin = async (req, res) => {
         if (user.isAdmin === false) {
             return res.status(500).json({ message: "you are not authorized to be an admin" })
         }
+        const existingAdmin = await Admin.findOne({
+            where: {
+                userId:user.id
+            }
+        })
+
         const { email, password } = req.body
         const saltRounds = 10
         const hashedPassword = await bcrypt.hash(password, saltRounds)
-
-        const newAdmin = await Admin.create({
-            name: user.name,
-            email,
-            password: hashedPassword
-        })
-        return res.status(200).json({ message: "Admin credentials are set", newAdmin })
+        if (existingAdmin) {
+            existingAdmin.email = email
+            existingAdmin.password = hashedPassword
+            existingAdmin.save()
+            return res.status(200).json({ message: "Your Admin credentials are reset" })
+        } else {
+            const newAdmin = await Admin.create({
+                name: user.name,
+                email,
+                password: hashedPassword,
+                userId: user.id
+            })
+            return res.status(200).json({ message: "Admin credentials are set", newAdmin })
+        }
     } catch (err) {
         console.log("error setting admin credentials ", err);
         return res.status(500).json({ message: "error setting admin credentials", details: err })
