@@ -4,7 +4,6 @@ const {generateToken}= require('../jwtmiddleware')
 const { Sequelize, Op } = require('sequelize');
 const sequelize = require('../util/database');
 const FollowUsers = require('../models/followUsers');
-const Admin = require('../models/admin');
 
 
 exports.signupUser = async (req, res, next) => {
@@ -53,12 +52,6 @@ exports.getUser = async (req, res, next) => {
         if (!isValid) {
             return res.status(401).json({message:"Incorrect password"})
         }
-        
-        if (role === 'admin') {
-            if (existingUser.isAdmin === false) {
-                return res.status(400).json({message:"Access denied!, you are not an admin"})
-            }
-        }
         existingUser.isLoggedIn = true;
         existingUser.save();
         const token = generateToken(existingUser)
@@ -70,31 +63,7 @@ exports.getUser = async (req, res, next) => {
     }
 }
 
-exports.makeAdmin = async (req, res) => {
-    try {
-        const user = await User.findByPk(req.user.id)
-        if (!user) {
-            return res.status(404).json({ message: "User not found" })
-        }
-        if (!user.isAdmin === false) {
-            return res.status(500).json({ message: "you are not authorized to be an admin" })
-        }
-        const { email, password } = req.body
-        const saltRounds = 10
-        const hashedPassword = await bcrypt.hash(password, saltRounds)
 
-        const newAdmin = await Admin.create({
-            name: user.name,
-            email,
-            password:hashedPassword
-        })
-        return res.status(200).json({message:"Admin credentials are set",newAdmin})
-    } catch (err) {
-        console.log("error setting admin credentials ", err);
-        return res.status(500).json({ message:"error setting admin credentials", details:err})
-        
-    }
-}
 exports.editUser = async (req, res, next) => {
     try {
         const user = await User.findByPk(req.user.id)

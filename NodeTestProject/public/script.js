@@ -1,3 +1,5 @@
+// const { default: axios } = require("axios")
+
 const signupForm = document.querySelector('#signup-form')
 const loginForm = document.querySelector('#login-form')
 const createProfBtn = document.querySelector('.create-profBtn')
@@ -77,14 +79,19 @@ if (!url.includes('admin')) {
                     email: email,
                     password: password
                 }
+                if (role === 'admin') {
+                    const loginAdmin = await axios.post(`${api_url}/admin-login`, user)
+                    console.log("login response: ", loginAdmin);
+                    loginForm.reset()
+                    localStorage.setItem("token", loginAdmin.data.token)
+                    alert("Login successful!")
+                    window.location.href = "/admin"
+                } else {
                 const loginRes = await axios.post(`${api_url}/users`, user)
                 console.log("login response: ", loginRes);
                 localStorage.setItem("token", loginRes.data.token)
                 alert("Login successful!")
                 loginForm.reset()
-                if (role === 'admin') {
-                    window.location.href = "/admin"
-                } else {
                     window.location.href = "/home"
                 }
             } catch (err) {

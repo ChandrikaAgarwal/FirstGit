@@ -34,7 +34,7 @@ if (pathParts.includes('admin')) {
 
         async function getAllRecipes() {
             try {
-                const allRecipes = await axios.get(`${apiUrl}/api/allrecipes`, {
+                const allRecipes = await axios.get(`${apiUrl}/admin/allrecipes`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -229,7 +229,7 @@ if (pathParts.includes('admin')) {
 
         async function getAuthors() {
             try {
-                const getAuthors = await axios.get(`${api_url}/api/authors`, {
+                const getAuthors = await axios.get(`${api_url}/admin/authors`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

@@ -2,15 +2,59 @@ const { Sequelize } = require('sequelize')
 const User = require('../models/users')
 const Recipe = require('../models/recipes')
 const DeletedRecipes = require('../models/adminDeletedRec')
-const UserControls=require('../models/adminUserControl')
-exports.countUsersRecipes = async (req, res) => {
+const UserControls = require('../models/adminUserControl')
+const Admin = require('../models/admin');
+const bcrypt = require('bcrypt')
+const { generateToken } = require('../jwtmiddleware')
+exports.makeAdmin = async (req, res) => {
     try {
         const user = await User.findByPk(req.user.id)
         if (!user) {
-            return res.status(404).json({message:"User not found"})
+            return res.status(404).json({ message: "User not found" })
         }
         if (user.isAdmin === false) {
-            return res.status(400).json({ message: "You are not an admin" })
+            return res.status(500).json({ message: "you are not authorized to be an admin" })
+        }
+        const { email, password } = req.body
+        const saltRounds = 10
+        const hashedPassword = await bcrypt.hash(password, saltRounds)
+
+        const newAdmin = await Admin.create({
+            name: user.name,
+            email,
+            password: hashedPassword
+        })
+        return res.status(200).json({ message: "Admin credentials are set", newAdmin })
+    } catch (err) {
+        console.log("error setting admin credentials ", err);
+        return res.status(500).json({ message: "error setting admin credentials", details: err })
+
+    }
+}
+exports.loginAdmin = async (req, res, next) => {
+    try {
+        const { email, password, role } = req.body
+        const existingAdmin = await Admin.findOne({ where: { email: email } })
+        if (!existingAdmin) {
+            return res.status(404).json({ message: "Admin not found" })
+        }
+        const isValid = await bcrypt.compare(password, existingAdmin.password)
+        if (!isValid) {
+         return res.status(401).json({message:"Incorrect password"})
+        }
+        const token = generateToken(existingAdmin)
+        return res.status(200).json({ message: "Login successful", token })
+        
+    } catch (err) {
+        console.log("error while getting admin: ", err);
+        res.status(500).json({ message: "Failed to log in", details: err })
+    }
+}
+exports.countUsersRecipes = async (req, res) => {
+    try {
+        const user = await Admin.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({message:"User not found"})
         }
         const allUsers = await User.findAll({
             attributes: [
@@ -36,11 +80,27 @@ exports.countUsersRecipes = async (req, res) => {
         return res.status(500).json({message:"error getting all users qand recipes", details:err})
     }
 }
-
+exports.getAllRecipes = async (req, res, next) => {
+    try {
+        const user = await Admin.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "Admin not found" })
+        }
+        const recipes = await Recipe.findAll({
+            // where: {
+            //     userId: { [Op.not]: user.id }
+            // },
+        })
+        return res.status(200).json({ message: "All recipes: ", recipes, user })
+    } catch (err) {
+        console.log("error fetching all recipes: ", err);
+        return res.status(500).json({ message: "Error fetching all recipes" })
+    }
+}
 exports.deleteRecipe = async (req, res) => {
     try {
-        const user=await User.findByPk(req.user.id)
-        if (!user || user.isAdmin !== true) {
+        const user=await Admin.findByPk(req.user.id)
+        if (!user) {
             return res.status(404).json({message:"Admin not found"})
         }
         let { reason, recipeId } = req.body.recipe
@@ -62,11 +122,30 @@ exports.deleteRecipe = async (req, res) => {
     }
 }
 
+exports.getAuthors = async (req, res, next) => {
+    try {
+        const user = await Admin.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "Admin not found" })
+        }
+        const allAuthors = await User.findAll({
+            // where: {
+            //     id: { [Op.not]: user.id }
+            // }
+        })
+        
+        return res.status(200).json({ message: "All authors: ", allAuthors })
+    } catch (err) {
+        console.log("error getting all authors: ", err);
+        return res.status(500).json({ message: "Error getting all authors: ", details: err })
+
+    }
+}
 exports.actionOnUser = async (req, res) => {
     try {
-        const user = await User.findByPk(req.user.id)
+        const user = await Admin.findByPk(req.user.id)
         let actionTaken
-        if (!user || user.isAdmin !== true) {
+        if (!user) {
             return res.status(404).json({ message: "Admin not found" })
         }
         const { reason, control, userid } = req.body

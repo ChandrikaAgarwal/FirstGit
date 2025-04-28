@@ -9,5 +9,5 @@ router.post('/edit-profile', jwtAuthMiddleware, userControl.editUser)
 router.get('/api/authors', jwtAuthMiddleware, userControl.getAuthors)
 router.get('/api/followers',jwtAuthMiddleware,userControl.getFollowers)
 router.post('/api/follow-user', jwtAuthMiddleware, userControl.followUser)
-router.post('/api/setadmin-creds',jwtAuthMiddleware,userControl.makeAdmin)
+
 module.exports = router;
