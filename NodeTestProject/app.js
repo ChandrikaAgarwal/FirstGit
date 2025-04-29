@@ -98,8 +98,8 @@ User.belongsToMany(Collection, { through: Usercollection })
 Collection.belongsToMany(User, { through: Usercollection })
 Recipe.belongsToMany(Collection, { through: RecipeCollection })
 Collection.belongsToMany(Recipe, { through: RecipeCollection })
-sequelize.sync({alter:true})
-// sequelize.sync()
+// sequelize.sync({alter:true})
+sequelize.sync()
     try {
          app.listen(process.env.PORT || 5000, () => {
             console.log("app is nrunning on ", process.env.API_URL);
