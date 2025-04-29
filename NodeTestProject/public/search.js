@@ -2,7 +2,7 @@ const searchPage=document.querySelector('#searchPage')
 const searchForm = document.querySelector("#search-form")
 const searchResultsPage = document.querySelector("#searchResults")
 const token=localStorage.getItem("token")
-const api_url ="http://localhost:5000"
+const api_url ="http://13.203.229.232"
 let searchQuery;
 
 if (searchPage) {

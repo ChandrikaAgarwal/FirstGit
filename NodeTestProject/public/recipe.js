@@ -2,7 +2,7 @@ const shareRecipePage=document.querySelector('#share-recipe')
 
 const newColletionPage = document.querySelector('#createCollection')
 const mycollections=document.querySelector("#mycollections")
-const api_url ="http://localhost:5000"
+const api_url ="http://13.203.229.232"
 const token=localStorage.getItem("token")
 if (shareRecipePage) {
     const recipeForm = document.querySelector('#shareRecipe-form')
