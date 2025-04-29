@@ -119,8 +119,9 @@ if (!url.includes('admin')) {
                         'Authorization': `Bearer ${token}`
                     }
                 })
-                console.log("admin credentials: ", setAdminCreds);
+                // console.log("admin credentials: ", setAdminCreds);
                 alert(setAdminCreds.data.message)
+                adminCredsForm.reset()
             })
         } catch (err) {
             console.log("error creating admin credentials: ", err);

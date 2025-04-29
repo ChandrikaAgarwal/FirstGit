@@ -48,8 +48,9 @@ if (pathParts.includes('admin')) {
                         }
                     })
                     console.log("admin credentials: ", setAdminCreds);
-                    // alert(setAdminCreds.data.message)
-                    window.location.href='/users'
+                    adminCredsForm.reset()
+                    window.location.href = '/users'
+                    
                 })
             } catch (err) {
                 console.log("error creating admin credentials: ", err);
