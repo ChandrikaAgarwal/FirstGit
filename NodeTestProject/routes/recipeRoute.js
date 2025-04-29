@@ -16,4 +16,5 @@ router.get('/api/getedit-recipe/:recipeId', jwtAuthMiddleware, recipeControl.get
 router.put('/api/edit-recipe/:recipeId', jwtAuthMiddleware, upload.array('files'), recipeControl.updateRecipe)
 router.get('/api/author-recipes/:authorId', jwtAuthMiddleware, recipeControl.getAuthorRecipes)
 router.get('/recipes', jwtAuthMiddleware, recipeControl.getSearchResults)
+router.get('/api/follower-recipes',jwtAuthMiddleware,recipeControl.getFollowerRecipes)
 module.exports = router;

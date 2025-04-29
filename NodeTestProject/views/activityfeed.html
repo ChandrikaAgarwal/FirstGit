@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="output.css">
+</head>
+<body id="activityFeed-page">
+    <nav class="bg-slate-400 border-gray-900 h-16 relative" id="navbar-home">
+        <a href="/home" class="text-white underline p-3" id="home">Home</a>
+        <a href="/share-recipe" class="text-white underline p-3" id="share-recipe">Share a Recipe</a>
+        <a href="/profile" class="text-white underline p-3" id="profile">My account</a>
+        <a href="/search" class="text-white underline p-3" id="search">Search</a>
+        <a href="/authors" class="text-white underline p-3" id="authors">Authors</a>
+        <a href="/mycollections" class="text-white underline p-3" id="mycollections">My collections</a>
+        <div id="username" class="text-black font-semibold absolute right-2 top-1"></div>
+        <a id="admin" href="/admin-creds" class="text-white underline p-3 absolute right-2 top-4 hidden">You are an
+            admin</a>
+    </nav>
+    <div class="filters m-3 flex flex-row bg-slate-950 rounded-lg justify-center items-center h-10">
+        <h4 class="mx-4 text-white font-bold">Filter by:</h4>
+        <div class="px-3 justify-center items-center flex">
+            <select name="main-ingredients" id="main-ingredients" class="outline outline-slate-950">
+                <option value="Please Select">Main Ingredients</option>
+                <option value="Wheat">Wheat</option>
+                <option value="Rice">Rice</option>
+                <option value="Beans/Pulses">Beans/Pulses</option>
+                <option value="Cheese/Paneer/Tofu">Cheese/Paneer/Tofu</option>
+                <option value="Egg">Egg</option>
+                <option value="Dairy">Dairy</option>
+                <option value="Flour">Flour</option>
+                <option value="Fruits">Fruits</option>
+                <option value="Grains">Grains</option>
+                <option value="Pasta">Pasta</option>
+                <option value="Vegetables">Vegetables</option>
+            </select>
+        </div>
+        <div class="px-3 justify-center items-center flex">
+            <select name="recipe-type" id="recipe-type" class="outline outline-slate-950">
+                <option value="Please Select">Recipe Type</option>
+                <option value="Baking">Baking</option>
+                <option value="Beverages">Beverages</option>
+                <option value="Breakfast">Breakfast</option>
+                <option value="Bread">Bread</option>
+                <option value="Desserts">Desserts</option>
+                <option value="Dinner">Dinner</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Quick Meal">Quick Meal</option>
+                <option value="Snacks">Snacks</option>
+                <option value="Special Occassion">Special Occassion</option>
+            </select>
+        </div>
+        <div class="px-3">
+            <select name="cuisine" id="cuisine" class="outline outline-slate-950">
+                <option value="pleaseSelect">Cuisine</option>
+                <option value="General">General</option>
+                <option value="African">African</option>
+                <option value="American">American</option>
+                <option value="Australian">Australian</option>
+                <option value="British">British</option>
+                <option value="Bengali">Bengali</option>
+                <option value="Chinese">Chinese</option>
+                <option value="European">European</option>
+                <option value="French">French</option>
+                <option value="German">German</option>
+                <option value="Indian">Indian</option>
+                <option value="Uncategorized">Uncategorized</option>
+            </select>
+        </div>
+    </div>
+    <div id="recipes" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 mx-auto max-w-7xl">
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script src="/script.js" defer></script>
+</html>

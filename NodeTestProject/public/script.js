@@ -12,7 +12,8 @@ const selectedRecipePage = document.querySelector("#selected-recipe")
 const authorsPage = document.querySelector('#authorsPage')
 const author = document.querySelector('#author')
 const adminCredsPage = document.querySelector('#adminCredsPage')
-let api_url = "http://localhost:5000"
+const activityFeedPg = document.querySelector('#activityFeed-page')
+let api_url = "http://13.203.229.232"
 const url = window.location.pathname.split('/')
 if (!url.includes('admin')) {
     if (signupForm) {
@@ -85,11 +86,11 @@ if (!url.includes('admin')) {
                     alert("Login successful!")
                     window.location.href = "/admin"
                 } else {
-                const loginRes = await axios.post(`${api_url}/users`, user)
-                console.log("login response: ", loginRes);
-                localStorage.setItem("token", loginRes.data.token)
-                alert("Login successful!")
-                loginForm.reset()
+                    const loginRes = await axios.post(`${api_url}/users`, user)
+                    console.log("login response: ", loginRes);
+                    localStorage.setItem("token", loginRes.data.token)
+                    alert("Login successful!")
+                    loginForm.reset()
                     window.location.href = "/home"
                 }
             } catch (err) {
@@ -118,11 +119,11 @@ if (!url.includes('admin')) {
                         'Authorization': `Bearer ${token}`
                     }
                 })
-                console.log("admin credentials: ",setAdminCreds);
+                console.log("admin credentials: ", setAdminCreds);
                 alert(setAdminCreds.data.message)
             })
         } catch (err) {
-            console.log("error creating admin credentials: ",err);
+            console.log("error creating admin credentials: ", err);
             
         }
     }
@@ -211,12 +212,12 @@ if (!url.includes('admin')) {
                 }
                 const response = await axios.get(`${api_url}/recipes?${query}`, {
                     headers: {
-                        'Authorization':`Bearer ${token}`
+                        'Authorization': `Bearer ${token}`
                     }
                 });
                 const recipes = response.data.matchedRecipe;
-                displayRecipes(recipes,false)
-            }catch(err){}
+                displayRecipes(recipes, false)
+            } catch (err) { }
         }
     }
     async function displayRecipes(allrecipes, showEditDelete) {
@@ -249,7 +250,11 @@ if (!url.includes('admin')) {
             const recipeName = document.createElement('h2');
             recipeName.textContent = recipe.name;
             recipeName.className = "text-xl font-bold text-red-700 mb-1";
-
+            
+            const authorName = document.createElement('p');
+            authorName.textContent = `By: ${recipe.username}`
+            authorName.className = "text-small font-bold text-black mb-1";
+            
             const avgRating = recipe.avgRating
             const recipeRating = document.createElement('div')
             recipeRating.innerHTML = ""
@@ -290,6 +295,7 @@ if (!url.includes('admin')) {
             }
             recipeCard.appendChild(recipeImg);
             recipeCard.appendChild(recipeName);
+            recipeCard.appendChild(authorName)
             recipeCard.appendChild(recipeRating)
             recipeCard.appendChild(recipeDesc);
             recipeCard.appendChild(readMore);
@@ -371,7 +377,7 @@ if (!url.includes('admin')) {
             
             }
         }
-        async function displayRecipe(recipe, usercollections, path,isCreator) {
+        async function displayRecipe(recipe, usercollections, path, isCreator) {
             const recipeDetailsDiv = document.querySelector("#recipeDetails")
             const mainIngredArray = JSON.parse(recipe.mainingrediant);
             const mainIngred = mainIngredArray.join(", ")
@@ -582,7 +588,7 @@ if (!url.includes('admin')) {
                     }
                 })
                 console.log("all Authors: ", getAuthors);
-                await displayAuthors(getAuthors.data.allAuthors,getAuthors.data.following)
+                await displayAuthors(getAuthors.data.allAuthors, getAuthors.data.following)
             } catch (err) {
                 console.log("error getting all authors ", err);
             
@@ -590,7 +596,7 @@ if (!url.includes('admin')) {
         }
 
 
-        async function displayAuthors(allauthors,following) {
+        async function displayAuthors(allauthors, following) {
             const authorList = document.querySelector('#authorsList')
             authorList.innerHTML = ""
             const followingIds = following.map(f => f.followingId);
@@ -617,14 +623,14 @@ if (!url.includes('admin')) {
                 authorRef.href = `/author/${author.id}`
                 authorRef.textContent = `${author.name}`
                 authorRef.className = "text-red-600 font-semibold hover:underline";
-                const followbutton=document.createElement('button')
-                followbutton.type="button"
+                const followbutton = document.createElement('button')
+                followbutton.type = "button"
                 followbutton.className = "follow absolute bottom-2 right-3 bg-black text-white rounded-md p-1 font-bold"
-                    if (followingIds.includes(author.id)) {
-                        followbutton.textContent = "Following"
-                        followbutton.disabled = true;
-                    } else {
-                        followbutton.textContent="Follow"    
+                if (followingIds.includes(author.id)) {
+                    followbutton.textContent = "Following"
+                    followbutton.disabled = true;
+                } else {
+                    followbutton.textContent = "Follow"
                 }
                 authorDiv.appendChild(authorRef)
                 authorDiv.appendChild(followbutton)
@@ -637,8 +643,8 @@ if (!url.includes('admin')) {
                         e.target.textContent = "Following"
                         let closestDiv = e.target.closest("div[id]")
                         let followingId = closestDiv.id
-                        let followingName=closestDiv.querySelector('a').textContent.trim()
-                        console.log("id:",followingId);
+                        let followingName = closestDiv.querySelector('a').textContent.trim()
+                        console.log("id:", followingId);
                         const userfollowed = {
                             followingId,
                             followingName
@@ -651,7 +657,7 @@ if (!url.includes('admin')) {
                         console.log("followUser: ", followUser);
                     }
                 } catch (err) {
-                    console.log("error following user: ",err);
+                    console.log("error following user: ", err);
                     
                 }
             })
@@ -683,6 +689,60 @@ if (!url.includes('admin')) {
         }
     }
 
+    if (activityFeedPg) {
+        const token = localStorage.getItem("token")
+        window.addEventListener('DOMContentLoaded', async () => {
+            const mainIngredientSelect = document.getElementById('main-ingredients');
+            const recipeTypeSelect = document.getElementById('recipe-type');
+            const cuisineSelect = document.getElementById('cuisine');
+            mainIngredientSelect.addEventListener('change', fetchAndDisplayRecipes);
+            recipeTypeSelect.addEventListener('change', fetchAndDisplayRecipes);
+            cuisineSelect.addEventListener('change', fetchAndDisplayRecipes);
 
+            await getFollwerRecipes()
+        })
+
+        async function getFollwerRecipes() {
+            try {
+                const getFollowerRecipes = await axios.get(`${api_url}/api/follower-recipes`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                console.log("follower recipes: ",getFollowerRecipes);
+                displayRecipes(getFollowerRecipes.data.recipes, false)
+            } catch (err) {
+                console.log("error getting follower recipes: ",err);
+                
+            }
+        }
+
+        async function fetchAndDisplayRecipes() {
+            const mainIngredient = document.getElementById('main-ingredients').value;
+            const recipeType = document.getElementById('recipe-type').value;
+            const cuisine = document.getElementById('cuisine').value;
+            try {
+                let query = "";
+                if (mainIngredient !== "Please Select") {
+                    query += `ingredients=${mainIngredient}&`;
+                }
+                if (recipeType !== "Please Select") {
+                    query += `type=${recipeType}&`;
+                }
+                if (cuisine !== "pleaseSelect") {
+                    query += `cuisine=${cuisine}&`;
+                }
+                query+=`feed=yes`
+                const response = await axios.get(`${api_url}/recipes?${query}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const recipes = response.data.matchedRecipe;
+                displayRecipes(recipes, false)
+            } catch (err) { }
+        }
+
+
+    }
 }
-

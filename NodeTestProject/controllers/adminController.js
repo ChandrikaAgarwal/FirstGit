@@ -166,16 +166,15 @@ exports.actionOnUser = async (req, res) => {
         let userId=parseInt(userid)
         const targetUser = await User.findByPk(userId)
         if (!reason && control === 'make-admin') {
-            console.log("make admin!!");
             if (targetUser) {
-                if (targetUser.isAdmin !== true) {
+                if (targetUser.isAdmin !== true && targetUser.isBanned===false) {
                     targetUser.isAdmin = true
                     await targetUser.save()
                 } else {
                     if (!targetUser) {
                         return res.status(404).json({ message: "User not found" })
                     } else if (targetUser.isAdmin === true) {
-                        return res.status(200).json({ message: "User is already an admin" })
+                        return res.status(500).json({ message: "User is already an admin" })
                     }
                 }
             }
@@ -186,7 +185,7 @@ exports.actionOnUser = async (req, res) => {
             } else if (!targetUser) {
                 return res.status(404).json({ message: "User not found" })
             } else if (targetUser.isBanned === true) {
-                return res.status(200).json({ message: "User is already banned" })
+                return res.status(500).json({ message: "User is already banned" })
             }
             actionTaken = await UserControls.create({
                 userId,

@@ -105,6 +105,10 @@ if (pathParts.includes('admin')) {
             recipeName.textContent = recipe.name;
             recipeName.className = "text-xl font-bold text-red-700 mb-1";
 
+            const authorName = document.createElement('p');
+            authorName.textContent = `By: ${recipe.username}`
+            authorName.className = "text-small font-bold text-black mb-1";
+
             const avgRating = recipe.avgRating
             const recipeRating = document.createElement('div')
             recipeRating.innerHTML = ""
@@ -143,6 +147,7 @@ if (pathParts.includes('admin')) {
             }
             recipeCard.appendChild(recipeImg);
             recipeCard.appendChild(recipeName);
+            recipeCard.appendChild(authorName)
             recipeCard.appendChild(recipeRating)
             recipeCard.appendChild(recipeDesc);
             recipeCard.appendChild(readMore);
@@ -311,62 +316,70 @@ if (pathParts.includes('admin')) {
             })
             //event-delegation
             authorList.addEventListener('click', async (e) => {
-                if (e.target.tagName==='BUTTON') {
-                    let control = e.target.className.split(' ')[0]
-                    console.log("control: ",control.trim());
-                    let userid = e.target.closest("div[id]").id
-                    // console.log("userId: ", userid);
-                    let reasonDiv = document.querySelector('#reasonDiv')
-                    let oldReasonForm = document.querySelector('#reason-form')
-                    let actionDetails
-                    if (control === 'ban-author' || control === 'remove-author') {
-                        reasonDiv.classList.remove('hidden')
-                        reasonDiv.classList.add('flex')
+                try {
+                    if (e.target.tagName === 'BUTTON') {
+                        let control = e.target.className.split(' ')[0]
+                        console.log("control: ", control.trim());
+                        let userid = e.target.closest("div[id]").id
+                        // console.log("userId: ", userid);
+                        let reasonDiv = document.querySelector('#reasonDiv')
+                        let oldReasonForm = document.querySelector('#reason-form')
+                        let actionDetails
+                        if (control === 'ban-author' || control === 'remove-author') {
+                            reasonDiv.classList.remove('hidden')
+                            reasonDiv.classList.add('flex')
                         
-                        // Clone and replace the form to remove old event listeners
-                        const newReasonForm = oldReasonForm.cloneNode(true);
-                        oldReasonForm.parentNode.replaceChild(newReasonForm, oldReasonForm);
+                            // Clone and replace the form to remove old event listeners
+                            const newReasonForm = oldReasonForm.cloneNode(true);
+                            oldReasonForm.parentNode.replaceChild(newReasonForm, oldReasonForm);
 
-                        newReasonForm.addEventListener('submit', async (e) => {
-                            e.preventDefault();
-                            let reason = e.target.reason.value.trim()
+                            newReasonForm.addEventListener('submit', async (e) => {
+                                e.preventDefault();
+                                let reason = e.target.reason.value.trim()
+                                const confirmAction = confirm("Are you sure you want to take this action?");
+                                if (!confirmAction) {
+                                    reasonDiv.classList.add('hidden')
+                                    return
+                                }
+
+                                actionDetails = {
+                                    reason,
+                                    control,
+                                    userid
+                                }
+                                reasonDiv.classList.add('hidden');
+                                e.target.reset();
+                                const actionTaken = await axios.post(`${apiUrl}/api/action`, actionDetails, {
+                                    headers: {
+                                        'Authorization': `Bearer ${token}`
+                                    }
+                                })
+                                console.log("action taken: ", actionTaken);
+                            
+                            })
+                        } else {
                             const confirmAction = confirm("Are you sure you want to take this action?");
                             if (!confirmAction) {
                                 reasonDiv.classList.add('hidden')
                                 return
                             }
-
                             actionDetails = {
-                                reason,
                                 control,
                                 userid
                             }
-                            reasonDiv.classList.add('hidden');
-                            e.target.reset();
-                            const actionTaken = await axios.post(`${apiUrl}/api/action`, actionDetails, {
+                            await axios.post(`${apiUrl}/api/action`, actionDetails, {
                                 headers: {
                                     'Authorization': `Bearer ${token}`
                                 }
-                            })
-                            console.log("action taken: ",actionTaken);
-                            
-                        })
-                    } else {
-                        const confirmAction = confirm("Are you sure you want to take this action?");
-                        if (!confirmAction) {
-                            reasonDiv.classList.add('hidden')
-                            return
+                            });
                         }
-                        actionDetails = {
-                            control,
-                            userid
-                        }
-                        await axios.post(`${apiUrl}/api/action`, actionDetails, {
-                            headers: {
-                                'Authorization': `Bearer ${token}`
-                            }
-                        }); 
-                    }             
+                    }
+                } catch (err) {
+                    console.log("Error in taking action: ", err);
+                    if (err.response && err.response.data.message) {
+                        alert(err.response.data.message)
+                    }
+                    
                 }
             })          
         }           

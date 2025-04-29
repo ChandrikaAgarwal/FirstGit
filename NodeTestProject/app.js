@@ -62,6 +62,9 @@ app.get('/create-collection', (req, res) => {
 app.get('/mycollections', (req, res) => {
     res.sendFile(path.join(__dirname,"views",'mycollections.html'))
 })
+app.get('/activity-feed', (req, res) => {
+    res.sendFile(path.join(__dirname, "views", 'activityfeed.html'))
+})
 app.get('/author/:authorId', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'author.html'))
 })
@@ -83,6 +86,7 @@ app.get('/admin-creds', (req, res) => {
 app.get('/admin/admin-creds', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'admincreds.html'))
 })
+
 app.use('/', userRoute)
 app.use('/', recipeRoute)
 app.use('/', collectionRoute)

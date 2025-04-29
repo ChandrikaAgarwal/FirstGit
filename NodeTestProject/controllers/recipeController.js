@@ -8,7 +8,7 @@ const Rating = require('../models/ratings')
 const Usercollection = require('../models/userCollection');
 const Collection = require('../models/collections');
 const RecipeCollection = require('../models/recipeCollection');
-
+const FollowUsers = require('../models/followUsers');
 exports.newRecipe = async (req, res, next) => {
     try {
         
@@ -129,13 +129,14 @@ exports.getSearchResults = async (req, res, next) => {
         if (!user) {
             return res.status(404).json({ message: "No user found" })
         }
-        const { name, cuisine, category, ingredients, type } = req.query
+        let matchedRecipe
+        const { name, cuisine, category, ingredients, type,feed } = req.query
         console.log("name: ",name);
         console.log("category: ", category);
         console.log("cuisine: ",cuisine);
         console.log("ingredients: ",ingredients);
         console.log("type: ", type);
-
+        
         const searchConditions = [];
         if (name) searchConditions.push({ name: { [Op.like]: `%${name}%` } });
         if (cuisine) searchConditions.push({ cuisine: { [Op.like]: `%${cuisine}%` } });
@@ -144,11 +145,29 @@ exports.getSearchResults = async (req, res, next) => {
         if (type) searchConditions.push({ recipetype: { [Op.like]: `%${type}%` } });
         console.log("search Conditions: ",searchConditions);
         
-        const matchedRecipe = await Recipe.findAll({
-            where: {
-                [Op.or]: searchConditions
-            }
-        })
+        //for activity feed
+        if (feed) {
+            const following = await FollowUsers.findAll({
+                where: {
+                    followerId: user.id
+                },
+                attributes: ['followingId']
+            })
+            const followingIds = following.map(f => f.followingId)
+            matchedRecipe = await Recipe.findAll({
+                where: {
+                    [Op.or]: searchConditions,
+                    userId: followingIds
+                }
+            })
+        } else {
+            matchedRecipe = await Recipe.findAll({
+                where: {
+                    [Op.or]: searchConditions
+                }
+            })
+        }
+        
         console.log("matched recipes: ",matchedRecipe);
         return res.status(200).json({message:"Matched Recipes: ",matchedRecipe})
     } catch (err) {
@@ -335,5 +354,32 @@ exports.getAuthorRecipes = async (req, res) => {
     } catch (err) {
         console.log("error getting the recipes: ", err);
         return res.status(500).json({ message: "error getting the recipe:", details: err })
+    }
+}
+
+exports.getFollowerRecipes = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.user.id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        const following = await FollowUsers.findAll({
+            where: {
+                followerId:user.id
+            },
+            attributes:['followingId']
+        })
+        const followingIds=following.map(f=>f.followingId)
+        const recipes = await Recipe.findAll({
+            where: {
+                userId:followingIds
+            }
+        })
+        // console.log("following ids: ",followingIds);
+        return res.status(200).json({message:"Getting follower recipes", recipes})
+    } catch (err) {
+        console.log("error getting the follower recipes: ",err);
+        
+        return res.status(500).json({ message: "error getting the follower recipes:", details: err })
     }
 }
