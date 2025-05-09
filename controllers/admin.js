@@ -89,15 +89,15 @@ exports.postAddProduct = (req, res, next) => {
 
 // }
 
-// exports.getProducts = (req, res, next) => {
+//admin side fetchAll products
+exports.getProducts = (req, res, next) => {
 
-//     // Product.findAll()
-//     req.user.getProducts()
-//         .then(products => {
-//             res.render('admin/products', {
-//                 prods: products,
-//                 pageTitle: 'Admin Products',
-//                 path: '/admin/products'
-//             });
-//         }).catch(err => console.log(err));
-// };
+    Product.fetchAll()
+        .then(products => {
+            res.render('admin/products', {
+                prods: products,
+                pageTitle: 'Admin Products',
+                path: '/admin/products'
+            });
+        }).catch(err => console.log(err));
+};

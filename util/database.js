@@ -7,6 +7,8 @@ const mongoConnect = callback => {
     MongoClient.connect('mongodb+srv://chandrika30:chandrika30@cluster0.f0j665r.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0').then(client => {
         console.log("connected");
         _db = client.db('e-commerce') //storing access to the database here. 
+        console.log(typeof(_db));
+        
         callback()
     }).catch(err => {
         console.log("could not connect");
