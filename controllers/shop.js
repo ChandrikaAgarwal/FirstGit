@@ -71,43 +71,50 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart= (req,res,next)=>{
 const prod_Id=req.body.ProductId //productId is the name we are using in the product-detail.ejs view file
-let fetchedCart;
-let newQty=1;
+  Product.findById(prod_Id).then(product => {
+    return req.user.addToCart(product)
+  }).then(result => {
+  console.log("result of updatedCart: ",result);
+  
+})
+// let fetchedCart;
+//   let newQty = 1;
+  
 // Product.findById(prod_Id,(product)=>{
 // console.log(prod_Id);
 // console.log(product);
 // Cart.addProduct(prod_Id,product.price);
 // })
 // res.redirect('/cart') //this will go to the get cart\
-req.user.getCart()
-.then(cart=>{
-  fetchedCart=cart;
-  return cart.getProducts({where:{id:prod_Id}}) //checking if the product is already present in the cart
-})
-.then(products=>{ //this products is an array but will hold only one product atmost if it is present in the cart.
-  let product;
-  if(products.length>0){
-    product=products[0]
-  }
+// req.user.getCart()
+// .then(cart=>{
+//   fetchedCart=cart;
+//   return cart.getProducts({where:{id:prod_Id}}) //checking if the product is already present in the cart
+// })
+// .then(products=>{ //this products is an array but will hold only one product atmost if it is present in the cart.
+//   let product;
+//   if(products.length>0){
+//     product=products[0]
+//   }
   
-  if(product){ //if product is present in the cart
-    const oldQuantity=product.cartItem.quantity;
-    newQty=oldQuantity+1;
-    return product
-    // return fetchedCart.addProduct(product,{through:{quantity:newQty}})
-  }
-//product not part of a cart yet
-return Product.findByPk(prod_Id)
-  // return fetchedCart.addProduct(product,{through:{quantity:newQty}}) //another method (addProduct) by sequelize for many to many relationships.
-  //this single product will be added to this inbetween table with its id.
-})
-.then(product=>{ //now here the data holds both the product and the quantity
-  return fetchedCart.addProduct(product,{through:{quantity:newQty}})
-})
-.then(()=>{
-  res.redirect('/cart')
-})
-.catch(err=>console.log(err))
+//   if(product){ //if product is present in the cart
+//     const oldQuantity=product.cartItem.quantity;
+//     newQty=oldQuantity+1;
+//     return product
+//     // return fetchedCart.addProduct(product,{through:{quantity:newQty}})
+//   }
+// //product not part of a cart yet
+// return Product.findByPk(prod_Id)
+//   // return fetchedCart.addProduct(product,{through:{quantity:newQty}}) //another method (addProduct) by sequelize for many to many relationships.
+//   //this single product will be added to this inbetween table with its id.
+// })
+// .then(product=>{ //now here the data holds both the product and the quantity
+//   return fetchedCart.addProduct(product,{through:{quantity:newQty}})
+// })
+// .then(()=>{
+//   res.redirect('/cart')
+// })
+// .catch(err=>console.log(err))
 
 
 };
