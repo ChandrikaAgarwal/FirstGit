@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const User = require('../models/user');
 // const Cart = require('../models/cart');
 // const Order=require('../models/order');
 
@@ -120,32 +121,20 @@ const prod_Id=req.body.ProductId //productId is the name we are using in the pro
 
 exports.postCartDeleteProd=(req,res,next)=>{
   const prodId=req.body.productId;
-  console.log("Body!!!",req.body);
   
-  console.log("Product ID !!! ",prodId);
-  
-  req.user.getCart().then(cart=>{
-    console.log("Cart Found!!!",cart);
-    
-    return cart.getProducts({where:{id:prodId}})
-  })
-  .then(products=>{
-    if(!products||products.length===0){
-      throw new Error("Product not found in cart.");
-    }else{
-      const product=products[0] //we destroy the product not in the products table but in the cartItems table that connects the cart and the product
-      console.log("Product to delete: ",product);
+  req.user.deleteById(prodId)
+        .then(result => {
+          console.log(result);
+          res.redirect('/cart')
+        }).catch(err => console.log(err));
+      // const product=products[0] //we destroy the product not in the products table but in the cartItems table that connects the cart and the product
+      // console.log("Product to delete: ",product);
       
-      return product.cartItem.destroy()
+      // return product.cartItem.destroy()
     }
-    })
-  .then(result=>{
-    console.log("Product removed from cart!!");
-    
-    res.redirect('/cart')
-  })
-  .catch(err=>console.log(err))
-}
+ 
+  
+ 
 
 exports.postOrder=(req,res,next)=>{
   let fetchedCart

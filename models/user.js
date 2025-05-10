@@ -58,6 +58,17 @@ class User{
             })
         })
     }
+    deleteById(prod_Id) {
+        const db = getDb();
+        const userCartItems = this.cart.items.filter(item => {
+            return item.productId.toString()!==prod_Id.toString() //return true if we want to keep the items and return false f we want to get rid of it.
+        })
+        return db.collection('users').updateOne({ _id: new mongodb.ObjectId(this._id) },{$set:{cart:{items:userCartItems}}})
+            .then(result => {
+            console.log("product deleted");
+            
+        }).catch(err=>console.log(err))
+    }
     static findById(userId) {
         const db = getDb();
         return db.collection('users')
