@@ -50,18 +50,15 @@ exports.getIndex = (req, res, next) => {
 exports.getCart = (req, res, next) => {
   console.log("Cart!!!",req.user.cart);//undefined- we cannot access cart as a property here
   
-  req.user.getCart().then(cart=>{
-    return cart
-    .getProducts() //returning the products inside of the cart
+  req.user.getCart() //returning the products inside of the cart
     .then(products=>{
       res.render('shop/cart', {
           path: '/cart',
           pageTitle: 'Your Cart',
           products:products
         });
-    })
-  .catch(err=>console.log(err))
-})
+    }).catch(err=>console.log(err))
+
     .catch(err=>console.log(err));
   // res.render('shop/cart', {
   //   path: '/cart',
@@ -72,9 +69,11 @@ exports.getCart = (req, res, next) => {
 exports.postCart= (req,res,next)=>{
 const prod_Id=req.body.ProductId //productId is the name we are using in the product-detail.ejs view file
   Product.findById(prod_Id).then(product => {
-    return req.user.addToCart(product)
+   return req.user.addToCart(product)
+    
   }).then(result => {
-  console.log("result of updatedCart: ",result);
+    console.log("result of updatedCart: ", result);
+    res.redirect('/cart')
   
 })
 // let fetchedCart;
