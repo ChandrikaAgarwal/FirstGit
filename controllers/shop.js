@@ -138,34 +138,17 @@ exports.postCartDeleteProd=(req,res,next)=>{
 
 exports.postOrder=(req,res,next)=>{
   let fetchedCart
-  req.user.getCart().then(cart=>{
-    fetchedCart=cart;
-    return cart.getProducts()
-  })
-  .then(products=>{
-    return req.user.createOrder()
-    .then(order=>{
-      return order.addProducts(products.map(product=>{
-        product.orderItem={quantity:product.cartItem.quantity}; //the name orderItem should be similar to the name defined in the model orderItem
-        // we get the quantity as above
-        return product;
-      }));
-    })
-    .catch(err=>console.log(err))
-    console.log(products);
-    
-  })
-  .then(result=>{
-   return fetchedCart.setProducts(null)
-  })
+  req.user
+    .addOrder()
   .then(result=>{
     res.redirect('/orders')
 
   })
   .catch(err=>console.log(err))
 }
+
 exports.getOrders = (req, res, next) => {
-  req.user.getOrders({include:['products']}).then(orders=>{
+  req.user.getOrders().then(orders=>{
     console.log("Orders!!!",orders);
     
     res.render('shop/orders', {
