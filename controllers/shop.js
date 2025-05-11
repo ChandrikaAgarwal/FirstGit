@@ -4,7 +4,7 @@ const User = require('../models/user');
 // const Order=require('../models/order');
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll().then(products=>{
+  Product.find().then(products=>{
     res.render('shop/product-list', {
       prods: products,
       pageTitle: 'All Products',
@@ -15,19 +15,6 @@ exports.getProducts = (req, res, next) => {
 
 exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId; //so because we have used productId as the name after the colon so we can use it on params object
-  // Product.fetchAll({ //sequelize also has a findById method.
-  //   where:{
-  //     id:prodId,
-  //   }
-  // }).then(products=>{
-  //   res.render('shop/product-detail', {
-  //     product: products[0],
-  //     pageTitle: products[0].title,
-  //     path: '/products'
-  //   });
-  // }).catch((err)=>{
-  //   console.log(err);
-  // })
   Product.findById(prodId)
   .then(product=>{
     res.render('shop/product-detail', {
@@ -39,7 +26,7 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll().then(products=>{
+  Product.find().then(products=>{
     res.render('shop/index', {
       prods: products,  //rows are the entries in our products table
       pageTitle: 'Shop',

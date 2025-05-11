@@ -15,9 +15,9 @@ exports.postAddProduct = (req, res, next) => {
     const imageUrl = req.body.imageUrl;
     const price = req.body.price;
     const description = req.body.description;
-    const product = new Product(title, price, description, imageUrl,null,req.user._id);
+    const product = new Product({title:title, price:price,imageUrl:imageUrl,description:description,userId:req.user}); //b/c we have saved our user into the request
     product
-        .save()
+        .save() 
         .then(result => {
             console.log('Product Created!');
             res.redirect('/admin/products')
@@ -56,10 +56,11 @@ exports.postEditProduct = (req, res, next) => {
     const updatedimageUrl = req.body.imageUrl;
     const updatedDescription = req.body.description;
     
-    const product = new Product(updatedTitle, updatedPrice, updatedDescription, updatedimageUrl, prodId)
-        product.save() //save method takes the data as we edit it and saves it back to the db. 
+    const product =  Product.updateOne({ title:updatedTitle, price: updatedPrice, description:updatedDescription, imageUrl:updatedimageUrl })
+        // product.save() //save method takes the data as we edit it and saves it back to the db. 
         //here we are returning the promise that is returned by save.
         .then(result => {
+            // product.save()
             console.log('UPDATED PRODUCT');
             res.redirect('/admin/products')
 
@@ -71,8 +72,12 @@ exports.postEditProduct = (req, res, next) => {
 //admin side fetchAll
 exports.getProducts = (req, res, next) => {
 
-    Product.fetchAll()
+    Product.find()
+    .select('title price -_id')
+    .populate('userId', 'name')
         .then(products => {
+            console.log("products: ",products);
+            
             res.render('admin/products', {
                 prods: products,
                 pageTitle: 'Admin Products',
@@ -83,7 +88,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.params.productId
-    Product.deleteById(prodId)
+    Product.findByIdAndDelete(prodId )
         .then(()=>{
         console.log("DESTROYED PRODUCT");
         res.redirect('/admin/products')
