@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="fonts.css">
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary py-4 py-lg-0 shadow">
+<div class="container px-4">
+        <a class="navbar-brand d-flex align-items-center" href="http://localhost:5000/expenses">
+            <img src="navBarLogo.png" alt="" class="nav_logo"> <sup class="daytodayexpenses">Day to Day Expenses</sup>
+        </a>
+</div>
+<button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#top-navbar"
+    aria-controls="top-navbar">
+    <i class="fa-solid fa-bars"></i>
+</button>
+        <button type="button" class="premium_member">Buy Premium Membership</button>
+        <h5 class="premiumUser"></h5><br><br>
+        <div class="collapse navbar-collapse justify-content-center d-none d-lg-flex" id="navbarNav">
+          <ul class="navbar-nav nav-underline">
+            <li class="nav-item"><a class="flex-sm-fill text-sm-center nav-link" href="/expenses">Daily</a>
+            </li>
+            <li class="nav-item"><a class="flex-sm-fill text-sm-center nav-link " href="/monthly">Monthly</a>
+            </li>
+            <li class="nav-item"><a class="flex-sm-fill text-sm-center nav-link " href="/weekly">Weekly</a>
+            </li>
+            <li class="nav-item"><a class="flex-sm-fill text-sm-center nav-link active" href="/report">Report</a></li>
+            <li class="nav-item"><a class="flex-sm-fill text-sm-center nav-link "
+            href="/premium">LeaderBoard</a></li>
+        </ul>
+        </div>
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="top-navbar" aria-labelledby="top-navbarLabel">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#top-navbar"
+                aria-controls="top-navbar">
+                <div class="d-flex justify-content-between p-3">
+                    <i class="fa-solid fa-bars"></i>
+                </div>
+            </button>
+       <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="top-navbarLabel">Menu</h5>
+       </div>
+    <div class="offcanvas-body">
+        <div class="mobile-logo d-none">
+            <img src="navBarLogo.png" alt="Logo" width="70">
+            <span>Day to Day Expenses</span>
+        </div>
+        <ul class="navbar-nav nav-underline">
+            <li class="nav-item daily"><a class="flex-sm-fill text-sm-center nav-link" href="/expenses">Daily</a>
+            </li>
+            <li class="nav-item monthly"><a class="flex-sm-fill text-sm-center nav-link " href="/monthly">Monthly</a>
+            </li>
+            <li class="nav-item weekly"><a class="flex-sm-fill text-sm-center nav-link " href="/weekly">Weekly</a>
+            </li>
+            <li class="nav-item report"><a class="flex-sm-fill text-sm-center nav-link active" href="/report">Report</a>
+            </li>
+            <li class="nav-item leaderBoard"><a class="flex-sm-fill text-sm-center nav-link " href="/premium">LeaderBoard</a>
+            </li>
+        </ul>
+    </div>
+    </div>
+    </nav>
+    <form action="/report" id="reportForm">
+       
+    <label for="monthSelect">Select Month:</label>
+    <select id="monthSelect"></select>
+    <label for="yearSelect">Select Year:</label>
+    <select id="yearSelect"></select><br />
+    <button type="submit" class="btn btn-primary submitBtn">Submit</button><br /><br />
+    </form>
+    <button id="download-report" class="btn btn-primary d-flex">Download Report</button>
+
+    <div class="container report-container">
+        <div class="displayYear">
+            <h5 id="year"></h5>
+        </div> <br >
+        <div class="displayMonth">
+            <h5 id="month"></h5>
+        </div>
+        <div class="report">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">DATE</th>
+                    <th scope="col">DESCRIPTION</th>
+                    <th scope="col">CATEGORY</th>
+                    <th scope="col">INCOME</th>
+                    <th scope="col">EXPENSE</th>
+                </tr>
+            </thead>
+            <tbody class="displayMonthReport"></tbody>
+        </table><br ><br >
+        <h5 id="yearReporthead">Yearly Report</h5>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">Month</th>
+                    <th scope="col">Income</th>
+                    <th scope="col">Expense</th>
+                    <th scope="col">C/F</th>
+                    <th scope="col">Savings</th>
+                </tr>
+            </thead>
+            <tbody class="displayYearReport"></tbody>
+        </table>
+        <h5 id="downloadedReports" style="margin-top: 3%;">Your Downloaded Reports</h5>
+        <div class="report-links">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Sr</th>
+                        <th>Date</th>
+                        <th>Report</th>
+                    </tr>
+                </thead>
+                <tbody id="link-list"></tbody>
+            </table>
+        </div>
+        </div>
+    </div>
+    
+    </body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="report.js"></script>
+    </html>

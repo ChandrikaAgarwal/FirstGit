@@ -1,0 +1,36 @@
+{
+  "name": "1.0-expense_tracker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js",
+    "start-server": "node app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "description": "",
+  "dependencies": {
+    "@getbrevo/brevo": "^2.2.0",
+    "aws-sdk": "^2.1692.0",
+    "axios": "^1.7.9",
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^1.20.3",
+    "cashfree-pg": "^4.3.10",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.12.0",
+    "sequelize": "^6.37.5",
+    "sib-api-v3-sdk": "^8.5.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/sequelize": "^4.28.20",
+    "nodemon": "^3.1.9"
+  }
+}

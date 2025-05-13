@@ -1,0 +1,610 @@
+#toggle {
+    background-color: #74b174dc;
+    padding: 8px;
+    border-radius: 10px;
+}
+/* #expense-form {
+    display: none;
+    /* Initially hidden */
+    /* transition: all 0.3s ease-in-out; */
+/* }  */
+
+/* #expense-form.show {
+    display: block;
+    /* Show when class is added */
+/* } */ 
+body{
+    @media (max-width: 768px) {
+            .navbar-brand {
+                display: none !important;
+                /* Navbar se logo hatao */
+            }
+    
+            .mobile-logo {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                /* margin-bottom: 0.5rem; */
+            }
+        }
+    
+        /* Desktop Mode (Navbar mein wapas show karne ke liye) */
+        @media (min-width: 769px) {
+            .mobile-logo {
+                display: none !important;
+            }
+        }
+    background: linear-gradient(to bottom, white,#74b174dc);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: rgba(255, 255, 255, 0.5);
+        /* White transparent overlay */
+    background-blend-mode: overlay;
+    background-attachment: fixed;
+        /* Fix background so it doesn't scroll */
+        height: 100vh;
+        /* Full viewport height */
+        margin: 0;
+        padding: 0;
+}
+/* offcanvas-title{
+    padding: 1rem;
+} */
+.offcanvas-body {
+    padding-top: 10px !important;
+    /* Top ka extra gap hatane ke liye */
+}
+.offcanvas-body ul {
+    padding: 0;
+    margin: 0;
+}
+#add,
+#cancel,
+#save {
+    margin-top: 2%;
+    background-color: #74b174dc;
+    padding: 8px;
+    border-radius: 10px;
+    display: block;
+    flex-direction: column;
+    gap: 3px;
+    cursor: pointer;
+}
+
+#cancel {
+    margin-bottom: 20%;
+    margin-right: 50%;
+}
+
+input {
+    border: none;
+    border-bottom: 2px solid #74b174dc;
+    outline: none;
+    width: 200px;
+    padding: 5px;
+}
+
+#amount {
+    margin-right: 2%;
+}
+
+.col {
+    display: block;
+}
+
+
+.detailDiv {
+    display: flex;
+}
+
+.descaddbtn {
+    display: flex;
+}
+
+#show-form {
+    /* position: relative; */
+    padding: 10px;
+    background-color: #74b174dc;
+    border-radius: 10px;
+    display: flex;
+    z-index: 1050;
+}
+/* @media (max-width: 768px){
+    #show-form {
+        /* padding-bottom: 3%; */
+    /* } */
+/* }  */
+
+.navbar {
+    background-image: url("rupeeFalling.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    height: 85px;
+    padding: 0 20px;
+}
+
+.daytodayexpenses {
+    font-size: 25px;
+    font-weight: bolder;
+    font-family: 'Bodoni Moda',serif;
+    font-style: italic;
+    outline: none;
+    color: black;
+    position: absolute;
+    left:8%;
+    top: 40%;
+    display: flex;
+    justify-content: start;
+     /* Left align */
+    align-items: center;
+    /* padding-left: 20px; */
+}
+
+a:hover {
+    cursor: pointer;
+}
+
+.nav-underline {
+    position: absolute;
+    bottom: 1%;
+    left: 30%;
+    display: flex;
+    gap: 45px;
+    justify-content: space-between;
+    /* width: 40%;  */ 
+}
+
+
+ul{
+       /* display: flex; */
+        justify-content: start;
+        gap: 30px;
+        align-items: center;
+        padding-left: 20px;
+        list-style: none;
+}
+
+.nav-item,.nav-link{
+       font-family: 'Bodoni Moda',serif;
+        font-size: 20px;
+        margin-left: 13px;
+        font-weight: bolder;
+        color: black !important;
+}
+.nav-item, .nav-link.active {
+    color: black !important;
+    /* Active link bhi black hi rahega */
+}
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+.nav_logo {
+    height: 120px;
+    width: auto;
+    position: absolute;
+    left:2%;
+    /* margin-left: ; */
+}
+/* .collapse {
+    transition: height 0.3s ease-in-out;
+    /* display: block !important; */
+    /* height: auto !important; */
+/* } */ */
+#navbarNav {
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    overflow: visible !important;
+}
+p {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    margin-right: 2%;
+    position: relative;
+    left: 20%;
+}
+
+.slider {
+    width: 50%;
+    /* background-color: #74b174dc; */
+    background-color: gold;
+    height: 50px;
+    margin-top: 2%;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+}
+
+
+button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.incomecol {
+    /* display: flex; */
+    gap: 10px;
+    /* Add spacing between elements */
+    align-items: center;
+}
+
+.editIncome i,
+.deleteIncome i {
+    color: rgb(216, 211, 211)
+}
+
+.editIncome:hover i,
+.deleteIncome:hover i {
+    color: rgb(24, 49, 83)
+        /* Change color on hover */
+}
+
+.editIncome,
+.deleteIncome {
+    background: none;
+    margin-left: 2%;
+    font-size: 15px;
+}
+
+.incomecol li {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    font-weight: 600;
+}
+.allExpenses {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 3%;
+}
+.allExpenses li {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border: 1px solid rgb(105, 48, 202);
+    /* background:linear-gradient(to right,rgb(105, 48, 202),#956ed8 ); */
+    background: linear-gradient(to right, darkgreen, rgb(151, 238, 170));
+    padding: 10px;
+    border-radius: 30px;
+    font-weight: bold;
+}
+
+.deleteExpense,
+.editExpense {
+    background: none;
+    color: rgb(216, 211, 211);
+    align-items: center;
+}
+
+.editExpense:hover i,
+.deleteExpense:hover i {
+    color: rgb(24, 49, 83)
+        /* Change color on hover */
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    top: 70%;
+    /* Vertical center */
+    transform: translateY(-50%);
+    /* Center adjustment */
+    width: auto;
+    /* Adjust width */
+    filter: invert(0%);
+    
+}
+
+#prevbtn,#nextbtn {
+    justify-content: center;
+    /* color: black !important; */
+}
+
+#dateDisplay,
+#monthDisplay,
+#weekDisplay {
+    color: black;
+    text-align: center;
+    font-weight: bold;
+    font-family: 'Bodoni Moda',serif;
+    margin-top: 1.5%;
+}
+
+.monthlyOverView,.weeklyOverView {
+    align-items: center;
+    /* border: 2px, solid, #154b05; */
+    /* border-radius: 10px; */
+    padding: 15px;
+    font-family: 'Times New Roman';
+    font-weight: bold;
+    display: block;
+    margin-left: 10%;
+    margin-right: 5%;
+    /* outline: #007bff; */
+}
+.cf,.totalbalance{
+    margin-left: -5%;
+}
+hr{
+    border-top: 2px solid black;
+    /* margin: 20px auto; */
+}
+/* .totalIncomeDisplay,.totalExpenseDisplay,.cfDisplay,.balanceDisplay{
+    margin-left: 20%;
+    margin-bottom: 5px;
+    font-family: cursive;
+    display: flex;
+    gap:10px;
+    
+} */
+.totalIncomeDisplay,.totalExpenseDisplay,.cfDisplay,.balanceDisplay{
+    margin-left: 20%;
+    margin-bottom: 5px;
+    font-family: cursive;
+    display: flex;
+    gap:10px;
+    
+}
+/* .premium_member {
+    background-color: rgb(105, 48, 202);
+    position: absolute;
+    top: 10px;
+    left: 86%;
+    display: flex;
+    gap: 45px;
+    border-radius: 8px;
+    font-weight: 400;
+    font-size: 14px;
+    padding: 6px 10px;
+
+} */
+
+.premium_member {
+    background-color: rgb(105, 48, 202);
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+    font-weight: 400;
+    font-size: 14px;
+    padding: 6px 10px;
+    color: white;
+    white-space: nowrap;
+    z-index: 9999;
+
+}
+
+
+@media (max-width: 768px) {
+    .premium_member {
+        position: relative;
+        /* Absolute ki jagah fixed kiya */
+        top: -30px;
+        /* Top par fix */
+        left:45%;
+        /* right:2%; */
+        /* Right corner pe fix */
+        font-size: 12px;
+        /* Smaller font */
+        padding: 5px 8px;
+        /* Adjust padding */
+    }
+        
+}
+
+.premiumUser {
+    color: gold;
+    position: absolute;
+    top: 50px;
+    right:10px;
+    /* left: 85%; */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    font-size: 18px;
+    white-space: nowrap;
+    z-index: 9999;
+}
+ @media (max-width: 768px) {
+    .premiumUser{
+position: relative;
+/* Absolute ki jagah relative kiya */
+top: 2px;
+/* Remove top margin */
+left:50px;
+right: 17px;
+/* Reset right */
+display: flex;
+align-items:end;
+/* Center elements */
+font-size: 16px;
+/* Smaller text */
+gap: 5px;
+color: black;
+/* Less gap */
+}
+} 
+/* .displayMonthReport{
+    text-align: left;
+} */
+.monthExpenses{
+
+    background: linear-gradient(to right, rgb(112, 112, 235),white);
+}
+table{
+    border-radius: 30px;
+    box-shadow: 0 4px 8px rgba(8, 8, 8, 0.1);
+    border-collapse: separate;
+    border-spacing: 0;
+        /* Space remove karne ke liye */
+    overflow: hidden;
+}
+thead{
+    font-family: 'Bodoni Moda',serif;
+}
+th,
+td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+    /* Border color */
+}
+th:first-child {
+    border-top-left-radius: 10px;
+}
+
+th:last-child {
+    border-top-right-radius: 10px;
+}
+
+tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+}
+
+tr:last-child td:last-child {
+    border-bottom-right-radius: 10px;
+}
+
+.disabled {
+    opacity: 0.5;
+    /* pointer-events: none; */
+    cursor: not-allowed;
+    background-color: grey;
+}
+.leaderBoard.disabled {
+    color: grey !important;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+#pagination{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+}
+
+#pagination button:hover {
+    background-color: #7656eb;
+}
+
+#year,#month,#yearReporthead,#downloadedReports{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1%;
+    color: red;
+    position: relative;
+    top: -20px;
+}
+.report-container{
+    position: relative;
+    top:-15px;
+}
+/* .savingsandIncome{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+} */
+.incomedisplayed{
+    text-align: left;
+    font-family: "Cookie",cursive;
+    font-size: 23px;
+}
+.savingsdisplay,.incomedisplay{
+    margin-top: 2%;
+    margin-left: 25%;
+    border:1px solid gold;
+    height: 50px;
+    width: 50%;
+    background: linear-gradient(to right, orange,rgb(248, 222, 174) );
+    /* background: linear-gradient(to right, darkgreen, rgb(151, 238, 170)); */
+    border-radius: 10px;
+    display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+}
+.savingsHead,.incomeHead{
+    display: flex;
+    position: static;
+    margin-left: 3%;
+    color: white;
+    font-family: 'Germania One',cursive;
+}
+
+.savingsAmount{
+
+    position: absolute;
+    left: 60%; 
+    color: darkgreen;
+
+    font-family: 'Germania One',cursive; 
+}
+.navbar-toggler {
+    position: relative;
+    z-index: 9999;
+    right:20%;
+    /* Premium button se chhota rakhna */
+}
+.offcanvas {
+    z-index: 1050 !important;
+    /* Default Bootstrap se zyada value rakhna */
+}
+.offcanvas-body {
+    padding-top: 0.5rem !important;
+    /* Kam padding */
+}
+.offcanvas-title {
+    margin-bottom: 0.5rem;
+    /* Title aur links ke beech ka gap kam karo */
+}
+@media (max-width: 768px) {
+    .navbar-toggler{
+        right: 0;
+    }
+}
+
+.incomeTable{
+    max-width:400px;
+    /* margin-top: 2%;
+    margin-left: 35%; */
+    margin: 5px auto;
+    border-collapse: collapse;
+    
+}
+.incomeAmount{
+    width: 200px;
+}
+th,
+td {
+   
+    padding: 5px 10px;
+    /* Cells ke andar spacing adjust karna */
+    text-align: center;
+    /* Center align karna */
+    white-space: nowrap;
+    /* Text ko ek line me rakhna */
+}
+
+/* Mobile Mode (Offcanvas ke andar show karne ke liye) */
+.displayYearReport {
+    margin-bottom: 20px;
+    /* Adjust space between heading and table */
+}

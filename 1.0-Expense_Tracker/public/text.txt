@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="fonts.css">
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary d-flex justify-content-between align-items-center p-2">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="http://localhost:5000/expenses">
+                <img src="navBarLogo.png" alt="" class="nav_logo"> <sup class="daytodayexpenses">Day to Day
+                    Expenses</sup>
+            </a>
+
+            <button type="button" class="premium_member">Buy Premium Membership</button>
+            <h5 class="premiumUser"></h5><br><br>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                style="outline: auto; display: flex;"><span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav nav-underline d-flex">
+                    <li class="nav-item daily "><a class="flex-sm-fill text-sm-center nav-link active "
+                            href="/expenses">Daily</a></li>
+                    <li class="nav-item monthly"><a class="flex-sm-fill text-sm-center nav-link"
+                            href="/monthly">Monthly</a>
+                    </li>
+                    <li class="nav-item weekly"><a class="flex-sm-fill text-sm-center nav-link "
+                            href="/weekly">Weekly</a></li>
+                    <li class="nav-item report"><a class="flex-sm-fill text-sm-center nav-link "
+                            href="/report">Report</a></li>
+                    <li class="nav-item leaderBoard"><a class="flex-sm-fill text-sm-center nav-link "
+                            href="/premium">LeaderBoard</a></li>
+                </ul>
+            </div>
+
+    </nav>
+    <div class="container slider">
+        <div id="myslideshow" class="carousel slide" data-bs-ride="false">
+            <div class="carousel-inner">
+                <div class="carousel-item active" id="dateDisplay">
+
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#myslideshow" data-bs-slide="prev"
+                id="prevbtn">
+                <span class="carousel-control-prev-icon p-3 rounded-circle" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+
+            <button class="carousel-control-next" type="button" data-bs-target="#myslideshow" data-bs-slide="next"
+                id="nextbtn">
+                <span class="carousel-control-next-icon p-3 rounded-circle" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+    <div class="expense-Div container-fluid fixed-bottom pb-3 ">
+        <button type="button" data-bs-toggle="collapse" data-bs-target="#expense-form" aria-expanded="false"
+            id="show-form" class="rounded-pill"><i class="fa-solid fa-plus"></i></button>
+        <form action="/expenses" method="GET" id="expense-form" class="collapse collapse-horizontal">
+            <hr class="p-2" />
+            <button id="toggle" type="button">EXPENSE</button>
+            <sup>Click to change</sup> <br /> <br />
+            <div class="detailDiv grid gap-3">
+                <div class="g-col-0 dropdown">
+                    <button id="categoryDropdown" type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown"><i
+                            class="fa-solid fa-icons"></i></button>
+                    <div class="dropdown-menu">
+                        <select class="form-select" name="category" id="category">
+                            <option value="" disabled selected>Choose...</option>
+                            <option value="Food">Food</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Entertainment">Entertainment</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="g-col-1">
+                    <input type="number" name="amount" id="amount" placeholder="Amount"> <br />
+                    <!-- class="ms-0" -->
+                </div>
+            </div>
+            <div class=" descaddbtn grid gap-3">
+                <div class="g-col-5">
+                    <input type="text" name="description" class="mt-1 " id="description" placeholder="Enter Text">
+                    <br />
+                </div>
+                <div class="g-col-0 offset-sm-9">
+                    <button type="button" id="cancel" class="rounded-5 p-3" style="display: none;"><i
+                            class="fa-solid fa-xmark"></i></button>
+                    <button type="button" id="save" class="rounded-5 p-3" style="display: none;">SAVE</button>
+                    <button type="submit" id="add" class="rounded-5 p-3" style="display: block;"><i
+                            class="fa-solid fa-check"></i></button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="container savingsandIncome">
+        <div class="d-flex incomedisplay">
+            <div class="col incomeHead">
+                <h4>Total Income</h4>
+            </div>
+
+        </div>
+    </div>
+    <div class="container fixed-bottom pb-3" id="pagination">
+        <button id="prevPage"><i class="fa-solid fa-backward"></i></button>
+        <span id="pageNumber">1</span>
+        <button id="nextPage"><i class="fa-solid fa-forward"></i></button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
