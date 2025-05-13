@@ -2,7 +2,7 @@ const User = require('../models/user')
 const ResetPassword = require('../models/forgotPasswordReq')
 const { v4: uuidv4 } = require('uuid');
 const { jwtAuthMiddleware, generateToken } = require('../jwtmiddleware');
-const { Sequelize, Op } = require('sequelize');
+
 require('dotenv').config()
 const bcrypt = require('bcryptjs')
 const Sib = require('sib-api-v3-sdk')
@@ -23,20 +23,21 @@ exports.postAddUser = async (req, res, next) => {
         const email = req.body.email
         const phone = req.body.phone
         const password = req.body.password
-        const user = await User.findOne({ where: { email: email } })
+        const user = await User.findOne({ email: email })
         if (user) {
             return res.status(400).json({ message: "User already exists. Please log in." });
         }
 
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds)
-        const newUser = await User.create({
+        const newUser = new User({
             name: name,
             email: email,
             phone: phone,
             password: hashedPassword
         })
-        const token = generateToken({ id: newUser.id, email: newUser.email, phone: newUser.phone }) //we call this function when the user has successfully logged in
+        await newUser.save()
+        const token = generateToken({ newUser }) //we call this function when the user has successfully logged in
         console.log("New User Created: ", newUser, "Token :", token);
 
         return res.status(200).json({ message: "New user created ", userdetail: newUser, token: token })
@@ -53,7 +54,7 @@ exports.getUser = async (req, res, next) => {
     try {
         const email = req.body.email
         const password = req.body.password
-        const user = await User.findOne({ where: { email: email } })
+        const user = await User.findOne({ email: email } )
         if (!user) {
             return res.status(400).json({ message: "Not a user. Kindly signup" });
         }
@@ -65,7 +66,7 @@ exports.getUser = async (req, res, next) => {
             return res.status(401).json({ message: "Password is incorrect" })
 
         }
-        const token = generateToken({ id: user.id, email: user.email, phone: user.phone })
+        const token = generateToken({ id: user._id })
         console.log("Existing User:", user, "Token: ", token);
         return res.status(200).json({ message: "Login successful", existinguser: user, token })
         // console.log("New user: ",newUser);
@@ -79,18 +80,26 @@ exports.getUser = async (req, res, next) => {
 exports.forgotPassword = async (req, res, next) => {
     try {
         const newEmail = req.body.email
-        const user = await User.findOne({ where: { email: newEmail } })
+        console.log("new Email: ",newEmail);
+        
+        const user = await User.findOne({ email: newEmail })
+        console.log("user: ",user);
+        
         if (!user) {
-            alert("Not a user. Kindly Signup")
-            // return res.status(400).json({ message: "Not a user. Kindly signup" })
+            // alert("Not a user. Kindly Signup")
+            return res.status(400).json({ message: "Not a user. Kindly signup" })
         }
-        const userId = user.id
+        
         const resetId=uuidv4()
-        const resetPassRequest = await user.createResetPassword({
-            id:resetId,
-            isActive:true,
+        const resetPassRequest = new ResetPassword({
+           
+            isActive: true,
+            userId : user._id
         })
-        const resetLink =`http://localhost:5000/password/resetpassword/form/${resetId}`
+        console.log("new reset password request: ", resetPassRequest);
+        
+        await resetPassRequest.save()
+        const resetLink =`http://localhost:5000/password/resetpassword/form/${resetPassRequest._id}`
         const sender = {
             email: 'chandrikaagarwal086@gmail.com'
         }
@@ -118,7 +127,7 @@ exports.forgotPassword = async (req, res, next) => {
 exports.checkActiveStatus = async (req, res, next) => {
     try { 
         const requestId = req.params.reqId //bcoz requestId ek object hai
-        const isPresent = await ResetPassword.findOne({ where: { id: requestId } })
+        const isPresent = await ResetPassword.findOne({ _id: requestId })
         if (isPresent && isPresent.isActive === true) {
             res.status(200).json({ message: "Reset password link is active", details: isPresent,active:true })
         } else {
@@ -137,9 +146,9 @@ exports.updatePassword = async (req, res, next) => {
         
         const requestId = req.params.reqId
         const { newPassword, confirmPassword } = req.body
-        const resetRequest = await ResetPassword.findOne({ where: { id: requestId } })
+        const resetRequest = await ResetPassword.findOne({ _id: requestId })
         const userId = resetRequest.userId
-        const requiredUser = await User.findOne({ where: { id: userId } })
+        const requiredUser = await User.findOne({ _id: userId } )
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(confirmPassword, saltRounds)
         requiredUser.password = hashedPassword

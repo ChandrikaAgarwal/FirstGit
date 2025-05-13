@@ -21,6 +21,10 @@ const Order = sequelize.define('order', {
         type: Sequelize.STRING, // ENUM for order status
         allowNull: false
     },
+    createdAt: {
+        type: Date,
+        default: Date.now()
+    }
 }, {
     timestamps: true
 })

@@ -11,6 +11,10 @@ const FileUrl = sequelize.define('fileurl', {
     url: {
         type:Sequelize.STRING(255)
     },
+    createdAt: {
+        type: Date,
+        default: Date.now()
+    }
 },{timestamps:true})
 
 module.exports = FileUrl;

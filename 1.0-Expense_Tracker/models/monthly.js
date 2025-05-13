@@ -31,6 +31,10 @@ const Month = sequelize.define('month', {
     balance: {
         type: Sequelize.INTEGER,
         allowNull: false
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now()
     }
 },{ timestamps: true })
 

@@ -31,7 +31,7 @@ const generateToken = (userData) => { //call this when the user has successfully
     //Generate new jwt token using user data
     //  return jwt.sign(userData, process.env.JWT_SECRET)
     return jwt.sign(
-        { id: userData.id, email: userData.email, phone: userData.phone }, // 🛠 Add phone number
+        { id: userData._id }, // 🛠 Add phone number
         process.env.JWT_SECRET
     );
 }

@@ -18,6 +18,10 @@ const Income = sequelize.define('income', {
     totalsaving: {
         type: Sequelize.INTEGER,
         allowNull: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now()
     }
 }, { timestamps: true }) // automatically adds `createdAt` and `updatedAt
 

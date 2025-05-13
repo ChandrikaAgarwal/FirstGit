@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const fs = require('fs')
-const sequelize = require('./util/database')
 const Expense = require('./models/expense')
 const User = require('./models/user')
 const Income = require('./models/income')
@@ -20,7 +19,7 @@ const cors = require('cors')
 const path = require('path')
 const morgan = require('morgan')
 const app = express();
-
+const mongoose=require('mongoose')
 const accessLogsStream = fs.createWriteStream(
     path.join(__dirname, 'access.log'),
     { flags: 'a' } //means append to append new data to file and not overwrite it
@@ -30,7 +29,7 @@ app.use(morgan('combined', { stream: accessLogsStream }))
 app.use(bodyParser.json())
 // app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.static('public')) 
- 
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
@@ -74,26 +73,25 @@ app.use('/api/payment', payRoute)
 app.use('/api/leader', boardRoute)
 
 
-User.hasMany(Expense, { constraints: true, onDelete: 'CASCADE' })
-Expense.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
-User.hasMany(Income, { constraints: true, onDelete: 'CASCADE' })
-Income.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
-Order.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
-User.hasMany(Order, { constraints: true, onDelete: 'CASCADE' })
-ForgotPassRequest.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
-User.hasMany(ForgotPassRequest, { constraints: true, onDelete: 'CASCADE' })
-Month.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
-User.hasMany(Month, { constraints: true, onDelete: 'CASCADE' })
-FileUrl.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
-User.hasMany(FileUrl, { constraints: true, onDelete: 'CASCADE' })
+// User.hasMany(Expense, { constraints: true, onDelete: 'CASCADE' })
+// Expense.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
+// User.hasMany(Income, { constraints: true, onDelete: 'CASCADE' })
+// Income.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
+// Order.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
+// User.hasMany(Order, { constraints: true, onDelete: 'CASCADE' })
+// ForgotPassRequest.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
+// User.hasMany(ForgotPassRequest, { constraints: true, onDelete: 'CASCADE' })
+// Month.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
+// User.hasMany(Month, { constraints: true, onDelete: 'CASCADE' })
+// FileUrl.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
+// User.hasMany(FileUrl, { constraints: true, onDelete: 'CASCADE' })
 
 
-// sequelize.sync({force:true})
-sequelize.sync()
-    .then(() => {
-        app.listen(process.env.PORT || 5000, '0.0.0.0', () => {
-            console.log("Server running on  http://localhost:5000");
 
-        })
-    }).catch(err => console.log(err))
+mongoose.connect('mongodb+srv://chandrika30:chandrika30@cluster0.f0j665r.mongodb.net/expense-tracker?retryWrites=true&w=majority&appName=Cluster0')
+    .then(result => {
+    console.log("connected to mongodb");
+    app.listen(5000)
+    
+}).catch(err=>console.log("error connecting to mongodb: ",err))
 

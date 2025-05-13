@@ -4,7 +4,8 @@ const Income = require('../models/income')
 const Month = require('../models/monthly')
 const { jwtAuthMiddleware, generateToken } = require('../jwtmiddleware');
 const { Sequelize, Op } = require('sequelize');
-const sequelize=require('../util/database')
+
+
 async function isPremiumUser(usertocheck) {
     console.log("usertocheck:: ", usertocheck);
 
