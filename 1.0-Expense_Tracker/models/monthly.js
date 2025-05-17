@@ -1,41 +1,40 @@
-const { Sequelize } = require('sequelize')
-const sequelize = require('../util/database')
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-const Month = sequelize.define('month', {
-    id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-        allowNull: false
-    },
+const MonthSchema = new Schema({
     monthNum: {
-        type: Sequelize.INTEGER,
-        allowNull: false
+        type: Number,
+        required: false
     },
     year: {
-        type: Sequelize.INTEGER,
-        allowNull: false
+        type: Number,
+        required: false
     },
     totalIncome: {
-        type: Sequelize.INTEGER,
-        allowNull: false
+        type: Number,
+        required: false
     },
     totalExpense: {
-        type: Sequelize.INTEGER,
-        allowNull: false
+        type: Number,
+        required: false
     },
     carryForward: {
-        type: Sequelize.INTEGER,
-        allowNull: false
+        type: Number,
+        required: false
     },
     balance: {
-        type: Sequelize.INTEGER,
-        allowNull: false
+        type: Number,
+        required: false
+    },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
     createdAt: {
         type: Date,
         default: Date.now()
     }
-},{ timestamps: true })
+})
 
-module.exports = Month;
+module.exports = mongoose.model('Month',MonthSchema);

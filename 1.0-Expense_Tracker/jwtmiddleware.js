@@ -27,11 +27,11 @@ const jwtAuthMiddleware = (req, res, next) => {  //to figure out who the user is
 
 //function to generate jwt token
 
-const generateToken = (userData) => { //call this when the user has successfully logged in
+const generateToken = userData => { //call this when the user has successfully logged in
     //Generate new jwt token using user data
     //  return jwt.sign(userData, process.env.JWT_SECRET)
     return jwt.sign(
-        { id: userData._id }, // 🛠 Add phone number
+        { id: userData.id }, // 🛠 Add phone number
         process.env.JWT_SECRET
     );
 }

@@ -336,7 +336,7 @@ if (form) {
                 console.log("User id::", response.data.incomedetail.userId);
                 userId = response.data.incomedetail.userId
                 localStorage.setItem(userId, response.data.incomedetail.amount)
-                displayIncome(prevdate, response.data.incomedetail.amount, response.data.incomedetail.id, response.data.incomedetail.description)
+                displayIncome(prevdate, response.data.incomedetail.amount, response.data.incomedetail._id, response.data.incomedetail.description)
                 displaySavings(prevdate, response.data.incomedetail.totalsaving)
             } catch (err) {
                 console.log("Error posting income:: ", err);
@@ -405,7 +405,7 @@ if (form) {
             let arrofincomes = incomeResponse.data.allincomesonDate
             for (let income of arrofincomes) {
                 let incomeDate = income.createdAt.split('T')[0]
-                displayIncome(incomeDate, income.amount, income.id, income.description)
+                displayIncome(incomeDate, income.amount, income._id, income.description)
 
             }
 
@@ -478,7 +478,7 @@ if (form) {
             <button class="editExpense"><i class="fa-solid fa-pen"></i></button>
             <button class="deleteExpense"><i class="fa-solid fa-trash"></i></button>
         `;
-            newExpense.dataset.id = expense.id;
+            newExpense.dataset.id = expense._id;
             newExpense.className = "expenseDisplayed";
             expense_list.appendChild(newExpense);
         })
@@ -580,7 +580,9 @@ if (form) {
                             description: document.getElementById('description').value,
                             category: document.getElementById('category').value,
                         }
-                        listOfExpenses.removeChild(editItem)
+                        console.log("list of expenses: ",listOfExpenses);
+                        
+                        await listOfExpenses.removeChild(editItem)
                         console.log("new expense details: ", newExpenseDetail);
                         try {
                             const newExpense = await axios.put(`${api_url}/api/expenses/${id}`, newExpenseDetail, {
@@ -759,7 +761,7 @@ if (form) {
                             })
                             console.log("Income after edit response: ", newIncome.data);
                             // editIncome.textContent = `${newIncome.data.editedIncome.amount} `;
-                            displayIncome(prevdate, newIncome.data.editedIncome.amount, newIncome.data.editedIncome.id, newIncome.data.editedIncome.description)
+                            displayIncome(prevdate, newIncome.data.editedIncome.amount, newIncome.data.editedIncome._id, newIncome.data.editedIncome.description)
                             try {
                                 const getIncome = await axios.get(`${api_url}/api/income?carouseldate=${prevdate}`, {
                                     headers: {

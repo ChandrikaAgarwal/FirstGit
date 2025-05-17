@@ -8,15 +8,20 @@ const expenseSchema=new Schema({
     },
     description: {
         type: String,
-        required:true
+        required:false
     },
     category: {
         type: String,
-        required:true
+        required:false
     },
     currentsaving: {
         type: Number,
         required:true
+    },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
     createdAt: {
         type: Date,
