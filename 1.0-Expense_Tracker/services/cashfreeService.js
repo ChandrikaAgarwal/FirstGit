@@ -35,7 +35,7 @@ exports.createOrder = async (
                 customer_email: customerEmail,
             },
             order_meta: {
-                return_url: `http://15.206.27.247/create-payment/?orderId=${orderId}`,
+                return_url: `http://localhost:5000/create-payment/?orderId=${orderId}`,
                 payment_methods: "cc,dc,upi"
             },
             order_expiry_time: formattedExpiryDate  //optional

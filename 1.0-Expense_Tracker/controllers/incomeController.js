@@ -2,7 +2,7 @@ const Income = require('../models/income')
 const User = require('../models/user')
 const Expense = require('../models/expense')
 const Month = require('../models/monthly');
-
+const mongoose=require('mongoose')
 async function finduserIncome(incomedate, userId) {
     const lastIncome = await Income.findOne({
         
@@ -26,7 +26,7 @@ async function getStartAndEndDate(year, month) {
 
     return { startDate, endDate }
 }
-async function monthlyCalculation(year, month, userId) {
+async function monthlyCalculation(year, month, userId, newIncomeAmount = 0) {
     try {
         let carryForward = 0;
         let balance = 0;
@@ -87,7 +87,6 @@ async function monthlyCalculation(year, month, userId) {
             
                 userId:userId,
                 createdAt: { $gte: startDate, $lte: endDate }
-            
             // order: [["id", "DESC"]],
             // transaction
         }).sort({_id:-1}).exec()
@@ -100,56 +99,75 @@ async function monthlyCalculation(year, month, userId) {
             // transaction
         }).sort({ _id: -1 }).exec()
 
-        let totalIncome = await Income.sum("amount", {
-            
-                userId:userId,
-                createdAt: {  $gte: startDate, $lte: endDate  }  
-            
-        })
-        if (!totalIncome) {
-            totalIncome = 0;
+        let totalIncome = await Income.aggregate([
+            {
+                $match: {
+                    userId: new mongoose.Types.ObjectId(req.user.id),
+                    createdAt: { $gte: startDate, $lte: endDate }
+                }
+            },  
+            {
+                $group: {
+                    _id: null,
+                    totalAmount:{$sum:"$amount"}
+                }
+            }
+        ])
+        console.log("totalIncome in monthly Calculation: ",totalIncome);
+        
+        let total_I = totalIncome.length > 0 ? totalIncome[0].totalAmount : 0
+        console.log("totalInc: total_I: ",total_I);
+        if (total_I === 0 && newIncomeAmount > 0) {
+            total_I=newIncomeAmount
         }
+        let totalExpense = await Expense.aggregate([
+            {
+                $match: {
+                    userId:new mongoose.Types.ObjectId(req.user.id),
+                    createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) }
+             
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: { $sum: "$amount" }
+                }
+            }
+        ])
+        const total_E = totalExpense.length > 0 ? totalExpense[0].totalAmount : 0
 
-        let totalExpense = await Expense.sum("amount", {
-                userId,
-                createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) }
-         
-        })
-        if (!totalExpense) {
-            totalExpense = 0;
-        }
-
-        if (totalExpense && totalIncome && carryForward) {
-            balance = (totalIncome + carryForward) - totalExpense
-        } else if (totalIncome && totalExpense) {
-            balance = totalIncome - totalExpense
-        } else if (totalExpense && carryForward) {
-            balance = carryForward - totalExpense
-        } else if (totalIncome && carryForward) {
-            balance = totalIncome + carryForward
-        } else if (totalExpense) {
-            balance = -totalExpense
+        if (total_E && total_I && carryForward) {
+            balance = (total_I + carryForward) - total_E
+        } else if (total_I && total_E) {
+            balance = total_I- total_E
+        } else if (total_I && carryForward) {
+            balance = carryForward - total_E
+        } else if (total_I && carryForward) {
+            balance = total_I + carryForward
+        } else if (total_E) {
+            balance = -total_E
         } else if (carryForward) {
             balance = carryForward
-        } else if (totalIncome) {
-            balance=totalIncome
+        } else if (total_I) {
+            balance=total_I
         }
 
         console.log("balance:: ", balance);
         console.log("carryForward: ",carryForward);
         
         console.log("Filtered Expenses: ", allexpenses);
-        console.log("total Income: ", totalIncome);
-        console.log("total Expense: ", totalExpense);
+        console.log("total Income: ", total_I);
+        console.log("total Expense: ", total_E);
         
         const newMonth =new Month({
             monthNum: month,
             year: year,
-            totalIncome: totalIncome,
-            totalExpense: totalExpense,
+            totalIncome: total_I,
+            totalExpense: total_E,
             carryForward: carryForward,
             balance: balance,
-            userId:req.user.id
+            userId:userId
         })
         await newMonth.save()
         console.log("new month updated: ",newMonth);
@@ -176,7 +194,7 @@ exports.postAddIncome = async (req, res, next) => {
         console.log("incomeMonth: ", incomeMonth, "incomeYear: ", incomeYear);
         let existingMonth = await Month.findOne({
             
-                userId: req.user.id,
+            userId: req.user.id,
             monthNum: { $eq: incomeMonth },
             year: { $eq: incomeYear }
             
@@ -186,8 +204,6 @@ exports.postAddIncome = async (req, res, next) => {
                 userId: req.user.id,
                 createdAt: {$eq:new Date(date)}
 
-            
-            
         }).sort({_id:-1}).exec()
 
         console.log("existingIncome: ", existingIncome);
@@ -227,7 +243,7 @@ exports.postAddIncome = async (req, res, next) => {
         } else if (allexpensesOnDate.length > 0) {  //update the cs of all expenses on that date if present
             for (let expense of allexpensesOnDate) {
                 expense.currentsaving += req.body.amount
-                await expense.save({ transaction: t });
+                await expense.save();
                 latestSaving=expense.currentsaving
             }
         } else if (lastExpense) {
@@ -250,13 +266,17 @@ exports.postAddIncome = async (req, res, next) => {
             userId:req.user.id
         })
         await newIncome.save()
-
+        console.log("new Income: ",newIncome);
+        
         if (existingMonth) {
+            console.log("entering existing month!!!!");
+            
             existingMonth.totalIncome += req.body.amount
             existingMonth.balance += req.body.amount
-            await existingMonth.save({ transaction: t });
+            await existingMonth.save();
         } else {
-            await monthlyCalculation(incomeYear, incomeMonth, req.user.id)
+            console.log("calling monthlyCalc function!!!");
+            await monthlyCalculation(incomeYear, incomeMonth, req.user.id,newIncome.amount)
         }
         
         console.log("req.body.amount:: ", req.body.amount);
@@ -340,7 +360,6 @@ async function updateFutureIncomes(userId, updatedDate, addedAmount) {
 
 exports.getIncome = async (req, res, next) => {
     try {
-
         const { carouseldate } = req.query
         let lastIncomeDate;
         let expenseOnLatestDate;
@@ -471,7 +490,7 @@ async function deleteInc(id, date, userId) {
         let incomesbeforeDel = await Income.find({
             
                 userId: userId,
-                createdAt: date
+            createdAt: { $eq: new Date(date) }
         
             // order: [['id', 'ASC']],
             // transaction: t
@@ -482,7 +501,7 @@ async function deleteInc(id, date, userId) {
         const expensesOnDate = await Expense.find({
             
                 userId: userId,
-                createdAt: date
+            createdAt: { $eq: new Date(date) }
 
             // order: [['id', 'ASC']], //smallest id will come first
             // transaction: t
@@ -552,9 +571,9 @@ async function deleteInc(id, date, userId) {
             existingMonth.balance -= delAmount
             console.log("existing month Balance!!!! ", existingMonth.balance);
 
-            await existingMonth.save({ transaction: t })
+            await existingMonth.save()
         }
-        await updateAfterDelete(userId, date, delAmount,t)
+        await updateAfterDelete(userId, date, delAmount)
         
     } catch (err) {
         console.log("Error deleting income from backend ", err)
@@ -604,7 +623,7 @@ exports.editIncome = async (req, res, next) => {
            
                 userId: req.user.id,
                 createdAt: prevdate,
-                id: {$gt: id }
+                _id: {$gt: id }
         
             // order: [['id', "ASC"]],
             // // limit: 1
@@ -619,26 +638,27 @@ exports.editIncome = async (req, res, next) => {
 
         let monthtoEdit = await Month.findOne({
             
-                userId: req.user.id,
-                monthNum: month,
-                year: year
+            userId: req.user.id,
+            monthNum: {$eq:month},
+            year:{$eq: year}
             
         })
         monthtoEdit.totalIncome += difference
         monthtoEdit.balance+=difference
-        monthtoEdit.save({transaction:t})
+        await monthtoEdit.save()
+        
        await updateFutureIncomes(req.user.id, prevdate, difference)
-        await t.commit();
+        // await t.commit();
         res.status(200).json({ message: "edited income.", editedIncome: incometoEdit })
 
     } catch (err) {
         console.log("Error editing Income: ", err);
-        await t.rollback()
+        // await t.rollback()
         res.status(500).json({ error: "Failed to edit income", details: err })
 
     }
 }
-async function updateAfterDelete(userId, updatedDate, amount,transaction) {
+async function updateAfterDelete(userId, updatedDate, amount) {
     try {
         let month = parseInt(updatedDate.split('-')[1])
         let year = parseInt(updatedDate.split('-')[0])

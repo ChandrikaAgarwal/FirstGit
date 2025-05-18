@@ -2,10 +2,11 @@ const { createOrder, getPaymentStatus } = require("../services/cashfreeService")
 const { v4: uuidv4 } = require('uuid');
 const Order = require('../models/orders')
 const User = require('../models/user')
+const mongoose=require('mongoose')
 exports.createPayment = async (req, res, next) => {
     try {
 
-        const user = await User.findByPk(req.user.id)
+        const user = await User.findById(req.user.id)
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
@@ -20,13 +21,14 @@ exports.createPayment = async (req, res, next) => {
         const paymentSessionId = await createOrder(orderId, 2000, "INR", id, phone, email)
 
         if (paymentSessionId) {
-            await user.createOrder({
+            const newOrder=new Order({
                 order_id: orderId,
                 customer_email: email,
-                order_status: "PENDING"
+                order_status: "PENDING",
+                userId:req.user.id
             })
+            await newOrder.save()
         }
-
         res.json({
             paymentSessionId, orderId
         });
@@ -40,21 +42,21 @@ exports.createPayment = async (req, res, next) => {
 
 exports.getPayment = async (req, res, next) => {
     try {
-        const user = await User.findByPk(req.user.id)
+        const user = await User.findById(req.user.id)
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
 
         console.log("UserDetails: ", user);
 
-        const { orderId } = req.params
+        const {orderId } = req.params
         const ordertoupdate = await Order.findOne({
-            where: {
-                userId: req.user.id,
-                order_id: orderId
-            },
-            order: [["id", "DESC"]]
-        })
+           
+            userId: req.user.id,
+            order_id: { $eq: orderId }
+            
+            // order: [["id", "DESC"]]
+        }).sort({_id:-1}).exec()
         if (!ordertoupdate) {
             console.log("Order not found in database:", orderId);
             return res.status(404).json({ message: "Order not found in database" });

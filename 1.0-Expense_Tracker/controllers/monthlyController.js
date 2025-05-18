@@ -3,8 +3,8 @@ const User = require('../models/user')
 const Expense = require('../models/expense')
 const Month = require('../models/monthly')
 const File = require('../models/fileUrl')
-const { Sequelize, Op } = require('sequelize')
 const AWS = require('aws-sdk')
+const mongoose = require('mongoose')
 
 async function getStartAndEndDate(year, month) {
     const startDate = new Date(`${year}-${month}-01`)
@@ -26,7 +26,7 @@ exports.getAllExpenses = async (req, res = null) => {
         let totalExpense = 0;
         console.log("month number is: ", month, "of type: ", typeof (month));
 
-        const user = await User.findByPk(req.user.id)
+        const user = await User.findById(req.user.id)
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
@@ -37,28 +37,26 @@ exports.getAllExpenses = async (req, res = null) => {
         const endDate = returnedDate.endDate
 
         const existingMonth = await Month.findOne({
-            where: {
                 userId: req.user.id,
                 monthNum: month,
                 year: year
-            },
         })
 
-        const allexpenses = await Expense.findAll({
-            where: {
+        const allexpenses = await Expense.find({
+            
                 userId: req.user.id,
-                createdAt: { [Op.between]: [startDate, endDate] }
-            },
-            order: [["id", "DESC"]]
-        })
+                createdAt: { $gte: startDate, $lte:endDate }
+            
+            // order: [["id", "DESC"]]
+        }).sort({_id:-1}).exec()
 
-        const allincomes = await Income.findAll({
-            where: {
+        const allincomes = await Income.find({
+            
                 userId: req.user.id,
-                createdAt: { [Op.between]: [startDate, endDate] }
-            },
-            order: [["id", "DESC"]]
-        })
+                createdAt: { $gte: startDate, $lte: endDate }
+           
+            // order: [["id", "DESC"]]
+        }).sort({ _id: -1 }).exec()
 
         if (existingMonth) {
             totalIncome = existingMonth.totalIncome
@@ -108,74 +106,94 @@ exports.getExpensesWeekly = async (req, res, next) => {
         console.log("startDate: ", startDate, "endDate", endDate);
         startDate = new Date(startDate)
         endDate = new Date(endDate)
+       
         console.log("startDate ", startDate, "endDate ", endDate);
         let previousWeek = await calculateDate(startDate, endDate)
         console.log("previous Week!!! ", previousWeek);
-        let totalIncome = 0;
+        // let totalIncome = 0;
         let totalExpense = 0;
         let carryForward = 0;
         let balance = 0;
-        const user = await User.findByPk(req.user.id)
+        const user = await User.findById(req.user.id)
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
         console.log("Fetching Weekly Expenses for User: ", req.user.id);
 
-        const allExpenses = await Expense.findAll({
-            where: {
+        const allExpenses = await Expense.find({
+            
+            userId: req.user.id,
+            createdAt: { $gte: startDate, $lte: endDate }
+            
+            // order: [["id", "DESC"]]
+        }).sort({_id:-1}).exec()
+        const allincomes = await Income.find({
+            
                 userId: req.user.id,
-                createdAt: { [Op.between]: [startDate, endDate] }
+                createdAt: { $gte: startDate, $lte: endDate }
+            
+            // order: [["id", "DESC"]]
+        }).sort({ _id: -1 }).exec()
+        console.log("all incomes: ",allincomes);
+        
+
+       let totalIncome = await Income.aggregate([
+            {
+                $match: {
+                    userId: new mongoose.Types.ObjectId(req.user.id),
+                    createdAt: { $gte: startDate, $lte: endDate }
+                }
             },
-            order: [["id", "DESC"]]
-        })
-        const allincomes = await Income.findAll({
-            where: {
-                userId: req.user.id,
-                createdAt: { [Op.between]: [startDate, endDate] }
-            },
-            order: [["id", "DESC"]]
-        })
+            {
+                $group: {
+                    _id: null,
+                    totalAmount:{$sum:"$amount"}
+                }
+            }
+        ])
+        console.log("totalIncome in monthly Calculation: ",totalIncome);
+        // if (!totalIncome) {
+        //     totalIncome = 0;
+        // }
+        let total_I = totalIncome.length > 0 ? totalIncome[0].totalAmount : 0
+        totalExpense = await Expense.aggregate([
+                    {
+                        $match: {
+                            userId: new mongoose.Types.ObjectId(req.user.id),
+                            createdAt: { $gte: startDate, $lte: endDate}
+                     
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            totalAmount: { $sum: "$amount" }
+                        }
+                    }
+                ])
 
-        totalIncome = await Income.sum("amount", {
-            where: {
-                userId: req.user.id,
-                createdAt: { [Op.between]: [startDate, endDate] }
-            },
-        })
-
-        if (!totalIncome) {
-            totalIncome = 0;
-        }
-
-        totalExpense = await Expense.sum("amount", {
-            where: {
-                userId: req.user.id,
-                createdAt: { [Op.between]: [startDate, endDate] }
-            },
-        })
-
-        if (!totalExpense) {
-            totalExpense = 0;
-        }
-
+        // if (!totalExpense) {
+        //     totalExpense = 0;
+        // }
+        let total_E = totalExpense.length > 0 ? totalExpense[0].totalAmount : 0
         const lastWeekExpense = await Expense.findOne({
-            where: {
+            
                 userId: req.user.id,
-                createdAt: { [Op.lt]: startDate }
-            },
-            order: [['createdAt', "DESC"], ["id", "DESC"]],
-            limit: 1
-        })
+                createdAt: { $lt: startDate }
+            
+            // order: [['createdAt', "DESC"], ["id", "DESC"]],
+            // limit: 1
+        }).sort({ createdAt:-1, _id:-1}).exec()
         console.log("lastWeekExpense!!! ", lastWeekExpense);
 
         const lastWeekIncome = await Income.findOne({
-            where: {
+           
                 userId: req.user.id,
-                createdAt: { [Op.lt]: startDate }
-            },
-            order: [['createdAt', "DESC"], ["id", "DESC"]],
-            limit: 1
-        })
+                createdAt: { $lt: startDate }
+        
+            // order: [['createdAt', "DESC"], ["id", "DESC"]],
+            // limit: 1
+        }).sort({ createdAt: -1, _id: -1 }).exec()
         console.log("lastWeekIncome!!! ", lastWeekIncome);
 
         if (!lastWeekExpense && !lastWeekIncome) {
@@ -196,27 +214,27 @@ exports.getExpensesWeekly = async (req, res, next) => {
         console.log("carry Forward!!! ", carryForward);
 
         console.log("Filtered Expenses: ", allExpenses);
-        console.log("total Income: ", totalIncome);
-        console.log("total Expense: ", totalExpense);
+        console.log("total Income: ", total_I);
+        console.log("total Expense: ", total_E);
 
-        if (totalExpense && totalIncome && carryForward) {
-            balance = (totalIncome + carryForward) - totalExpense
-        } else if (totalIncome && totalExpense) {
-            balance = totalIncome - totalExpense
-        } else if (totalExpense && carryForward) {
-            balance = carryForward - totalExpense
-        } else if (totalIncome && carryForward) {
-            balance = totalIncome + carryForward
-        } else if (totalExpense) {
-            balance = -totalExpense
+        if (total_E && total_I && carryForward) {
+            balance = (total_I + carryForward) - total_E
+        } else if (total_I && total_E) {
+            balance = total_I - total_E
+        } else if (total_E && carryForward) {
+            balance = carryForward - total_E
+        } else if (total_I && carryForward) {
+            balance = total_I + carryForward
+        } else if (total_E) {
+            balance = -total_E
         } else if (carryForward) {
             balance = carryForward
         } else {
-            balance=totalIncome
+            balance=total_I
         }
         console.log("Balance of this week: ", balance);
 
-        res.status(200).json({ message: "getting all weekly expenses: ", allExpenses, allincomes, totalIncome, totalExpense, carryForward, balance, isPremium: user.premium });
+        res.status(200).json({ message: "getting all weekly expenses: ", allExpenses, allincomes, totalIncome:total_I, totalExpense:total_E, carryForward, balance, isPremium: user.premium });
     } catch (err) {
         console.log("Error in getting all weekly expenses: ", err);
         res.status(400).json({ message: "error in getting expenses ", details: err })
@@ -232,17 +250,17 @@ exports.getYearlyReport = async (req, res = null) => {
         let totalExpense = 0
         let totalcf = 0
         let totalBalance = 0
-        const user = await User.findByPk(req.user.id)
+        const user = await User.findById(req.user.id)
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
-        const allMonths = await Month.findAll({
-            where: {
-                userId: req.user.id,
-                year: year
-            },
-            order: [["monthNum", "ASC"]]
-        })
+        const allMonths = await Month.find({
+            
+            userId: req.user.id,
+            year: {$eq: year}
+        
+            // order: [["monthNum", "ASC"]]
+        }).sort({monthNum:1}).exec()
         for (let month of allMonths) {
             totalIncome += month.totalIncome
             totalExpense += month.totalExpense
@@ -313,7 +331,7 @@ exports.downloadReport = async (req, res) => {
         year = parseInt(year)
         const monthlyData = await this.getAllExpenses(req);
         console.log("monthlyData: ", monthlyData.allexpenses);
-        const user = await User.findByPk(req.user.id)
+        const user = await User.findById(req.user.id)
         console.log("User: ", user);
 
         if (!user) {
@@ -331,10 +349,12 @@ exports.downloadReport = async (req, res) => {
         console.log("string data: ", combinedData);
         
 
-        const newUrl = await user.createFileurl({
+        const newUrl =  new File({
             url: fileURL,
-            createdAt: new Date()
+            createdAt: new Date(),
+            userId:userId
         })
+        await newUrl.save()
         res.status(200).json({ message: "message from download report", fileURL, monthlyData, yearlyData })
     } catch (err) {
         console.log("Error in downloading report:", err);
@@ -344,10 +364,8 @@ exports.downloadReport = async (req, res) => {
 
 exports.getAllReports = async (req, res) => {
     try {
-        const fileUrls = await File.findAll({
-            where: { userId: req.user.id },
-            order: [['createdAt', 'DESC']] // Latest first
-        });
+        const fileUrls = await File.find({ userId: req.user.id }).sort({createdAt:-1}).exec()
+            
 
         res.status(200).json({ fileUrls });
     } catch (error) {

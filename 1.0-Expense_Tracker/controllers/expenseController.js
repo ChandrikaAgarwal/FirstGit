@@ -3,7 +3,7 @@ const User = require('../models/user')
 const Income = require('../models/income')
 const Month = require('../models/monthly')
 const { default: mongoose } = require('mongoose')
-const session= mongoose.startSession()
+// const session= mongoose.startSession()
 
 
 async function isPremiumUser(usertocheck) {
@@ -96,7 +96,7 @@ async function monthlyCalculation (year, month,userId) {
         let totalIncome = await Income.aggregate([
             {
                 $match: {
-                    userId:userId,
+                    userId: new mongoose.Types.ObjectId(req.user.id),
                     createdAt: { $gte:startDate, $lte:endDate }
                 }                
             },
@@ -115,7 +115,7 @@ async function monthlyCalculation (year, month,userId) {
         let totalExpense = await Expense.aggregate([
             {
                $match: {
-                    userId:userId,
+                    userId: new mongoose.Types.ObjectId(req.user.id),
                     createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) }
                 }
                 

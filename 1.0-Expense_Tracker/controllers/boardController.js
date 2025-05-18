@@ -6,14 +6,14 @@ const sequelize = require('sequelize');
 exports.compareExpenses = async (req, res, next) => {
     try {
         console.log("Fetching users with total expenses...");
-        const user = await User.findByPk(req.user.id)
+        const user = await User.findById(req.user.id)
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
-        const usersWithExpenses = await User.findAll({
-            attributes: ["id", "name", "totalExpense"],
-            order: [["totalExpense", "DESC"]]
-        })
+        const usersWithExpenses = await User.find().select('_id name totalExpense').sort({ totalExpense:-1}).exec()
+            // attributes: ["id", "name", "totalExpense"],
+            // order: [["totalExpense", "DESC"]]
+        
         console.log("Sorted user expenses: ", usersWithExpenses);
         res.status(200).json({ message: "all users: ", userExpenses: usersWithExpenses,isPremium:user.premium })
     } catch (err) {

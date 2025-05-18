@@ -351,6 +351,7 @@ if (form) {
 
 
     function displayIncome(createdAt, income, incomeid, description) {
+        const totalIncdis = document.querySelector('.totalIncDisplay')
         const incomeLi = document.createElement('tr')
         // incomecol.innerHTML = "";
         if (createdAt === prevdate) {

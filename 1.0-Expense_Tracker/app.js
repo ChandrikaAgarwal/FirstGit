@@ -68,9 +68,9 @@ app.get('/password/resetpassword/form/:requestId', (req, res) => {
 app.use('/', userRoute)
 app.use('/api/expenses', expenseRoute)
 app.use('/api/income', incomeRoute)
-// app.use('/api/monthly', monthlyRoute)
-// app.use('/api/payment', payRoute)
-// app.use('/api/leader', boardRoute)
+app.use('/api/monthly', monthlyRoute)
+app.use('/api/payment', payRoute)
+app.use('/api/leader', boardRoute)
 
 
 // User.hasMany(Expense, { constraints: true, onDelete: 'CASCADE' })
