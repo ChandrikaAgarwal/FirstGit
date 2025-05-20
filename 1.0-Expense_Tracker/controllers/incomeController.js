@@ -49,7 +49,7 @@ async function monthlyCalculation(year, month, userId, newIncomeAmount = 0) {
                 createdAt: { $lt: new Date(`${year}-${month}`) }  // Before current month
             // order: [['createdAt', 'DESC'], ['id', 'DESC']],
             // // attributes:['createdAt']
-            // transaction
+            // 
         }).sort({createdAt:-1, _id:-1}).exec()
 
         console.log("Last expense date : ", lastExpenseDate)
@@ -59,7 +59,7 @@ async function monthlyCalculation(year, month, userId, newIncomeAmount = 0) {
             createdAt: { $lt: new Date(`${year}-${month}`) }  // Before current month
             // order: [['createdAt', 'DESC'], ['id', 'DESC']],
             // // attributes: ['createdAt']
-            // transaction
+            // 
         }).sort({ createdAt: -1, _id: -1 }).exec()
 
         console.log("Last expense date: ", lastExpenseDate?.createdAt);
@@ -88,7 +88,7 @@ async function monthlyCalculation(year, month, userId, newIncomeAmount = 0) {
                 userId:userId,
                 createdAt: { $gte: startDate, $lte: endDate }
             // order: [["id", "DESC"]],
-            // transaction
+            // 
         }).sort({_id:-1}).exec()
 
         const allincomes = await Income.find({
@@ -96,7 +96,7 @@ async function monthlyCalculation(year, month, userId, newIncomeAmount = 0) {
                 userId:userId,
                 createdAt: { $gte: startDate, $lte: endDate }
             // order: [["id", "DESC"]],
-            // transaction
+            // 
         }).sort({ _id: -1 }).exec()
 
         let totalIncome = await Income.aggregate([
@@ -214,7 +214,7 @@ exports.postAddIncome = async (req, res, next) => {
                 createdAt: { $lt: new Date(date) }
             // order: [['createdAt', 'DESC'], ['id', 'DESC']],
             // limit: 1,
-            // transaction: t
+            // : t
         }).sort({createdAt:-1 ,_id: -1 }).exec()
 
         const lastIncome = await finduserIncome(date, req.user.id)
@@ -228,7 +228,7 @@ exports.postAddIncome = async (req, res, next) => {
                createdAt: { $eq: new Date(date) }
            
             // order: [['id', 'ASC']],
-            // transaction: t
+            // : t
         }).sort({ _id: -1 }).exec()
         if (existingIncome) {
             amount = req.body.amount; // Add to existing income
@@ -303,7 +303,7 @@ async function updateFutureIncomes(userId, updatedDate, addedAmount) {
                 createdAt: { $gt: updatedDate }  // Get expenses after the updated date
         
             // order: [['createdAt', 'ASC'], ['id', 'ASC']],
-            // transaction
+            // 
         }).sort({ createdAt: 1, _id: 1 }).exec();
 
         let futureIncomes = await Income.find({
@@ -311,7 +311,7 @@ async function updateFutureIncomes(userId, updatedDate, addedAmount) {
                 userId: userId,
                 createdAt: { $gt: updatedDate }
             // order: [['createdAt', 'ASC'], ['id', 'ASC']],
-            // transaction
+            // 
         }).sort({ createdAt: 1, _id: 1 }).exec()
 
         let newaddedInc = await Income.findOne({
@@ -321,7 +321,7 @@ async function updateFutureIncomes(userId, updatedDate, addedAmount) {
 
             // order: [['id', 'DESC']],
             // limit: 1,
-            // transaction
+            // 
         }).sort({ _id: -1 }).exec()
 
         let monthlyIncomes = await Month.find({
@@ -330,7 +330,7 @@ async function updateFutureIncomes(userId, updatedDate, addedAmount) {
                 monthNum: { $gt: month },
                 year: { $eq: year }
             // order: [['year', 'ASC'], ['monthNum', 'ASC']],
-            // transaction
+            // 
         }).sort({ year: 1, monthNum: 1 }).exec()
         console.log("new saving:: ", addedAmount);
 
@@ -493,7 +493,7 @@ async function deleteInc(id, date, userId) {
             createdAt: { $eq: new Date(date) }
         
             // order: [['id', 'ASC']],
-            // transaction: t
+            // : t
         }).sort({_id:1}).exec()
 
         console.log("incomes before delete: ", incomesbeforeDel);
@@ -504,7 +504,7 @@ async function deleteInc(id, date, userId) {
             createdAt: { $eq: new Date(date) }
 
             // order: [['id', 'ASC']], //smallest id will come first
-            // transaction: t
+            // : t
         }).sort({_id:1}).exec()
 
         if (expensesOnDate.length === 0) {
@@ -527,7 +527,7 @@ async function deleteInc(id, date, userId) {
         
             // order: [['id', 'DESC']],
             // limit: 1,
-            // transaction: t
+            // : t
         }).sort({_id:-1}).exec();
 
         console.log("income on that date:: ", incomeonThatDate);
@@ -540,7 +540,7 @@ async function deleteInc(id, date, userId) {
             
             // order: [['id', "ASC"]],
             // // limit: 1
-            // transaction: t
+            // : t
         }).sort({_id:1}).exec()
 
         console.log("remaining incomes: ", remainingincomes);
@@ -564,7 +564,7 @@ async function deleteInc(id, date, userId) {
                 monthNum: month,
                 year: year
             
-            // transaction: t,
+            // : t,
         })
         if (existingMonth) {
             existingMonth.totalIncome -= delAmount
@@ -627,7 +627,7 @@ exports.editIncome = async (req, res, next) => {
         
             // order: [['id', "ASC"]],
             // // limit: 1
-            // transaction:t
+            // :t
         }).sort({_id:1}).exec()
         console.log("remaining incomes: ", remainingincomes);
 
@@ -668,7 +668,7 @@ async function updateAfterDelete(userId, updatedDate, amount) {
                 createdAt: { $gt: updatedDate }  // Get expenses after the updated date
             
             // order: [['createdAt', 'ASC'], ['id', 'ASC']],
-            // transaction
+            // 
         });
 
         let futureIncomes = await Income.find({
@@ -677,7 +677,7 @@ async function updateAfterDelete(userId, updatedDate, amount) {
                 createdAt: { $gt: updatedDate }
             
             // order: [['createdAt', 'ASC'], ['id', 'ASC']],
-            // transaction
+            // 
 
         }).sort({createdAt:1,_id:1}).exec()
  

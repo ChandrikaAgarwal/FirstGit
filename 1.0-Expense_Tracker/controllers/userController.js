@@ -90,7 +90,7 @@ exports.forgotPassword = async (req, res, next) => {
             return res.status(400).json({ message: "Not a user. Kindly signup" })
         }
         
-        const resetId=uuidv4()
+        
         const resetPassRequest = new ResetPassword({
            
             isActive: true,
