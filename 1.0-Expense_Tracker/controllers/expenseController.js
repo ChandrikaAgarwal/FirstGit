@@ -3,7 +3,7 @@ const User = require('../models/user')
 const Income = require('../models/income')
 const Month = require('../models/monthly')
 const { default: mongoose } = require('mongoose')
-// const session= mongoose.startSession()
+
 
 
 async function isPremiumUser(usertocheck) {
@@ -169,7 +169,7 @@ async function monthlyCalculation (year, month,userId) {
 exports.postAddExpense = async (req, res, next) => {
     console.log("expense controller activated!!");
     try {
-        // const t=await sequelize.transaction() //transaction object and we pass it down to each and every place where we are updating the db.
+        // const t=await sequelize.() // object and we pass it down to each and every place where we are updating the db.
         const user = await User.findById(req.user.id)
         console.log("user: ",user);
         console.log("request user: ",req.user);
@@ -190,9 +190,7 @@ exports.postAddExpense = async (req, res, next) => {
         let incomeonThatDate = await Income.findOne({ userId: req.user.id , 
             createdAt: { $eq: new Date(date) } 
         }
-            // order: [['id', 'DESC']],
-            // limit: 1,
-            // transaction:t,
+            
         ).sort({_id:-1}).exec();
         console.log("incomeonThatDate ", incomeonThatDate)
         let userIncome = incomeonThatDate ? incomeonThatDate : await finduserIncome(date, req.user.id)
@@ -286,7 +284,7 @@ async function updateFutureExpenses(userId, updatedDate, newSaving) {
                 userId: userId,
                 createdAt: { $gt: new Date(updatedDate) }  // Get expenses after the updated date
             // order: [['createdAt', 'ASC'], ['id', 'ASC']],
-            // transaction
+            // 
         }).sort({createdAt:1, _id:1}).exec();
 
         let futureIncomes = await Income.find({
@@ -295,7 +293,7 @@ async function updateFutureExpenses(userId, updatedDate, newSaving) {
                 createdAt: { $gt: updatedDate }
            
             // order: [['createdAt', 'ASC'], ['id', 'ASC']],
-            // transaction
+            // 
         }).sort({ createdAt: 1, _id: 1 }).exec()
         let monthlyExpenses = await Month.find({
             
@@ -403,7 +401,7 @@ exports.deleteExpense = async (req, res, next) => {
 
             // order: [['id', 'DESC']],
             // limit: 1,
-            // transaction: t
+            // : t
         }).sort({_id:-1}).exec();
 
         let expensesbeforeDel = await Expense.find({
@@ -412,7 +410,7 @@ exports.deleteExpense = async (req, res, next) => {
                 createdAt: prevdate
 
             // order: [['id', 'ASC']],
-            // transaction: t
+            // : t
         }).sort({_id:1}).exec()
 
         let delamount = expensetodel.amount
@@ -428,7 +426,7 @@ exports.deleteExpense = async (req, res, next) => {
                 createdAt: prevdate,
                 _id: { $gt: id }
             // order: [['id', 'ASC']],
-            // transaction: t
+            // : t
         }).sort({_id:1}).exec()
         let lastExpcurrSaving;
         console.log("delete id:: ", id);
@@ -452,7 +450,7 @@ exports.deleteExpense = async (req, res, next) => {
             monthNum: { $eq: deleteMonth },
             year: { $eq: deleteYear }
             
-            // transaction: t,
+            // : t,
         })
         if (existingMonth) {
             existingMonth.totalExpense -= delamount
@@ -554,7 +552,7 @@ exports.updateExpense = async (req, res, next) => {
                 id: { $gt: id }
                 
             // order: [['id', 'ASC']],
-            // transaction: t
+            // : t
         }).sort({_id:1}).exec()
         console.log("PreExpenses:: ", allExpensesOnDate);
 
@@ -564,7 +562,7 @@ exports.updateExpense = async (req, res, next) => {
                 createdAt: {$eq: prevdate }
     
             // order: [['id', 'ASC']],
-            // transaction: t
+            // : t
         }).sort({_id:1}).exec()
         const expenseToEdit = await Expense.findById(id)
         console.log(expenseToEdit);
