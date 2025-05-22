@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/output.css">
+</head>
+<body>
+    <div class="bg-slate-600 p-5 m-28 flex justify-between items-center h-screen" > 
+    <div class="website-info">
+      <div class="w-[450px] bg-white p-6 rounded-lg flex items-center justify-center m-4 mx-32">
+        <p class="text-gray-800 text-lg leading-relaxed">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem animi excepturi eveniet sunt, id numquam
+            architecto dolore sed eos dolorem nihil, nemo reiciendis fuga atque fugiat sit saepequam soluta!
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum tenetur ducimus doloribus expedita commodi corrupti quisquam perspiciatis consequatur rem aliquid quos impedit, reiciendis hic. Veniam maxime eius quas dolore corrupti?
+        </p>
+    </div>
+    </div>  
+    <form action="/" method="POST" id="signup-form" class="max-w-md w-full flex flex-col items-center gap-4 bg-purple-300 p-6 rounded-lg  hover:shadow-lg hover:shadow-sky-500  hover:rounded-full hover:bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] hover:from-pink-400 hover:from-40% hover:to-fuchsia-700 transition-all duration-500 ">
+        <label for="name">Name: </label>
+        <input type="text" name="name" id="name" class="border-black border-2 rounded-lg hover:scale-110"><br /><br />
+        <label for="email">Email: </label>
+        <input type="text" name="email" id="email" class="outline-black border-black border-2 rounded-lg hover:scale-110"><br /><br />
+        <label for="phone" >Mobile No.</label>
+        <input type="tel" name="phone" id="phone" class="outline-black border-black border-2 rounded-lg hover:scale-110"><br />
+        <label for="password">Password: </label>
+        <input type="password" name="password" id="password" class="outline-black border-black border-2 rounded-lg hover:scale-110"><br /><br />
+        <button type="submit" class="flex flex-col bg-zinc-200 rounded-lg p-2 mb-4" >SignUp</button>
+        <div class="loginDiv flex items-center gap-2 mt-1">
+        <label for="loginBtn" class="text-sm font-semibold">Already a User?</label>
+        <button type="button" id="loginBtn" class="bg-zinc-200 rounded-lg p-2">Login</button>
+    </div>
+    </form>
+</div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script src="/script.js"></script>
+</html>
