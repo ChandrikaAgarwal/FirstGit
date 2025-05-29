@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="/output.css">
+</head>
+<body id="chatPage" class="relative min-h-screen">
+    <div class="flex min-h-screen">
+        <div
+            class="sideBar bg-gradient-to-b from-teal-400 to to-blue-400 min-h-screen p-5 pt-8 w-72 relative duration-300 z-50 overflow-y-auto">
+            <div class="inline-flex">
+                <img src="/booklogo.png" alt="" class="text-xl rounded cursor-pointer block float-left duration-500"
+                    id="bookLogo">
+                <h1 class="text-red-700 origin-left font-bold text-2xl duration-300 hover:cursor-pointer " id="brandName">
+                    ReadCycle</h1>
+            </div>
+            <div class="flex items-center rounded-md bg-yellow-100 mt-4"><i
+                    class="fa-solid fa-magnifying-glass text-red-950 px-2 py-1 text-lg block float-left cursor-pointer"></i>
+                <input type="search" class="text-base bg-transparent w-full text-red-700 focus:outline-none"
+                    placeholder="Search">
+            </div>
+            <div id="menuDiv">
+                <ul class="pt-10" id="menu">
+                    <li><a href="/books"
+                            class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i
+                                class="fa-solid fa-house text-2xl float-left block transition-transform duration-500"
+                                id="icon"></i><span class="link-text duration-100">Home</span></a></li>
+                    <li><a href="/sellBook"
+                            class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i
+                                class="fa-solid fa-book text-2xl float-left block transition-transform duration-500"
+                                id="icon"></i><span class="link-text duration-100">Sell a book</span></a></li>
+                    <li><a href="/chat"
+                            class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i
+                                class="fa-brands fa-rocketchat text-2xl float-left block transition-transform duration-500"
+                                id="icon"></i><span class="link-text duration-100">Chat</span></a></li>
+                                <li><a href="/our-sellers"
+                                        class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i
+                                            class="fa-solid fa-user text-2xl float-left block transition-transform duration-500" id="icon"></i><span
+                                            class="link-text duration-100">See our sellers</span></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="flex flex-col">
+        <h1 id="yourListedBooks" class="top-0 bottom-4 text-emerald-900 font-bold m-2 p-2 text-xl">You Listed Books:</h1>
+        <div id="booksBySeller" class="m-5 flex flex-wrap gap-4">
+        </div>
+    
+    <h1 id="yourListedBooks" class="top-0 bottom-4 text-emerald-900 font-bold m-2 p-2 text-xl">Your Interested Books:</h1>
+    <div id="interestBooksDiv" class="m-5 flex flex-wrap gap-4"></div>
+</div>
+    </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script type="module">
+    import { initializeSidebar } from "/sidebar.js"
+    document.addEventListener("DOMContentLoaded", () => {
+        initializeSidebar();
+    });
+
+</script>
+<script src="/chatpage.js"></script>
+</html>

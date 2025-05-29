@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="/output.css">
+</head>
+<body id="bookDetails">
+    <div class="flex min-h-screen">
+        <div class="sideBar bg-gradient-to-b from-teal-400 to to-blue-400 min-h-screen p-5 pt-8 w-72 relative duration-300 z-50 overflow-y-auto">
+            <div class="inline-flex">
+                <img src="/booklogo.png" alt="" class="text-xl rounded cursor-pointer block float-left duration-500" id="bookLogo">
+                <h1 class="text-red-700 origin-left font-bold text-2xl duration-300 hover:cursor-pointer " id="brandName">
+                    ReadCycle</h1>
+            </div>
+            <div class="flex items-center rounded-md bg-yellow-100 mt-4"><i
+                    class="fa-solid fa-magnifying-glass text-red-950 px-2 py-1 text-lg block float-left cursor-pointer"></i>
+                <input type="search" class="text-base bg-transparent w-full text-red-700 focus:outline-none"
+                    placeholder="Search">
+            </div>
+            <div id="menuDiv">
+                <ul class="pt-10" id="menu">
+                    <li><a href="/books"
+                            class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i
+                                class="fa-solid fa-house text-2xl float-left block transition-transform duration-500"
+                                id="icon"></i><span class="link-text duration-100">Home</span></a></li>
+                    <li><a href="/sellBook"
+                            class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i
+                                class="fa-solid fa-book text-2xl float-left block transition-transform duration-500"
+                                id="icon"></i><span class="link-text duration-100">Sell a book</span></a></li>
+                    <li><a href="/chat"
+                            class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i
+                                class="fa-brands fa-rocketchat text-2xl float-left block transition-transform duration-500"
+                                id="icon"></i><span class="link-text duration-100">Chat</span></a></li>
+                    <li><a href="/our-sellers"
+                            class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i
+                                class="fa-solid fa-user text-2xl float-left block transition-transform duration-500" id="icon"></i><span
+                                class="link-text duration-100">See our sellers</span></a></li>
+                </ul>
+            </div>
+            </div>
+    
+        <div class="flex-1 p-10">
+        <div id="selectedBook"></div>
+        <div id="userReviews" class="max-w-2xl">
+            <label for="review-form" class="mb-4 review-label">Leave a Reply</label>
+            <form method="post" id="review-form" class="mb-7">
+                <textarea name="comment" id="comment" class="outline outline-slate-950 px-4 py-2 mb-2 rounded-sm" rows="4"
+                    cols="50"></textarea>
+        
+                <div id="star-container" class="flex space-x-1 mb-2">
+                    <!-- Stars will be generated here -->
+                </div>
+                <button type="submit" id="submit-review" class="border-2 border-slate-950 rounded-md p-1">Submit Review</button>
+            </form> 
+            <div class="">
+                <p id="rating-value" class="text-lg font-medium text-gray-700">Rating: 0</p>
+                <p id="totalRatings" class="text-lg font-medium text-gray-700">Total Ratings</p>
+                </div>
+            </div>
+            
+            
+            
+  
+            
+        </div>
+        
+    </div>
+    
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script type="module">
+    import { initializeSidebar } from "/sidebar.js"
+    document.addEventListener("DOMContentLoaded", () => {
+        initializeSidebar();
+    });
+
+</script>
+<script src="/bookDetail.js"></script>
+</html>

@@ -1,6 +1,6 @@
 const jwt=require('jsonwebtoken')
 
-const jwtAuthMiddleware = (req, res) => {
+const jwtAuthMiddleware = (req, res,next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
         return res.status(401).json({ error: "Unauthorized:No token provided" });

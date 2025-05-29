@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="/output.css">
+    
+</head>
+<body id="listBook-page" class="relative min-h-screen">
+      <div class="flex min-h-screen">
+        <div class="sideBar bg-gradient-to-b from-teal-400 to to-blue-400 min-h-screen p-5 pt-8 w-72 relative duration-300 z-50 overflow-y-auto">
+         <div class="inline-flex">
+            <img src="/booklogo.png" alt="" class="text-xl rounded cursor-pointer block float-left duration-500" id="bookLogo">
+            <h1 class="text-red-700 origin-left font-bold text-2xl duration-300 hover:cursor-pointer " id="brandName">ReadCycle</h1>
+         </div>
+         <div class="flex items-center rounded-md bg-yellow-100 mt-4"><i class="fa-solid fa-magnifying-glass text-red-950 px-2 py-1 text-lg block float-left cursor-pointer"></i>
+         <input type="search" class="text-base bg-transparent w-full text-red-700 focus:outline-none" placeholder="Search">
+        </div>
+        <div id="menuDiv">
+            <ul class="pt-10" id="menu">
+        <li><a href="/books" class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i class="fa-solid fa-house text-2xl float-left block transition-transform duration-500" id="icon"></i><span class="link-text duration-100">Home</span></a></li>
+        <li><a href="/sellBook" class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i class="fa-solid fa-book text-2xl float-left block transition-transform duration-500" id="icon"></i><span class="link-text duration-100">Sell a book</span></a></li>
+        <li><a href="/chat" class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i class="fa-brands fa-rocketchat text-2xl float-left block transition-transform duration-500" id="icon"></i><span class="link-text duration-100">Chat</span></a></li>
+        <li><a href="/our-sellers"  class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i class="fa-solid fa-user text-2xl float-left block transition-transform duration-500" id="icon"></i><span class="link-text duration-100">See our sellers</span></a></li>
+    </ul>
+    </div>
+    </div>
+    </div>
+   
+    <div class="absolute inset-0 flex items-center justify-center z-0">
+        <img src="book-watermark.png" alt="" class="max-w-full max-h-screen opacity-10 mb-40 ml-60">
+    
+    <div class="absolute flex items-center justify-center mt-30 ml-[200px] bg-slate-400 p-7 px-8 opacity-60 h-[500px] rounded-xl shadow-black shadow-xl motion-preset-slide-down-lg motion-duration-1500">
+    <form action="/sellbook" method="post" enctype="multipart/form-data" id="listBook-form">
+        <label for="title" required class="mr-8 font-semibold text-lg">Title:</label>
+        <input type="text" name="title" id="title" required class="p-1 rounded-xl"> <br /><br />
+        <label for="author" class="mr-3 font-semibold text-lg">Author:</label>
+        <input type="text" name="author" id="author" required class="p-1 rounded-xl"> <br /><br />
+        <label for="genre" class="mr-3 font-semibold text-lg">Subject:</label>
+        <select name="genre" id="genre" required class="p-1 rounded-xl">
+            <option value="pleaseSelect">Please Select</option>
+            <option value="Children's literature">Children's literature</option>
+            <option value="Fantasy">Fantasy</option>
+            <option value="Historical">Historical</option>
+            <option value="Horror">Horror</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Fiction">Fiction</option>
+            <option value="Thriller">Thriller</option>
+            <option value="Other">Other</option>
+        </select><br /><br />
+        <div id="otherGenreWrapper" class="hidden transition-all duration-300">
+        <label for="otherGenre" class="mr-5">Other</label>
+        <input type="text" name="otherGenre" id="otherGenre" class="p-1 rounded-xl"/>
+    </div>
+        <label for="location" class="mr-1 font-semibold text-lg">Location:</label>
+        <input type="text" name="location" id="location" class="p-1 rounded-xl"><br /><br />
+        <div class="flex items-start gap-2 mb-4">
+        <label for="experience" class="font-semibold text-lg">Experience:</label>
+        <textarea name="experience" id="experience" class="p-1 rounded-xl"></textarea><br /><br />
+    </div>
+        <label for="price" class="mr-10 font-semibold text-lg">Price:</label>
+        <input type="number" name="price" id="price" class="p-1 rounded-xl"><br /><br />
+        <label for="files" class="mr-6 font-semibold text-lg">Image:</label>
+        <input type="file" name="files" id="bookImgs" multiple required class="p-1 rounded-xl"/><br /><br />
+        <button type="submit" id="listBook" class="bg-black p-2 text-white rounded-md font-semibold text-lg">Done</button>
+    </form>
+</div>
+</div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script src="/script.js" defer></script>
+<script type="module">
+    import { initializeSidebar } from "/sidebar.js"
+    document.addEventListener("DOMContentLoaded", () => {
+            initializeSidebar();
+        });
+    
+</script>
+</html>

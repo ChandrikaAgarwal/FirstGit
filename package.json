@@ -15,11 +15,24 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "aws-sdk": "^2.1692.0",
+    "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
+    "dotenv": "^16.5.0",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.16.0",
     "mongoose": "^8.14.2",
-    "nodemon": "^3.1.10"
+    "multer": "^2.0.0",
+    "nodemon": "^3.1.10",
+    "sib-api-v3-sdk": "^8.5.0",
+    "ws": "^8.18.2"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "tailwindcss-motion": "^1.1.0"
   }
 }

@@ -1,0 +1,15 @@
+const express=require('express')
+const router=express.Router()
+const { jwtAuthMiddleware } =require('../middlewares/jwtmiddleware')
+const bookControl=require('../controllers/bookController')
+const upload=require('../middlewares/multer')
+
+router.post('/sellbook', jwtAuthMiddleware, upload.array('files'), bookControl.listingABook)
+router.get('/fetch-books', jwtAuthMiddleware, bookControl.getListedBooks)
+router.get('/api/book/:bookId',jwtAuthMiddleware,bookControl.getRequestedBook)
+router.post('/user-interest/:bookId', jwtAuthMiddleware, bookControl.bookInterest)
+router.get('/api/listed-books', jwtAuthMiddleware, bookControl.getListedBooksByUser)
+router.get('/api/chat/:bookId', jwtAuthMiddleware, bookControl.getChatList)
+router.post('/send-msg', jwtAuthMiddleware, bookControl.messageRecieved)
+router.get('/fetch-chats/:bookId',jwtAuthMiddleware,bookControl.getMyChats)
+module.exports = router;

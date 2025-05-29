@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/output.css">
+</head>
+<body id="login-page" class="bg-[url(/books-bg.jpg)]">
+    <div id="login-formDiv" class="mx-auto max-w-xl m-32 bg-blue-950 p-10 h-[32rem] rounded-lg shadow-2xl border-b-red-800 border-b-4 border-l-red-800 border-l-4">
+        <h1 class="font-bold text-yellow-400 text-3xl mx-32 mb-8 mt-0">Welcome Back!</h1>
+        <form action="/users" method="POST" id="login-form" >
+            <label for="email" class="font-bold text-rose-400 text-2xl">Email: </label>
+            <input type="text" name="email" id="email" class="border-rose-400 border-2 rounded-full hover:scale-110 mx-9 px-4 py-2 mb-6 w-64"><br /><br />
+            <label for="password" class="font-bold text-rose-400 text-2xl">Password: </label>
+            <input type="password" name="password" id="password" class="border-rose-400 border-2 rounded-full hover:scale-110 mx-1 px-4 py-2 mb-6 w-64"><br /><br />
+            <button type="submit" class="bg-rose-400 p-3 rounded-full hover:scale-110 border-b-white border-b-4 w-40 text-red-950 font-bold text-xl leading-relaxed shadow-lg">Login</button> <br /><br />
+            <label for="signUpBtn" class="font-bold text-rose-400 text-xl mx-3 ">Not a user? </label>
+            <button type="button" id="signUpBtn" class="bg-rose-400 p-3 rounded-full hover:scale-110 border-b-white border-b-4 font-bold text-lg leading-relaxed shadow-lg text-red-950"> SignUp </button><br /><br />
+        </form>
+
+    </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script src="/script.js"></script>
+</html>
