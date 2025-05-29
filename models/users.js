@@ -19,6 +19,11 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    avgRating: {
+        type: mongoose.Schema.Types.Decimal128,
+        default: 0.0,
+        required:true
+    },
 }, { timestamps: true })
 
 module.exports=mongoose.model('User',userSchema)

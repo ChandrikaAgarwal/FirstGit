@@ -10,7 +10,7 @@ app.use(express.static('public'))
 app.use(bodyParser.json())
 const userRoute = require('./routes/userRoute')
 const bookRoute=require('./routes/bookRoute')
-const User = require('./models/users')
+const sellerRoute=require('./routes/sellerRoute')
 const jwt=require('jsonwebtoken')
 const server = http.createServer(app)
 const wss = new WebSocket.Server({ server })
@@ -76,6 +76,7 @@ app.get('/chat/:bookId', (req, res) => {
 app.get('/our-sellers', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'sellerList.html'));
 })
+app.use('/',sellerRoute)
 app.use('/', userRoute)
 app.use('/',bookRoute)
 mongoose.connect(process.env.CONNECT)

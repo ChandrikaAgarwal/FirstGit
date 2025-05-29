@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,14 +8,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="/output.css">
 </head>
-<body id="SellersListPage" class="relative min-h-screen">
+
+<body id="buyerSellerChat" class="relative min-h-screen">
     <div class="relative flex min-h-screen">
         <div
             class="sideBar bg-gradient-to-b from-teal-400 to to-blue-400 min-h-screen p-5 pt-8 w-72 relative duration-300 z-50 overflow-y-auto">
             <div class="inline-flex">
                 <img src="/booklogo.png" alt="" class="text-xl rounded cursor-pointer block float-left duration-500"
                     id="bookLogo">
-                <h1 class="text-red-700 origin-left font-bold text-2xl duration-300 hover:cursor-pointer " id="brandName">
+                <h1 class="text-red-700 origin-left font-bold text-2xl duration-300 hover:cursor-pointer "
+                    id="brandName">
                     ReadCycle</h1>
             </div>
             <div class="flex items-center rounded-md bg-yellow-100 mt-4"><i
@@ -36,40 +39,46 @@
                             class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i
                                 class="fa-brands fa-rocketchat text-2xl float-left block transition-transform duration-500"
                                 id="icon"></i><span class="link-text duration-100">Chat</span></a></li>
+                    <li><a href="/our-sellers"
+                            class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i
+                                class="fa-solid fa-user text-2xl float-left block transition-transform duration-500"
+                                id="icon"></i><span class="link-text duration-100">See our sellers</span></a>
+                    </li>
                     <hr class="mt-5" />
+
                     <li class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"
                         id="buyers"><i
-                            class="fa-solid fa-user text-2xl float-left block transition-transform duration-500"></i><span
-                            class="link-text duration-100">Buyers</span></li>
-                    <li><a href="/our-sellers" class="text-blue-950 text-sm flex items-center gap-x-4 cursor-pointer font-semibold p-2 hover:bg-red-200 rounded-md mt-2 flex-1"><i
-                                class="fa-solid fa-user text-2xl float-left block transition-transform duration-500" id="icon"></i><span class="link-text duration-100">See our sellers</span></a></li>
+                            class="fa-solid fa-user text-2xl float-left block transition-transform duration-500"
+                            id="icon"></i><span class="link-text duration-100">Buyers</span></li>
+
                 </ul>
             </div>
         </div>
-        <div id="userListPanel" class="w-[200px] border-r border-gray-300 overflow-y-auto p-4 bg-gray-50 duration-1000 hidden ">
+        <div id="userListPanel"
+            class="w-[200px] border-r border-gray-300 overflow-y-auto p-4 bg-gray-50 duration-1000 hidden ">
             <h2 class="text-lg font-bold text-indigo-700 mb-4">Contacts</h2>
             <ul id="userList" class="relative">
                 <!-- JS will inject users like -->
                 <!-- <li class="p-2 cursor-pointer hover:bg-indigo-100 rounded">User Name</li> -->
-            </ul>  
+            </ul>
         </div>
         <div id="chatWindow" class="flex-1 flex flex-col bg-white">
-            
+
             <!-- MESSAGES -->
             <div id="chatMessages" class="flex-grow p-4 overflow-y-auto space-y-3">
-              <ul id="messagesUl" class="flex flex-col"></ul>
+                <ul id="messagesUl" class="flex flex-col"></ul>
                 <!-- <div class="text-right"><span class="bg-indigo-100 p-2 rounded">Hi there!</span></div>-->
             </div>
             <div class="border-t border-gray-300 p-4">
                 <form id="chatForm" class="flex gap-2">
-                    <input type="text" id="messageInput" class="flex-grow p-2 border rounded" placeholder="Type your message..." />
+                    <input type="text" id="messageInput" class="flex-grow p-2 border rounded"
+                        placeholder="Type your message..." />
                     <button type="submit" class="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">
                         Send
                     </button>
                 </form>
-            </div> 
-         </div>
-         <div id="sellesList"></div>
+            </div>
+        </div>
     </div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
@@ -79,5 +88,6 @@
         initializeSidebar();
     });
 </script>
-<script src="/sellers.js"></script>
+<script src="/buyerSellerChat.js"></script>
+
 </html>

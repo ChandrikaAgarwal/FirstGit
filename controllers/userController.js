@@ -1,3 +1,4 @@
+const  mongoose  = require("mongoose")
 const { generateToken, jwtAuthMiddleware } = require("../middlewares/jwtmiddleware")
 const User = require("../models/users")
 const bcrypt=require('bcryptjs')
@@ -47,5 +48,6 @@ const userLogin = async (req, res) => {
 
 module.exports = {
     userSignUp,
-    userLogin
+    userLogin,
+    
 }
