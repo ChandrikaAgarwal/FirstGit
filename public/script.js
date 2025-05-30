@@ -133,8 +133,7 @@ if (bookManagementPage) {
         books.forEach(book => {
            const boxSize = document.createElement("div")
             boxSize.id = "boxSize" 
-            // boxSize.className =" relative border border-gray-300 rounded-lg shadow-md p-4 w-[300px] h-[450px] m-4 transition-transform duration-300 transform hover:scale-105 hover:z-10 bg-white motion-preset-bounce motion-duration-1000"
-            boxSize.className = " relative border border-gray-300 rounded-lg shadow-md p-4 w-[300px] h-[450px] m-4 motion-scale-in-[0.5] motion-rotate-in-[-10deg] motion-blur-in-[10px] motion-delay-[0.75s]/rotate motion-delay-[0.75s]/blur motion-preset-bounce motion-duration-1000"
+            boxSize.className = " relative border border-gray-300 rounded-lg shadow-md p-4 w-[300px] h-[450px] m-4 overflow-hidden flex flex-col motion-scale-in-[0.5] motion-rotate-in-[-10deg] motion-blur-in-[10px] motion-delay-[0.75s]/rotate motion-delay-[0.75s]/blur motion-preset-bounce motion-duration-1000"
            const detailDiv=document.createElement("div")
             detailDiv.id = "detailDiv"
             detailDiv.className="p-2 rounded-lg "
@@ -152,7 +151,7 @@ if (bookManagementPage) {
             NamePriceDiv.className="flex flex-row"
             const bookName = document.createElement('h2')
             bookName.textContent = book.title
-            bookName.className="uppercase text-indigo-500 font-medium mt-4 mr-28"
+            bookName.className ="uppercase text-indigo-500 font-medium mt-4 mr-28 truncate w-[200px]"
             const bookPrice=document.createElement('h2')
             bookPrice.textContent =`INR ${book.price}`
             bookPrice.className ="text-indigo-500 font-medium mt-4 "

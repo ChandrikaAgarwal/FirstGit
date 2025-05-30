@@ -3,7 +3,7 @@ const User=require('../models/users')
 const mongoose = require('mongoose')
 const message = require('../models/message')
 const Followers = require('../models/followUsers')
-
+const Ratings=require('../models/ratings')
 
 const followSeller = async (req, res) => {
     try {
@@ -43,7 +43,61 @@ const getAllSellers = async (req, res) => {
 
     }
 }
+
+const sellerRating = async (req, res) => {
+    try { 
+        let { starRating, totalRating, sellerId, comment } = req.body
+        const userId = new mongoose.Types.ObjectId(req.user.id)
+        sellerId = new mongoose.Types.ObjectId(sellerId)
+        const user=await User.findById(userId)
+        const seller=await User.findById(sellerId)
+        const existingRating = await Ratings.findOne({
+            userId,
+            sellerId
+        })
+           
+        if (existingRating) {
+            return res.status(400).json({ message: "You have already rated this seller once" })
+        }
+        const newRating = new Ratings({
+            userId: userId,
+            userName: user.name,
+            sellerId: sellerId,
+            sellerName: seller.name,
+            rating: starRating,
+            comment
+        })
+        await newRating.save()
+        const totalRatings = await Ratings.countDocuments({
+            sellerId
+        })
+       
+        const avgResult = await Ratings.aggregate([
+            {
+                $group: {
+                    _id: sellerId,
+                    avgValue:{$avg:'$rating'}
+                }
+            }
+        ])
+        console.log(`Average value: ${avgResult[0].avgValue}`);
+        console.log("total Ratings: ", totalRatings);
+        const updatedUser = await User.findByIdAndUpdate(
+            {_id: sellerId } ,
+            {
+                avgRating: avgResult[0].avgValue,
+                totalRating:totalRatings
+            },
+            { new: true }
+        )
+        return res.status(200).json({message:"Rating: ",newRating,totalRatings,updatedUser})
+    } catch (err) {
+        console.log("Error generating a rating for seller : ", err);
+        return res.status(500).json({ message: "Error generating a rating for seller: ", details: err })
+    }
+}
 module.exports={
     getAllSellers,
-    followSeller
+    followSeller,
+    sellerRating
 }

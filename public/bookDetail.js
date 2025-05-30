@@ -35,11 +35,6 @@ if (bookDetailPage) {
         bookName.textContent = bookDetails.title.toUpperCase()
         bookName.className = "text-red-600 font-bold mx-10 mt-5"
         
-        if (isSeller) {
-            reviewForm.classList.add('hidden')
-            document.querySelector('.review-label').classList.add('hidden')
-           
-        }
         const sellerDiv=document.createElement('div')
         sellerDiv.className="flex flex-col"
         const postedBy=document.createElement('p')
@@ -79,39 +74,7 @@ if (bookDetailPage) {
         if (isSeller) {
             interestedBtn.classList.add('hidden')
         }
-        const starContainer = document.getElementById('star-container');
-        const ratingText = document.getElementById('rating-value');
-        const totalRatings = document.getElementById("totalRatings")
-        let selectedRating = 0;
-        let totalRating = 0;
-        for (let i = 1; i <= 5; i++) {
-            const star = document.createElement('span');
-            star.innerHTML = "&#9734"
-            star.classList.add('text-gray-400', 'text-3xl', 'cursor-pointer', 'transition-colors', 'duration-200');
-            star.dataset.rating = i;
-            star.addEventListener('mouseenter', () => highlightStars(i));
-            star.addEventListener('mouseleave', () => highlightStars(selectedRating));
-            star.addEventListener('click', async () => {
-                selectedRating = i;
-                totalRating += 1
-                ratingText.textContent = `Rating: ${selectedRating}`;
-                totalRatings.textContent = `Total Ratings: ${totalRating}`
-                await highlightStars(selectedRating);
-            })
-            starContainer.appendChild(star);
-        }
-        reviewForm.addEventListener("submit", async (e) => {
-            try {
-                e.preventDefault();
-                const ratingDetail = {
-                    selectedRating,
-                    totalRating,
-                    selectedBookId:bookDetails._id,
-                    comment:e.target.comment.value
-                }
-                const giveRating=await axios.post(`${apiUrl}/api/ratings`,ratingDetail)
-            }catch(err){}
-        })
+        
         const detailDiv = document.createElement('div')
         detailDiv.className = "grid grid-cols-1 sm:grid-cols-2 gap-2 my-8";
         const leftDetails = document.createElement("div");

@@ -20,10 +20,15 @@ const userSchema = new Schema({
         required: true
     },
     avgRating: {
-        type: mongoose.Schema.Types.Decimal128,
+        type: Number,
         default: 0.0,
         required:true
     },
+    totalRating: {
+        type: Number,
+        default: 0,
+        required: true
+    }
 }, { timestamps: true })
 
 module.exports=mongoose.model('User',userSchema)
