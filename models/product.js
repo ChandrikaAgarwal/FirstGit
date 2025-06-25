@@ -1,28 +1,18 @@
-const Sequelize=require('sequelize') //this will give us a class or constructor function
-const sequelize=require('../util/database') //this is a fully configured sequelize environment that also has a connection pool
+const getDb = require('../util/database').getDb // to get access to the database
+class Product {
+  constructor(title, price, description, imageUrl) {
+    this.title = title;
+    this.price = price;
+    this.description = description;
+    this.imageUrl = imageUrl;
+  }
+  save() {
+    const db = getDb(); //getDb gives us the connection to the database
+    db.collection('products').insertOne(this).then((result) => {
+      console.log(result);
+    }).catch((err) => {
+      console.log(err);
 
-//define a model to be managed by sequelize
-
-const Product=sequelize.define('product', {
-  id:{
-    type:Sequelize.INTEGER,
-    autoIncrement:true,
-    allowNull:false,
-    primaryKey:true
-  },
-  title:Sequelize.STRING,
-  price:{
-    type:Sequelize.DOUBLE,
-    allowNull:false,
-  },
- imageUrl:{
-  type:Sequelize.STRING,
-  allowNull:false,
- },
- description:{
-type:Sequelize.STRING,
-allowNull:false,
- }
-  });
-
-module.exports=Product;
+    });
+  }
+}

@@ -76,7 +76,6 @@ exports.getAllExpenses = async (req, res = null) => {
             isPremium: user.premium
         }
         if (res) {
-
             return res.status(200).json({ message: "all months in this year: ", responseData });
         } else {
             return responseData;

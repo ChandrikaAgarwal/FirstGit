@@ -1,22 +1,27 @@
-//to connect to sql and also gives us back a connection object so that we can run queries.
+const mongodb = require('mongodb')
+const MongoClient = mongodb.MongoClient;
 
-// const mysql=require('mysql2');
-// const pool=mysql.createPool({
-//     host: 'localhost',
-//     user:'root',
-//     database: 'node-complete',
-//     password: 'Ia24yon#'
-// })
+let _db;
+//connects and stores the connection to the database
+const mongoConnect = callback => {
+    MongoClient.connect('mongodb+srv://chandrika30:chandrika30@cluster0.f0j665r.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0').then(client => {
+        console.log("connected");
+        _db = client.db('e-commerce') //storing access to the database here. 
+        callback()
+    }).catch(err => {
+        console.log("could not connect");
+        console.log(err)
+        throw err;
+    })
+}
 
-// module.exports=pool.promise();
+//returns access to that connected db if it exists.
+const getDb = () => {
+    if (_db) {
+        return _db
+    }
+    throw "no database found"
+}
+exports.mongoConnect = mongoConnect;
+exports.getDb = getDb
 
-
-//connecting sequelize to the database. precisely sequelize willset up a connection pool
-const Sequelize=require('sequelize')
-
-const sequelize=new Sequelize('node-complete','root','Ia24yon#',{
-    dialect: 'mysql',host:'localhost'});
-    //dialect:which db we are using.
-
-
-module.exports=sequelize;

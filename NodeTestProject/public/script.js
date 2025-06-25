@@ -13,7 +13,7 @@ const authorsPage = document.querySelector('#authorsPage')
 const author = document.querySelector('#author')
 const adminCredsPage = document.querySelector('#adminCredsPage')
 const activityFeedPg = document.querySelector('#activityFeed-page')
-let api_url = "http://13.203.229.232"
+let api_url = "http://localhost:3000"
 const url = window.location.pathname.split('/')
 if (!url.includes('admin')) {
     if (signupForm) {

@@ -101,7 +101,7 @@ Collection.belongsToMany(Recipe, { through: RecipeCollection })
 // sequelize.sync({force:true})
 sequelize.sync()
     try {
-         app.listen(process.env.PORT || 5000, () => {
+         app.listen(process.env.PORT || 3000, () => {
             console.log("app is nrunning on ", process.env.API_URL);
     
         })

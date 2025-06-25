@@ -1,4 +1,4 @@
-let apiUrl = "http://13.203.229.232"
+let apiUrl = "http://localhost:3000"
 let token=localStorage.getItem('token')
 const adminPage=document.querySelector('#adminPage')
 const totalUsers = document.querySelector('#usersCount')
