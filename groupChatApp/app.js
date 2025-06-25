@@ -47,19 +47,22 @@ wss.on('connection', (ws) => {
 app.use(cors())
 app.use(bodyParser.json())
 app.use(express.static('public'))
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
 app.get('/users', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+    res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
 app.get('/chat', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', "chat.html"));
+    res.sendFile(path.join(__dirname, 'views', "chat.html"));
 })
 
 app.get('/groups', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', "groups.html"));
+    res.sendFile(path.join(__dirname, 'views', "groups.html"));
 })
 
 app.get('/group/:groupId', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', "group.html"));
+    res.sendFile(path.join(__dirname, 'views', "group.html"));
 })
 app.use('/', userRoute)
 app.use('/api/messages', messageRoute)
@@ -73,7 +76,7 @@ User.belongsToMany(Group, { through: Usergroup })
 Group.belongsToMany(User, { through: Usergroup })
 Grpmsg.belongsTo(Group, { constraints: true, onDelete: 'CASCADE' })
 Group.hasMany(Grpmsg, { constraints: true, onDelete: 'CASCADE' })
-sequelize.sync({alter:true})
+sequelize.sync()
 // sequelize.sync()
     .then(() => {
         server.listen(process.env.PORT || 3000, () => {
