@@ -31,21 +31,22 @@ wss.on('connection', (ws) => {
             console.log("AuthenticatedUser: ", ws.userId)
             ws.send(JSON.stringify({ event: 'auth-success' }))
         }
-        const interval = setInterval(() => {
-            wss.clients.forEach((ws) => {
-                if (ws.isAlive === false) return ws.terminate();
-
-                ws.isAlive = false;
-                ws.ping(); // this triggers pong from client
-            });
-        }, 30000); 
-        
         wss.clients.forEach(client => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(message)
             }
         })
     });
+
+    const interval = setInterval(() => {
+        wss.clients.forEach((ws) => {
+            if (ws.isAlive === false) return ws.terminate();
+
+            ws.isAlive = false;
+            ws.ping(); // this triggers pong from client
+        });
+    }, 30000);
+
     ws.on('close', () => {
         console.log("Websocket connection closed");
         

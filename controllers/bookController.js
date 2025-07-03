@@ -241,7 +241,10 @@ const getChatList = async (req, res) => {
         if (isSeller) {
          list = await Interest.find({ bookId: bookId })
         } else {
-            list=await Interest.findOne({buyerId:userId})
+            list = await Interest.findOne({
+                buyerId: userId,
+                bookId
+            })
         }
         console.log("list: ", list);
         return res.status(200).json({message:"Your list has arrived: ",list,isSeller})

@@ -4,7 +4,9 @@ const apiUrl = "http://localhost:5000"
 let socket = new WebSocket('ws://localhost:5000')
 if (buyerSellerchatPage) {
     const pathParts=window.location.pathname.split('/')
-    let bookId=pathParts[pathParts.length-1]
+    let bookId = pathParts[pathParts.length - 1]
+    console.log("bookId ",bookId);
+    
     const buyers = document.querySelector("#buyers")
     const usersListPanel = document.querySelector("#userListPanel")
     const userList = document.querySelector("#userList")
@@ -146,7 +148,6 @@ if (buyerSellerchatPage) {
                 })
                 console.log("Message sent: ", sendMsg);
                 chatForm.reset()
-                await startWebSocket()
 
 
             } catch (err) {
@@ -155,9 +156,6 @@ if (buyerSellerchatPage) {
             }
 
         })
-
-    
-
 
     async function startWebSocket() {
         socket = new WebSocket("ws://localhost:5000");

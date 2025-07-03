@@ -1037,10 +1037,66 @@ video {
   }
 }
 
-.motion-preset-typewriter-\[24\] {
+.motion-preset-typewriter-\[100\] {
   --motion-duration: 2000ms;
-  --motion-typewriter-value: 24ch;
-  animation: typing var(--motion-duration) steps(24) var(--motion-loop-count), blink 0.4s step-end infinite alternate;
+  --motion-typewriter-value: 100ch;
+  animation: typing var(--motion-duration) steps(100) var(--motion-loop-count), blink 0.4s step-end infinite alternate;
+  white-space: nowrap;
+  border-right: 2px solid;
+  font-family: monospace;
+  overflow: hidden;
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  @keyframes typing {
+    10%, 90% {
+      width: 0;
+    }
+
+    40%, 60% {
+      width: calc(var(--motion-typewriter-value) + 1px);
+    }
+  }
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+}
+
+.motion-preset-typewriter-\[1000\] {
+  --motion-duration: 2000ms;
+  --motion-typewriter-value: 1000ch;
+  animation: typing var(--motion-duration) steps(1000) var(--motion-loop-count), blink 0.4s step-end infinite alternate;
+  white-space: nowrap;
+  border-right: 2px solid;
+  font-family: monospace;
+  overflow: hidden;
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  @keyframes typing {
+    10%, 90% {
+      width: 0;
+    }
+
+    40%, 60% {
+      width: calc(var(--motion-typewriter-value) + 1px);
+    }
+  }
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+}
+
+.motion-preset-typewriter-\[2000\] {
+  --motion-duration: 2000ms;
+  --motion-typewriter-value: 2000ch;
+  animation: typing var(--motion-duration) steps(2000) var(--motion-loop-count), blink 0.4s step-end infinite alternate;
   white-space: nowrap;
   border-right: 2px solid;
   font-family: monospace;
@@ -1451,14 +1507,6 @@ video {
   width: 100%;
 }
 
-.w-\[180px\] {
-  width: 180px;
-}
-
-.w-\[0px\] {
-  width: 0px;
-}
-
 .max-w-full {
   max-width: 100%;
 }
@@ -1485,10 +1533,6 @@ video {
 
 .origin-left {
   transform-origin: left;
-}
-
-.transform {
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
 @keyframes blob {
@@ -1886,6 +1930,10 @@ video {
   text-align: justify;
 }
 
+.font-serif {
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
@@ -2133,6 +2181,18 @@ video {
   animation: var(--motion-all-loop-and-enter-animations);
 }
 
+.-motion-translate-x-in-100 {
+  --motion-origin-translate-x: -100%;
+  --motion-translate-in-animation: motion-translate-in calc(var(--motion-translate-duration) * var(--motion-translate-perceptual-duration-multiplier)) var(--motion-translate-timing) var(--motion-translate-delay) both;
+  animation: var(--motion-all-loop-and-enter-animations);
+}
+
+.motion-translate-y-in-75 {
+  --motion-origin-translate-y: 75%;
+  --motion-translate-in-animation: motion-translate-in calc(var(--motion-translate-duration) * var(--motion-translate-perceptual-duration-multiplier)) var(--motion-translate-timing) var(--motion-translate-delay) both;
+  animation: var(--motion-all-loop-and-enter-animations);
+}
+
 .motion-rotate-in-\[-10deg\] {
   --motion-origin-rotate: -10deg;
   --motion-rotate-in-animation: motion-rotate-in calc(var(--motion-rotate-duration) * var(--motion-rotate-perceptual-duration-multiplier)) var(--motion-rotate-timing) var(--motion-rotate-delay) both;
@@ -2153,6 +2213,14 @@ video {
   --motion-duration: 1500ms;
 }
 
+.motion-duration-500 {
+  --motion-duration: 500ms;
+}
+
+.motion-duration-700 {
+  --motion-duration: 700ms;
+}
+
 .motion-delay-\[0\.75s\]\/blur {
   --motion-filter-delay: 0.75s;
 }
@@ -2167,16 +2235,6 @@ video {
 
 .animation-delay-4000 {
   animation-delay: 4s;
-}
-
-.hover\:z-10:hover {
-  z-index: 10;
-}
-
-.hover\:scale-105:hover {
-  --tw-scale-x: 1.05;
-  --tw-scale-y: 1.05;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
 .hover\:scale-110:hover {
