@@ -29,7 +29,7 @@ const CreatePoll = () => {
         try {
             const token = localStorage.getItem('token');
             const res = await API.post(
-                '/polls/create',
+                '/create',
                 { question, options, expiresAt },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

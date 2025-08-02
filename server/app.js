@@ -15,7 +15,7 @@ const io = require('socket.io')(server, {
         origin: "*",
     },
 });
-
+app.set('io',io)
 app.get('/',(req, res)=> {
     res.send("Api is running")
 })
@@ -40,10 +40,10 @@ io.on('connection', (socket) => {
         
     })
 })
-app.use((req, res, next) => {
-    req.io = io;
-    next();
-});
+// app.use((req, res, next) => {
+//     req.io = io;
+//     next();
+// });
 
 app.use(cors())
 app.use(express.json())

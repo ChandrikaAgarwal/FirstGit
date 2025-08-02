@@ -15,6 +15,7 @@ const Navbar = () => {
                 <>
                     <Link to="/polls">Create Poll</Link> |{' '}
                     <Link to="/list-polls">See All Polls</Link> |{' '}
+                    <Link to="/cast-vote">Cast your Vote</Link> |{' '}
                     <button onClick={logout}>Logout</button>
             
                 </>

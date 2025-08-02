@@ -3,10 +3,13 @@ import { useEffect, useState } from 'react';
 import API from '../api'
 
 const ListPolls = () => {
+    const token = localStorage.getItem('token');
     const [polls, setPolls] = useState([]);
 
     useEffect(() => {
-        API.get('/all-polls')
+        API.get('/all-polls',
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
             .then(res => { 
                 setPolls(res.data.polls)
             })
