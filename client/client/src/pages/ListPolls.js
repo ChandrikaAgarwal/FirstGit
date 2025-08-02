@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-// import axios from 'axios';
 import API from '../api'
 
 const ListPolls = () => {
-    const token = localStorage.getItem('token');
     const [polls, setPolls] = useState([]);
-
+    const token = localStorage.getItem('token');
+    
     useEffect(() => {
         API.get('/all-polls',
             { headers: { Authorization: `Bearer ${token}` } }
@@ -14,7 +13,7 @@ const ListPolls = () => {
                 setPolls(res.data.polls)
             })
             .catch(err => console.log(err));
-    }, []);
+    }, [token]);
 
     return (
         <div className="p-6 max-w-2xl mx-auto">

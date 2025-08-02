@@ -2,19 +2,17 @@ import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import API from '../api'
 
-
-
 const VotePolls = () => {
     const token = localStorage.getItem('token');
     const [polls, setPolls] = useState([]);
-
+    
     useEffect(() => {
         API.get('/all-polls',
             { headers: { Authorization: `Bearer ${token}` } }
         )
             .then(res => setPolls(res.data.polls));
         const socket = io('http://localhost:5000');
-        
+
         socket.on('pollUpdated', updatedPoll => {
             setPolls(prev =>
                 prev.map(p => (p._id === updatedPoll._id ? updatedPoll : p))
@@ -22,11 +20,11 @@ const VotePolls = () => {
         });
 
         return () => socket.disconnect();
-    }, []);
+    }, [token]);
 
     const handleVote = async (pollId, index) => {
         try {
-            const response = await API.post('/vote', {
+           await API.post('/vote', {
                 pollId,
                 optionIndex: index,
             },
