@@ -19,7 +19,7 @@ app.set('io',io)
 app.get('/',(req, res)=> {
     res.send("Api is running")
 })
-
+const onlineUsers=new Map()
 io.on('connection', (socket) => {
     console.log("new client connected ", socket.id);
     
@@ -27,6 +27,9 @@ io.on('connection', (socket) => {
         socket.join(pollId)
     })
 
+    socket.on("register", (userId) => {
+        onlineUsers.set(userId, socket.id);
+    })
     socket.on("vote", (data) => {
         io.to(data.pollId).emit('new-vote', data);
     })
@@ -35,6 +38,7 @@ io.on('connection', (socket) => {
         io.to(data.pollId).emit('new-comment', data);
     })
     
+
     socket.on('disconnect', () => {
         console.log("client disconnected",socket.id);
         
