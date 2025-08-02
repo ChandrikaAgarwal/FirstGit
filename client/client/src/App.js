@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import Navbar from './components/Navbar';
 import CreatePoll from './pages/CreatePolls';
+import ListPolls from './pages/ListPolls';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/polls" element={<CreatePoll />} />
+        <Route path="/list-polls" element={<ListPolls />} />
       </Routes>
     </Router>
   );

@@ -1,4 +1,5 @@
-const Poll = require('../models/Poll');
+const Poll = require('../Models/Poll')
+const router = require('../Routes/authRoute');
 
 const createPoll = async (req, res) => {
     try {
@@ -17,6 +18,17 @@ const createPoll = async (req, res) => {
     }
 }
 
+const getAllPolls = async (req, res, next) => {
+    try {
+        const polls = await Poll.find().populate('createdBy', 'name email').sort({ createdAt: -1 });
+        return res.status(200).json({ message: "Fetching all polls", polls });
+    } catch (err) {
+        console.log("Error Fetching all polls: ",err);
+        res.status(500).json({ message: 'Failed to fetch polls',details:err });
+    }
+
+}
 module.exports = {
-    createPoll
+    createPoll,
+    getAllPolls
 }

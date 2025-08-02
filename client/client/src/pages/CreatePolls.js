@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import API from '../api'
 import { io } from 'socket.io-client';
 
 const socket = io('http://localhost:5000'); // Adjust if needed
@@ -27,8 +28,8 @@ const CreatePoll = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.post(
-                'http://localhost:5000/api/polls/create',
+            const res = await API.post(
+                '/polls/create',
                 { question, options, expiresAt },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

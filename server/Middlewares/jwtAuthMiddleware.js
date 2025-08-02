@@ -17,4 +17,4 @@ const jwtAuthMiddleware = (req,res,next) => {
     }
 }
 
-module.exports={jwtAuthMiddleware}
+module.exports = jwtAuthMiddleware;
