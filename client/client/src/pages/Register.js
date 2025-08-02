@@ -29,7 +29,7 @@ const Register = () => {
                         <label className="block mb-1 text-sm font-medium text-gray-700">Name</label>
                         <input
                             type="text"
-                            name="name"
+                            name="username"
                             value={form.name}
                             onChange={handleChange}
                             className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
