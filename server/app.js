@@ -9,7 +9,8 @@ const app = express()
 app.use(express.static('public'))
 const server = http.createServer(app)
 const authRoute = require('./Routes/authRoute')
-const pollRoute=require('./Routes/pollRoute')
+const pollRoute = require('./Routes/pollRoute')
+const commentRoute = require('./Routes/commentRoute')
 const io = require('socket.io')(server, {
     cors: {
         origin: "*",
@@ -52,7 +53,9 @@ io.on('connection', (socket) => {
 app.use(cors())
 app.use(express.json())
 app.use('/api/auth', authRoute)
-app.use('/api',pollRoute)
+app.use('/api', pollRoute)
+app.use('/api/comment', commentRoute);
+
 mongoose.connect(process.env.CONNECT)
     .then(result => {
         console.log("connected to mongoDb");
