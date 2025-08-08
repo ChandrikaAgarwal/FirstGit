@@ -7,7 +7,9 @@ const mongoose=require('mongoose')
 const { sendInterestEmail } = require('../services/emailService')
 const Interest=require('../models/book_interest')
 const listingABook = async (req, res) => {
+    const session = await Book.startSession()
     try {
+        session.startTransaction()
         const files = req.files;
         console.log("files:",files);
         
@@ -24,7 +26,9 @@ const listingABook = async (req, res) => {
         })
         const fileUrls=await Promise.all(files.map(file=>uploadToS3(file)))
         newBook.bookImg = fileUrls
-        await newBook.save()
+        await newBook.save({ session })
+        await session.commitTransaction()
+        session.endSession()
         res.status(201).json({message:"Book listed successfully",newBook})
     } catch (err) {
         console.log("error in uploading book: ", err);
