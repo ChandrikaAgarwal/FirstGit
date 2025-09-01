@@ -18,12 +18,7 @@ exports.newRecipe = async (req, res, next) => {
         }
         const files = req.files;
          const { name, description, ingredients, method, cuisine, category, cookingTime, marinationTime, serves, mainingrediant, recipetype } = req.body;
-        
-        console.log("recipeType: ", recipetype);
-        console.log("mainingredient: ",mainingrediant);
-        console.log("category: ",category);
-       
-    
+            
         const newRecipe = await user.createRecipe({
             username:user.name,
             name,
@@ -91,11 +86,7 @@ exports.getAllRecipes = async (req, res, next) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
-        const recipes = await Recipe.findAll({
-            // where: {
-            //     userId: { [Op.not]: user.id }
-            // },
-        })
+        const recipes = await Recipe.findAll()
         return res.status(200).json({message:"All recipes: ",recipes,user})
     } catch (err) { 
         console.log("error fetching all recipes: ", err);
@@ -131,19 +122,14 @@ exports.getSearchResults = async (req, res, next) => {
         }
         let matchedRecipe
         const { name, cuisine, category, ingredients, type,feed } = req.query
-        console.log("name: ",name);
-        console.log("category: ", category);
-        console.log("cuisine: ",cuisine);
-        console.log("ingredients: ",ingredients);
-        console.log("type: ", type);
-        
+               
         const searchConditions = [];
         if (name) searchConditions.push({ name: { [Op.like]: `%${name}%` } });
         if (cuisine) searchConditions.push({ cuisine: { [Op.like]: `%${cuisine}%` } });
         if (category) searchConditions.push({ category: { [Op.like]: `%${category}%` } });
         if (ingredients) searchConditions.push({ mainingrediant: { [Op.like]: `%${ingredients}%` } });
         if (type) searchConditions.push({ recipetype: { [Op.like]: `%${type}%` } });
-        console.log("search Conditions: ",searchConditions);
+        
         
         //for activity feed
         if (feed) {

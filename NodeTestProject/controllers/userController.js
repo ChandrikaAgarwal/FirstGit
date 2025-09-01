@@ -24,7 +24,8 @@ exports.signupUser = async (req, res, next) => {
             phone,
             password: hashedPassword,
             isLoggedIn: false,
-            isAdmin:false
+            isAdmin: false,
+            isBanned:false
         })
         if (newUser.email === 'chandrikaagarwal2@gmail.com') {
             newUser.isAdmin = true

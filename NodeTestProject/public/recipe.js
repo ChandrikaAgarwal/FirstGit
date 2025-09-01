@@ -76,7 +76,6 @@ if (shareRecipePage) {
                         'Authorization': `Bearer: ${token}`
                     }
                 })
-                console.log("recipe submitted: ", newRecipe);
             }
             recipeForm.reset()
             
@@ -146,6 +145,8 @@ if (newColletionPage) {
         }
 
     }
+
+    //create new collection
     collectionBtn.addEventListener("click", async () => {
         console.log("toggle textContent: ", toggle.textContent);
         const selectedUsers = Array.from(document.querySelectorAll("input[type='checkbox']:checked"))

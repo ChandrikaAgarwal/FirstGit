@@ -22,7 +22,7 @@ if (searchPage) {
         for (let key in rawQuery) {
             if (
                 rawQuery[key] !== null &&
-                rawQuery[key] !== "Please Select" || undefined &&
+                rawQuery[key] !== "Please Select" && rawQuery[key] !== undefined &&
                 !(Array.isArray(rawQuery[key]) && rawQuery[key].length === 0)
             ) {
                 searchQuery[key] = rawQuery[key];
@@ -52,7 +52,6 @@ if (searchResultsPage) {
                     'Authorization': `Bearer ${token}`
                 }
             })
-            console.log("search results: ", getResults);
             await displayRecipes(getResults.data.matchedRecipe)
         } catch (err) {
             console.log("error fetching matching recipes: ",err);
