@@ -160,7 +160,6 @@ const messageRecieved = async (req, res) => {
         let { message, recieverId, bookId,bookName } = req.body
         recieverId = new mongoose.Types.ObjectId(recieverId)
         let reciever = await User.findById(recieverId)
-        console.log("reciever: ",reciever);
         
         let senderId = new mongoose.Types.ObjectId(req.user.id)
         let sender = await User.findById(senderId)

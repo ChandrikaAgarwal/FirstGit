@@ -79,7 +79,7 @@ if (buyerSellerchatPage) {
             if (!clickedBuyerLi) return;
             buyerId = clickedBuyerLi.dataset.buyerId
             bookId = clickedBuyerLi.dataset.bookId
-            console.log("Chatting with: ", clickedBuyerLi.textContent, "for book: ", bookName, "buyerId: ", buyerId);
+
             let chatInfoDiv = document.querySelector("#chatInfoDiv")
             if (chatInfoDiv) {
                 chatInfoDiv.innerHTML = ""
@@ -136,15 +136,12 @@ if (buyerSellerchatPage) {
                     bookId,
                     bookName
                 }
-                
                 const sendMsg = await axios.post(`${apiUrl}/send-msg`, messageDetails, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 })
-                console.log("Message sent: ", sendMsg);
                 chatForm.reset()
-
 
             } catch (err) {
                 console.log("error sending a message: ", err);
@@ -179,13 +176,11 @@ if (buyerSellerchatPage) {
             let data;
             if (event.data instanceof Blob) {
                 const text = await event.data.text();
-                console.log("text: ", text);
                 data = JSON.parse(text)
             } else {
                 data = JSON.parse(event.data)
             }
             if (data.event === "new-msg") {
-                console.log("message received in : ", data);
                 await addMessage(data)
             }
         })
@@ -196,10 +191,8 @@ if (buyerSellerchatPage) {
             if (data.message.indexOf('https://') !== -1) {
                 messagesUl.innerHTML+=`<li id="gm-${data.msgId}" class="newMsg"><span>${data.senderName}<img src="${data.message}"></img></span></li>`
             } else if (currentUser === data.senderId) {
-                console.log("this is sender here!!");
                 messagesUl.innerHTML += `<li id="gm-${data.msgId}" class="newMsg text-right m-3 text-white font-semibold"><span class="bg-green-900 p-3 rounded-md h-4">You: ${data.message}</span></li>`
             } else {
-                console.log("this is reciever here!!");
                 messagesUl.innerHTML += `<li id="gm-${data.msgId}" class="newMsg text-left m-3 text-white font-semibold"><span class="bg-slate-800 p-3 rounded-md h-4">${data.senderName}: ${data.message}</span></li>`
             }
         }

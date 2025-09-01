@@ -75,8 +75,13 @@ const sellerRating = async (req, res) => {
         const avgResult = await Ratings.aggregate([
             {
                 $group: {
-                    _id: sellerId,
+                    _id: "$sellerId",
                     avgValue:{$avg:'$rating'}
+                }
+            },
+            {
+                $project: {
+                    avgValue:{$round:["$avgValue",2]}
                 }
             }
         ])
