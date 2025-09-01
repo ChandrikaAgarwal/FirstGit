@@ -50,10 +50,6 @@ exports.getAllMsgs = async (req, res, next) => {
             return res.status(404).json({message:"User not found"})
         }
         const allMsgs = await Message.findAll({
-            // where: {
-            //     // id:{[Op.not]:user.id}
-            //     id: user.id
-            // },
             attributes: ["id","userId","name","message"],
             order:[["id","ASC"]]
         })
@@ -113,10 +109,7 @@ exports.createGrpMsg = async (req, res, next) => {
         })
         req.app.get('wss').clients.forEach(client => {
             if (client.readyState === require('ws').OPEN) {
-                console.log("group client: ", client);
-                console.log("client user id in group message: ", client.userId);
                 if (usersofGrp.some(u => parseInt(u.userId) === client.userId)) {
-                    console.log("entering if of websocket");
                     client.send(JSON.stringify({
                         event: 'new-group-msg',
                         message: message,
@@ -137,25 +130,20 @@ exports.createGrpMsg = async (req, res, next) => {
 
 exports.getAllGroupMsgs = async (req, res, next) => {
     try {
-        console.log("entering getAllGroupMsgs function");
-        
+             
         const { groupId } = req.params
-        console.log("groupId: ",groupId);
-        
+       
         const user = await User.findByPk(req.user.id)
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
         const allMsgs = await Groupmessage.findAll({
             where: {
-                // id:{[Op.not]:user.id}
                 groupId:groupId
             },
-            // attributes: ["id", "userId", "name", "message"],
-            // order: [["id", "ASC"]]
+            
         })
-        console.log("all groupmessages: ", allMsgs);
-        
+           
         return res.status(200).json({ message: "getting all groupmessages ", allMsgs, currUser: user.id })
 
     } catch (err) {

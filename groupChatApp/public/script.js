@@ -111,7 +111,7 @@ if (chatAppPage) {
                     loggedInul.innerHTML += `<li id="${user.id}" class="navbar-item my-6 bg-slate-400 rounded-lg text-center">${user.name} joined</li>`
                 }
             })
-            // await startWebSocket()
+            
         } catch (err) {
             console.log("error getting loggedIn users ", err);
             
@@ -164,8 +164,7 @@ if (chatAppPage) {
             console.log("newMwsg ", newMsg);
             
             newMsg.textContent = `You:${sendMsg.data.newMsg.message}`
-            // messagesUl.innerHTML += `<li id="m-${sendMsg.data.newMsg.id}" class="newMsg">You: ${sendMsg.data.newMsg.message}</li>`
-            // await startWebSocket()
+           
         } catch (err) {
             console.log("error sending message: ", err);
         }
