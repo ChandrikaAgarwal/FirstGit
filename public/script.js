@@ -77,7 +77,6 @@ if (loginPage) {
 }
 
 
-
 if (bookManagementPage) {
     const token = localStorage.getItem("token")
         
@@ -122,7 +121,6 @@ if (bookManagementPage) {
                 'Authorization': `Bearer ${token}`
             }
         })
-        console.log(allListedBooks);
         
         await displayAllBooks(allListedBooks.data.allBooks)
         
@@ -133,7 +131,7 @@ if (bookManagementPage) {
         books.forEach(book => {
            const boxSize = document.createElement("div")
             boxSize.id = "boxSize" 
-            boxSize.className = " relative border border-gray-300 rounded-lg shadow-md p-4 w-[300px] h-[450px] m-4 overflow-hidden flex flex-col motion-scale-in-[0.5] motion-rotate-in-[-10deg] motion-blur-in-[10px] motion-delay-[0.75s]/rotate motion-delay-[0.75s]/blur motion-preset-bounce motion-duration-1000"
+            boxSize.className = " relative border border-gray-300 rounded-lg shadow-md p-4 w-[300px] h-[455px] m-4 overflow-hidden flex flex-col motion-scale-in-[0.5] motion-rotate-in-[-10deg] motion-blur-in-[10px] motion-delay-[0.75s]/rotate motion-delay-[0.75s]/blur motion-preset-bounce motion-duration-1000"
            const detailDiv=document.createElement("div")
             detailDiv.id = "detailDiv"
             detailDiv.className="p-2 rounded-lg "
@@ -174,7 +172,7 @@ if (bookManagementPage) {
             const readMore=document.createElement('a')
             readMore.href = `/books/${book._id}`
             readMore.textContent="Read more"
-            readMore.className=""
+            readMore.className = "p-1 bg-red-400 text-white rounded-md shadow-lg font-bold"
 
             detailDiv.appendChild(bookimg)
             detailDiv.appendChild(NamePriceDiv)

@@ -4,7 +4,6 @@ const token = localStorage.getItem("token")
 const apiUrl = "http://localhost:5000"
 
 if (chatPage) {
-    
     window.addEventListener("DOMContentLoaded", async () => {
         await getlistedBooksByUser()
     })
@@ -116,13 +115,11 @@ if (chatPage) {
     document.addEventListener("click", async (e) => {
         if (e.target.classList.contains('potentialBuyers')) {
             const bookId = e.target.getAttribute('data-bookId')
-            console.log("Seller clicked - Book ID:", bookId);
             window.location.href=`/chat/${bookId}`
         }
 
         if (e.target.classList.contains('chatWithSeller')) {
             const bookId = e.target.getAttribute('data-bookId')
-            console.log("Buyer clicked - Book ID:", bookId);
             window.location.href = `/chat/${bookId}`
         }
     })

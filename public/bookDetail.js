@@ -22,14 +22,14 @@ if (bookDetailPage) {
                 }
             })
             console.log("Book: ",getBook);
-            await displayBookDetails(getBook.data.requestedBook, getBook.data.isSeller)
+            await displayBookDetails(getBook.data.requestedBook, getBook.data.isSeller, getBook.data.isInterested)
         } catch (err) {
             console.log("Error fetching you book: ",err);
             
         }
     }
 
-    async function displayBookDetails(bookDetails,isSeller) {
+    async function displayBookDetails(bookDetails,isSeller,isInterested) {
         const selectedBookDetails = document.querySelector("#selectedBook")
         const bookName=document.createElement('p')
         bookName.textContent = bookDetails.title.toUpperCase()
@@ -68,8 +68,8 @@ if (bookDetailPage) {
             imgContainer.appendChild(imgElement);
         }
         const interestedBtn = document.createElement('button')
-        interestedBtn.id="interested"
-        interestedBtn.textContent = "I'm Interested"
+        interestedBtn.id = "interested" 
+        interestedBtn.textContent = isInterested?"Shown Interest":"I'm interested"
         interestedBtn.className = "mx-36 mt-5 bg-black text-white p-2 rounded-full font-semibold"
         if (isSeller) {
             interestedBtn.classList.add('hidden')
@@ -87,8 +87,14 @@ if (bookDetailPage) {
 <p><span class="font-bold text-red-900">Status :</span> <span class="text-purple-700">${bookDetails.status}</span></p>
 <p><span class="font-bold text-red-900">Subject :</span> <span class="text-purple-700">${bookDetails.subject}</span></p>
 `;  
+        const experienceDiv = document.createElement('div')
+        experienceDiv.className="m-2"
+        const sellerExperienceDiv = document.createElement('p')
+        sellerExperienceDiv.innerHTML=`<span class="font-bold text-xl">Seller's Experience:</span><p class="border p-2 mt-2 rounded-md font-mono bg-pink-100 from-neutral-500 font-[100] shadow-sm">${bookDetails.experience}</p>`
+        experienceDiv.appendChild(sellerExperienceDiv)
         detailDiv.appendChild(leftDetails)
         detailDiv.appendChild(rightDetails)
+        detailDiv.appendChild(experienceDiv)
         selectedBookDetails.appendChild(bookName)
         selectedBookDetails.appendChild(sellerDiv)
         selectedBookDetails.appendChild(imgContainer)
@@ -96,6 +102,8 @@ if (bookDetailPage) {
         selectedBookDetails.appendChild(detailDiv)
 
         interestedBtn.addEventListener("click", async (e) => {
+            interestedBtn.textContent = "Shown Interest"
+            interestedBtn.disabled = true;
             const userinterest = await axios.post(`${apiUrl}/user-interest/${bookId}`, {}, {
                 headers: {
                 'Authorization':`Bearer ${token}`

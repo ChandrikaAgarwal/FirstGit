@@ -28,10 +28,8 @@ if (buyerSellerchatPage) {
 
         console.log("chat List: ", getList);
         await displayChatList(getList.data.list, getList.data.isSeller)
-        
-        
-        
     }
+
     async function contactsCSS() {
         buyers.addEventListener("click", async () => {
             if (usersListPanel.classList.contains("hidden")) {
@@ -41,9 +39,7 @@ if (buyerSellerchatPage) {
             }
         })
     }
-    
-    
- 
+
     async function displayChatList(chatList, isSeller) {
         if (isSeller) {
             chatList.forEach(chat => {

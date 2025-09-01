@@ -91,6 +91,7 @@ const getRequestedBook = async (req, res=null) => {
         let userId = new mongoose.Types.ObjectId(req.user.id)
         let seller
         let buyer
+        // let isInterested=false
         const requestedBook = await Book.findById(bookId).populate('sellerId','name')
         let isSeller = false
         console.log("requestedBook: ",requestedBook);
@@ -98,6 +99,9 @@ const getRequestedBook = async (req, res=null) => {
         if ( userId.equals(requestedBook.sellerId._id)) {
             isSeller=true
         }
+       let isInterested = await Interest.findOne({ bookId, buyerId: userId })?true:false
+        console.log("isInterested: ",isInterested);
+        
         
         seller = await User.findById(requestedBook.sellerId._id)
         if(!isSeller){
@@ -106,20 +110,9 @@ const getRequestedBook = async (req, res=null) => {
         let buyerSeller = [seller, buyer]
         console.log("buyerSeller: ", buyerSeller);
         
-        // req.app.get('wss').clients.forEach(client => {
-        //     if (client.readyState === require('ws').OPEN) {
-        //         if (buyerSeller.some(u => parseInt(u._id) === client.userId)) {
-        //             console.log("entering if of websocket");
-        //             client.send(JSON.stringify({
-        //                 event: 'buyer-msg',
-        //                 message: message,
-                        
-        //             }))
-        //         }
-        //     }
-        // })
+        
         if (res) {
-            return res.status(200).json({message:"Book Requested: ",requestedBook,isSeller})
+            return res.status(200).json({message:"Book Requested: ",requestedBook,isSeller,isInterested})
         } else {
             return{requestedBook,buyer,seller}
         }
@@ -136,7 +129,7 @@ const bookInterest = async (req, res) => {
         const desiredBook = await Book.findById(bookId).populate('sellerId', 'email name')
         const buyer = await User.findById(req.user.id)
         
-        await sendInterestEmail({
+        sendInterestEmail({
             sellerEmail: desiredBook.sellerId.email,
             sellerName: desiredBook.sellerId.name,
             buyerName: buyer.name,
@@ -230,15 +223,11 @@ const getListedBooksByUser = async (req, res) => {
 const getChatList = async (req, res) => {
     try {
         const bookId = new mongoose.Types.ObjectId(req.params.bookId.trim())
-        console.log("bookId: ",bookId);
         let list;
         const userId = new mongoose.Types.ObjectId(req.user.id)
-        const user = await User.findById(userId)
         const book = await Book.findById(bookId)
         let isSeller=false
-        // let list=await Interest.find({bookId:bookId})
-        
-        
+               
         if (book.sellerId.equals(userId)) {
             isSeller = true
         } 
