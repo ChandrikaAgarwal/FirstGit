@@ -4,7 +4,7 @@ const { jwtAuthMiddleware }=require('../jwtmiddleware')
 const router = express.Router()
 
 router.post('/', userControl.signupUser)
-router.post('/users', userControl.getUser)
+router.post('/users', userControl.loginUser)
 router.post('/edit-profile', jwtAuthMiddleware, userControl.editUser)
 router.get('/api/authors', jwtAuthMiddleware, userControl.getAuthors)
 router.get('/api/followers',jwtAuthMiddleware,userControl.getFollowers)

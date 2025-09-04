@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/output.css">
 </head>
 <body id="share-recipe">
-    <nav class="bg-slate-400 border-gray-900 h-16 p-3">
+    <nav class="bg-gradient-to-bl from-[#0f172a] via-[#1e1a78] to-[#0f172a] h-16 p-3">
         <a href="/home" class="text-white underline p-3" id="home">Home</a>
         <a href="/profile" class="text-white underline p-3" id="profile">My account</a>
         <a href="/search" class="text-white underline p-3" id="search">Search</a>
@@ -38,7 +38,7 @@
         <div class="flex items-center">
         <div class="flex flex-col">
         <label for="cuisine">Cuisine(*)</label>
-        <select name="cuisine" id="cuisine" class="outline outline-slate-950 m-3">
+        <select name="cuisine" id="cuisine" class="outline outline-slate-950 m-3" required>
             <option value="pleaseSelect">Please Select</option>
             <option value="General">General</option>
             <option value="African">African</option>
@@ -56,7 +56,7 @@
     </div>
         <div class="flex flex-col">
         <label for="cuisine-category">Category(*)</label>
-        <select name="cuisine-category" id="cuisine-category" class="outline outline-slate-950 m-4">
+        <select name="cuisine-category" id="cuisine-category" class="outline outline-slate-950 m-4" required>
             <optgroup label="General">
                 <option value="Please Select">Please Select</option>
                 <option value="CakesBiscuits">Cakes/Biscuits</option>
@@ -77,7 +77,7 @@
         
         <div class="flex flex-col">
         <label for="main-ingredients">Main Ingredients(**)</label><br />
-        <select name="main-ingredients" id="main-ingredients" class="outline outline-slate-950 px-4 py-2 mb-4" multiple>
+        <select name="main-ingredients" id="main-ingredients" class="outline outline-slate-950 px-4 py-2 mb-4" multiple required>
             <option value="Please Select">Please Select</option>
             <option value="Wheat">Wheat</option>
             <option value="Rice">Rice</option>
@@ -95,7 +95,7 @@
 
         <div class="flex flex-col">
         <label for="recipe-type">Recipe Type(**)</label><br />
-        <select name="recipe-type" id="recipe-type" class="outline outline-slate-950 px-4 py-2 mb-4" multiple>
+        <select name="recipe-type" id="recipe-type" class="outline outline-slate-950 px-4 py-2 mb-4" multiple required>
             <option value="Please Select">Please Select</option>
             <option value="Baking">Baking</option>
             <option value="Beverages">Beverages</option>

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/output.css">
 </head>
 <body id="selected-recipe">
-    <nav class="bg-slate-400 border-gray-900 h-16 p-3">
+    <nav class="bg-gradient-to-bl from-[#0f172a] via-[#1e1a78] to-[#0f172a] h-16 p-3 sticky top-0">
         <a href="/home" class="text-white underline p-3" id="home">Home</a>
         <a href="/profile" class="text-white underline p-3" id="profile">My account</a>
         <a href="/search" class="text-white underline p-3" id="search">Search</a>
@@ -27,9 +27,11 @@
     <button type="submit" id="submit-review" class="border-2 border-slate-950 rounded-md p-1">Submit Review</button>
 </form>
 </div>
-<div class="max-w-md mx-auto">
-        <p id="rating-value" class="text-lg font-medium text-gray-700">Rating: 0</p>
+
+<div class="max-w-lg mx-auto flex gap-7 shadow-md shadow-emerald-900 p-3 mb-5 rounded-lg bg-pink-300">
+        <p id="rating-value" class="text-lg font-medium text-gray-700">You Rated: 0 </p>
         <p id="totalRatings" class="text-lg font-medium text-gray-700">Total Ratings</p>
+        <p id="avgRatings" class="text-lg font-medium text-gray-700">Average Ratings</p>
         </div>
     <!-- <div>
         <h4>Reviews</h4>
@@ -37,6 +39,7 @@
     </div> -->
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
-<script src="/script.js" defer></script>
+<script type="module" src="/script.js" defer></script>
+<script type="module" src="/utilities/displayRecipe.js"> </script>
 <script src="/admin.js" defer></script>
 </html>

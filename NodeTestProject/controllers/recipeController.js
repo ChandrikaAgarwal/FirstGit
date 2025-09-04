@@ -154,7 +154,6 @@ exports.getSearchResults = async (req, res, next) => {
             })
         }
         
-        console.log("matched recipes: ",matchedRecipe);
         return res.status(200).json({message:"Matched Recipes: ",matchedRecipe})
     } catch (err) {
         console.log("error fetching matching recipes: ", err);
@@ -179,8 +178,15 @@ exports.getThisRecipe = async (req, res, next) => {
                 userId:user.id
             }
         })
+        const existingRating = await Rating.findOne({
+            where: {
+                userId: user.id,
+                recipeId
+            },
+            attributes:["rating"]
+        })
         console.log("recipe: ", recipe);
-        return res.status(200).json({message:"Recipe found",recipe,collections,isCreator})
+        return res.status(200).json({message:"Recipe found",recipe,collections,isCreator,existingRating})
     } catch (err) {
         console.log("error fetching requested recipe: ",err);
         return res.status(500).json({message:"Recipe not found ",details:err})
@@ -231,10 +237,18 @@ exports.recipeRatings = async (req, res, next) => {
         const recipe = await Recipe.findByPk(recipeId)
         recipe.avgRating = allRecipes[0].avgRating
         recipe.totalRatings = allRecipes[0].totalRating
-        recipe.save()
-        console.log("allRecipes: ", recipe);
-        console.log("newrating: ",newRating);
-        
+        await recipe.save()
+        req.app.get('wss').clients.forEach(client => {
+            if (client.readyState === require('ws').OPEN) {
+                client.send(JSON.stringify({
+                    event: "new-rating",
+                    avgRating: recipe.avgRating,
+                    totalRatings: recipe.totalRatings,
+                    recipeId:recipe.id
+                }))
+            }
+        })
+       
         return res.status(200).json({message:"Recipe rated",recipe})
     } catch (err) {
         console.log("error fetching recipe ratings: ",err);

@@ -27,7 +27,7 @@ exports.makeAdmin = async (req, res) => {
         if (existingAdmin) {
             existingAdmin.email = email
             existingAdmin.password = hashedPassword
-            existingAdmin.save()
+            await existingAdmin.save()
             return res.status(200).json({ message: "Your Admin credentials are reset" })
         } else {
             const newAdmin = await Admin.create({
@@ -99,11 +99,7 @@ exports.getAllRecipes = async (req, res, next) => {
         if (!user) {
             return res.status(404).json({ message: "Admin not found" })
         }
-        const recipes = await Recipe.findAll({
-            // where: {
-            //     userId: { [Op.not]: user.id }
-            // },
-        })
+        const recipes = await Recipe.findAll()
         return res.status(200).json({ message: "All recipes: ", recipes, user })
     } catch (err) {
         console.log("error fetching all recipes: ", err);
@@ -157,7 +153,7 @@ exports.getAuthors = async (req, res, next) => {
 exports.actionOnUser = async (req, res) => {
     try {
         const user = await Admin.findByPk(req.user.id)
-        let actionTaken
+
         if (!user) {
             return res.status(404).json({ message: "Admin not found" })
         }

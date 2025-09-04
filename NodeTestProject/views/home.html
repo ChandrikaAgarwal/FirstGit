@@ -9,18 +9,18 @@
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
-<body id="homePage">
-    <nav class="bg-slate-400 border-gray-900 h-16 relative" id="navbar-home">
-    <a href="/share-recipe" class="text-white underline p-3" id="share-recipe">Share a Recipe</a>
+<body id="homePage" class="bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-100 via-white to-orange-200 h-screen">
+    <nav class="bg-gradient-to-bl from-[#0f172a] via-[#1e1a78] to-[#0f172a] h-16 relative" id="navbar-home">
+    <a href="/share-recipe" class="text-white underline p-3 " id="share-recipe">Share a Recipe</a>
     <a href="/profile" class="text-white underline p-3" id="profile">My account</a>
     <a href="/search" class="text-white underline p-3" id="search">Search</a>
     <a href="/authors" class="text-white underline p-3" id="authors">Authors</a>
     <a href="/mycollections" class="text-white underline p-3" id="mycollections">My collections</a>
     <a href="/activity-feed" class="text-white underline p-3" id="myactivity-feed">Activity Feed</a>
-    <div id="username" class="text-black font-semibold absolute right-2 top-1"></div>
-    <a id="admin" href="/admin-creds" class="text-white underline p-3 absolute right-2 top-4 hidden">You are an admin</a>
+    <div id="username" class="text-white font-semibold absolute right-2 top-1"></div>
+    <a id="admin" href="/admin-creds" class="text-red-600 underline p-3 absolute right-2 top-4 hidden">You are an admin</a>
     </nav>
-    <div class="filters m-3 flex flex-row bg-slate-950 rounded-lg justify-center items-center h-10">
+    <div class="filters m-3 flex flex-row bg-pink-950 rounded-lg justify-center items-center h-10">
         <h4 class="mx-4 text-white font-bold">Filter by:</h4>
         <div class="px-3 justify-center items-center flex">
         <select name="main-ingredients" id="main-ingredients" class="outline outline-slate-950">
@@ -76,6 +76,6 @@
     </div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
-<script src="/script.js" defer></script>
+<script type="module" src="/script.js" defer></script>
 <script src="/admin.js" defer></script>
 </html>

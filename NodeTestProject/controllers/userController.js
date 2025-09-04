@@ -42,7 +42,7 @@ exports.signupUser = async (req, res, next) => {
     }
 }
 
-exports.getUser = async (req, res, next) => {
+exports.loginUser = async (req, res, next) => {
     try {
         const { email, password,role } = req.body
         const existingUser = await User.findOne({ where: { email: email } })
@@ -52,6 +52,9 @@ exports.getUser = async (req, res, next) => {
         const isValid = await bcrypt.compare(password, existingUser.password)
         if (!isValid) {
             return res.status(401).json({message:"Incorrect password"})
+        }
+        if (existingUser.isBanned === true) {
+            return res.status(400).json({message:"You have been banned from the platform"})
         }
         existingUser.isLoggedIn = true;
         existingUser.save();

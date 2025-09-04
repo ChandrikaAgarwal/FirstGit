@@ -6,8 +6,8 @@
     <title>Document</title>
     <link rel="stylesheet" href="/output.css">
 </head>
-<body>
-    <nav class="bg-slate-400 border-gray-900 h-16">
+<body class="bg-gradient-to-l from-cyan-700 to-white h-screen">
+    <nav class="bg-gradient-to-bl from-[#0f172a] via-[#1e1a78] to-[#0f172a] h-16">
     <a href="/home" class="text-white underline p-3" id="home">Home</a>
     <a href="/share-recipe" class="text-white underline p-3" id="share-recipe">Share a Recipe</a>
     <a href="/search" class="text-white underline p-3" id="search">Search</a>
@@ -15,19 +15,19 @@
     <a href="/mycollections" class="text-white underline p-3" id="mycollections">My collections</a>
     <a href="/activity-feed" class="text-white underline p-3" id="myactivity-feed">Activity Feed</a>
     </nav>
-    <div class="max-w-md mx-auto">
-        <h5 class="m-12">My account</h5>
-        <div id="profilelinks" class="text-left outline outline-slate-950 w-60 p-9">
-            <ul>
-            <li><a href="/myrecipes" class="text-blue-600 underline">My Recipes</a></li>
-            <li><a href="/mycollections" class="text-blue-600 underline">View my favourite recipes</a></li>
-            <li><a href="/edit-profile" class="text-blue-600 underline">Edit my Profile</a></li>
-            <li><a href="/share-recipe" class="text-blue-600 underline">Share a Recipe</a></li>
-            <li><a href="/users" class="text-blue-600 underline">Logout</a></li>
+    <h5 class="m-12 max-w-md mx-auto text-2xl font-mono font-bold">My account</h5>
+    <div class="max-w-md mx-auto shadow-lg items-center justify-center pb-2">
+        <div id="profilelinks" class="text-left">
+            <ul class="m-7">
+            <li><a href="/myrecipes" class="text-blue-600 underline text-xl font-thin leading-5">My Recipes</a></li>
+            <li><a href="/mycollections" class="text-blue-600 underline text-xl font-thin leading-8">View my favourite recipes</a></li>
+            <li><a href="/edit-profile" class="text-blue-600 underline text-xl font-thin leading-8">Edit my Profile</a></li>
+            <li><a href="/share-recipe" class="text-blue-600 underline text-xl font-thin leading-8">Share a Recipe</a></li>
+            <li><a href="/users" class="text-blue-600 underline text-xl font-thin leading-8">Logout</a></li>
             </ul>
         </div>
     </div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
-<script src="/script.js"></script>
+<script type="module" src="/script.js"></script>
 </html>

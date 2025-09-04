@@ -46,7 +46,7 @@ if (shareRecipePage) {
             formData.append("serves", e.target.serves.value.trim());
             const mainIngredients = Array.from(document.querySelector("#main-ingredients").selectedOptions).map(opt => opt.value);
             formData.append("mainingrediant", JSON.stringify(mainIngredients));
-            console.log("mainIngredients: ",formData.get("mainingrediant"));
+            // console.log("mainIngredients: ",formData.get("mainingrediant"));
             
             const recipeType = Array.from(document.querySelector("#recipe-type").selectedOptions).map(opt => opt.value);
             formData.append("recipetype", JSON.stringify(recipeType));
@@ -57,19 +57,16 @@ if (shareRecipePage) {
 
             //edit recipe
             if (recipeId) {
-                console.log("sending put request",recipeId);
-                
+                        
                 const getRec = await axios.put(`${api_url}/api/edit-recipe/${recipeId}`,formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         'Authorization': `Bearer: ${token}`
                     }
                 })
-               console.log("getting recipe: ",getRec);
                
             } else {
-                console.log("new recipe");
-                
+                            
                 const newRecipe = await axios.post(`${api_url}/share-recipe`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
@@ -244,7 +241,7 @@ if (mycollections) {
 
         allrecipes.forEach(recipe => {
             const recipeCard = document.createElement('div');
-            recipeCard.className = "border border-gray-300 rounded-lg shadow-md p-4 m-4 max-w-sm";
+            recipeCard.className = "border border-gray-300 rounded-lg shadow-md p-4 m-4 max-w-sm h-fit";
 
             const recipeImg = document.createElement('img');
             if (recipe.recipeImg) {
@@ -281,7 +278,7 @@ if (mycollections) {
             }
             const recipeDesc = document.createElement('p');
             recipeDesc.textContent = recipe.description || "No description provided.";
-            recipeDesc.className = "text-gray-700 mb-2";
+            recipeDesc.className = "text-gray-700 mb-2 line-clamp-4";
 
             const readMore = document.createElement('a');
             readMore.href = `/recipes/${recipe.id}`; // You can link this to a detailed page if needed
